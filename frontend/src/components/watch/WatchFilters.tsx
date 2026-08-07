@@ -3,7 +3,6 @@ import * as Slider from '@radix-ui/react-slider';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn, formatPrice } from '../../lib/utils';
 import type { Brand, Category, WatchFilters as IWatchFilters } from '../../types';
-import { Button } from '../ui';
 
 interface WatchFiltersProps {
   filters: IWatchFilters;
@@ -74,6 +73,7 @@ export function WatchFilters({ filters, onChange, brands, categories, className 
         <FilterSection title="Price Range" defaultOpen>
           <div className="px-2 pt-4 pb-2">
             <Slider.Root
+              key={`${filters.minPrice}-${filters.maxPrice}`}
               className="relative flex items-center select-none touch-none w-full h-5 mb-6"
               defaultValue={[filters.minPrice, filters.maxPrice]}
               max={100000}
@@ -181,7 +181,7 @@ function FilterSection({ title, children, defaultOpen = false }: { title: string
 
 function CheckboxItem({ label, checked, onChange }: { label: string, checked: boolean, onChange: () => void }) {
   return (
-    <label className="flex items-center gap-3 cursor-pointer group">
+    <label className="flex items-center gap-3 cursor-pointer group" onClick={onChange}>
       <div className={cn(
         "w-4 h-4 flex items-center justify-center transition-colors border",
         checked ? "bg-gold border-gold" : "bg-transparent border-white/20 group-hover:border-white/50"
@@ -200,7 +200,7 @@ function CheckboxItem({ label, checked, onChange }: { label: string, checked: bo
 
 function ToggleItem({ label, checked, onChange }: { label: string, checked: boolean, onChange: () => void }) {
   return (
-    <label className="flex items-center justify-between cursor-pointer group">
+    <label className="flex items-center justify-between cursor-pointer group" onClick={onChange}>
       <span className={cn(
         "text-sm uppercase tracking-widest font-space transition-colors",
         checked ? "text-gold" : "text-white/60 group-hover:text-white"

@@ -17,20 +17,32 @@ export default function ShopPage() {
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [debouncedPrice, setDebouncedPrice] = useState<{min: number, max: number} | null>(null);
 
+  const parseIntSafe = (value: string | null, fallback: number): number => {
+    const n = parseInt(value || '', 10);
+    return Number.isFinite(n) ? n : fallback;
+  };
+
+  const categoryParam = searchParams.get('category');
+  const presetCategories = categoryParam ? [categoryParam] : [];
+
   // Parse filters from URL
   const filters: IWatchFilters = {
     brands: searchParams.get('brands')?.split(',').filter(Boolean) || [],
-    categories: searchParams.get('categories')?.split(',').filter(Boolean) || [],
+    categories: searchParams.get('categories')?.split(',').filter(Boolean) || presetCategories,
     movements: searchParams.get('movements')?.split(',').filter(Boolean) || [],
     genders: searchParams.get('genders')?.split(',').filter(Boolean) || [],
-    minPrice: parseInt(searchParams.get('minPrice') || '0', 10),
-    maxPrice: parseInt(searchParams.get('maxPrice') || '100000', 10),
+    minPrice: parseIntSafe(searchParams.get('minPrice'), 0),
+    maxPrice: parseIntSafe(searchParams.get('maxPrice'), 100000),
     inStockOnly: searchParams.get('inStockOnly') === 'true',
     onSaleOnly: searchParams.get('onSaleOnly') === 'true',
     search: searchParams.get('search') || '',
     sort: (searchParams.get('sort') as SortOption) || 'newest',
-    page: parseInt(searchParams.get('page') || '1', 10),
+    page: Math.max(1, parseIntSafe(searchParams.get('page'), 1)),
     view: (searchParams.get('view') as 'grid' | 'list') || 'grid',
+    newArrival: searchParams.get('new_arrival') === 'true',
+    trending: searchParams.get('trending') === 'true',
+    featured: searchParams.get('featured') === 'true' || searchParams.get('is_featured') === 'true',
+    bestSeller: searchParams.get('best_seller') === 'true',
   };
 
   // Queries
@@ -70,6 +82,10 @@ export default function ShopPage() {
     if (newFilters.sort !== 'newest') params.set('sort', newFilters.sort);
     if (newFilters.page > 1) params.set('page', newFilters.page.toString());
     if (newFilters.view !== 'grid') params.set('view', newFilters.view);
+    if (newFilters.newArrival) params.set('new_arrival', 'true');
+    if (newFilters.trending) params.set('trending', 'true');
+    if (newFilters.featured) params.set('featured', 'true');
+    if (newFilters.bestSeller) params.set('best_seller', 'true');
 
     setSearchParams(params);
   };

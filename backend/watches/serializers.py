@@ -2,11 +2,15 @@ from rest_framework import serializers
 from .models import Brand, Category, Collection, Watch, WatchImage, WatchVideo
 
 class BrandSerializer(serializers.ModelSerializer):
+    watch_count = serializers.IntegerField(read_only=True, default=0)
+
     class Meta:
         model = Brand
         fields = '__all__'
 
 class CategorySerializer(serializers.ModelSerializer):
+    watch_count = serializers.IntegerField(read_only=True, default=0)
+
     class Meta:
         model = Category
         fields = '__all__'

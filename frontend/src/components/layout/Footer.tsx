@@ -68,11 +68,21 @@ export function Footer() {
           <div>
             <h4 className="font-space tracking-widest uppercase text-sm mb-6 text-white">Company</h4>
             <ul className="space-y-4">
-              {['About Us', 'Contact', 'Privacy Policy', 'Terms of Service', 'Shipping Policy', 'Returns'].map((link) => (
-                <li key={link}>
-                  <Link to="#" className="text-white/60 hover:text-white transition-colors text-sm">
-                    {link}
-                  </Link>
+              {[
+                { name: 'About Us', path: '/legacy' },
+                { name: 'The Boutique', path: '/brands' },
+                { name: 'Contact', path: 'mailto:concierge@lustro.ch' },
+              ].map((link) => (
+                <li key={link.name}>
+                  {link.path.startsWith('/') ? (
+                    <Link to={link.path} className="text-white/60 hover:text-white transition-colors text-sm">
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a href={link.path} className="text-white/60 hover:text-white transition-colors text-sm">
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

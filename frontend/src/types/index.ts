@@ -148,11 +148,8 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  phone?: string;
-  avatar?: string | null;
+  phone?: string | null;
   role: 'customer' | 'seller' | 'admin';
-  is_verified: boolean;
-  created_at: string;
 }
 
 // ---------- Address ----------
@@ -229,6 +226,10 @@ export interface WatchFilters {
   sort: SortOption;
   page: number;
   view: 'grid' | 'list';
+  newArrival?: boolean;
+  trending?: boolean;
+  featured?: boolean;
+  bestSeller?: boolean;
 }
 
 export type SortOption =

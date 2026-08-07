@@ -24,9 +24,10 @@ export function formatDate(dateString: string): string {
 }
 
 export function getImageUrl(path: string | null | undefined): string {
-  if (!path) return '/placeholder-watch.jpg'; // We'll need a placeholder image
+  if (!path) return '/images/watch-detail.avif';
   if (path.startsWith('http')) return path;
-  return `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}${path}`;
+  if (path.startsWith('/media')) return `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}${path}`;
+  return path;
 }
 
 export function getDiscountPercent(price: string, discountPrice: string | null): number | null {

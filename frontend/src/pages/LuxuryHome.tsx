@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Menu, X, ShoppingBag, ArrowDown, ArrowUpRight, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useCartStore } from '../store/cartStore';
 import { fetchFeaturedWatches } from '../services/watches';
+import { getImageUrl } from '../lib/utils';
 import type { CartItem } from '../types';
 
 const WATCH_IMG = '/images/watch-detail.avif';
@@ -63,6 +66,7 @@ const VOICES = [
 
 export default function LuxuryHome() {
   const { items, addItem, updateQuantity, clearCart, totalItems, totalPrice } = useCartStore();
+  const navigate = useNavigate();
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [reserveOpen, setReserveOpen] = useState(false);
@@ -81,7 +85,7 @@ export default function LuxuryHome() {
           price: product.price,
           discount_price: product.discount_price,
           brandName: product.brand.name,
-          image: product.images[0]?.image ?? WATCH_IMG,
+          image: getImageUrl(product.images[0]?.image) ?? WATCH_IMG,
           quantity: 1,
           slug: product.slug,
         }
@@ -241,7 +245,7 @@ export default function LuxuryHome() {
               <p className="eyebrow">The collection</p>
               <h2>Objects of <i>devotion.</i></h2>
             </div>
-            <button className="text-button">
+            <button className="text-button" onClick={() => navigate('/shop')}>
               Explore all <ArrowUpRight size={14} />
             </button>
           </div>
@@ -352,8 +356,8 @@ export default function LuxuryHome() {
           <div>
             <span>Client services</span>
             <button onClick={() => setReserveOpen(true)}>Book a private viewing</button>
-            <button>Servicing & repairs</button>
-            <button>Warranty registration</button>
+            <button onClick={() => navigate('/shop')}>Servicing & repairs</button>
+            <button onClick={() => navigate('/shop')}>Warranty registration</button>
           </div>
           <div>
             <span>Boutiques</span>
@@ -385,7 +389,7 @@ export default function LuxuryHome() {
                 <div>
                   {items.map((i) => (
                     <div className="cart-line" key={i.id}>
-                      <img src={i.image || WATCH_IMG} alt={i.title} />
+                      <img src={getImageUrl(i.image)} alt={i.title} />
                       <div>
                         <h3>{i.title}</h3>
                         <p>{i.brandName} · CHF {formatPrice(i.price)}</p>
@@ -403,7 +407,7 @@ export default function LuxuryHome() {
                     <span>Subtotal</span>
                     <strong>CHF {formatPrice(totalPrice().toFixed(2))}</strong>
                   </div>
-                  <button>Proceed to checkout</button>
+                  <button onClick={() => navigate('/cart')}>Proceed to checkout</button>
                   <button onClick={clearCart} style={{ background: 'transparent', color: '#686a67' }}>Clear cart</button>
                   <small>Complimentary delivery · 5-year international warranty</small>
                 </footer>
@@ -424,7 +428,7 @@ export default function LuxuryHome() {
             <p className="eyebrow">A private appointment awaits</p>
             <h2>Reserve<br /><i>yours.</i></h2>
             <p>Book a private viewing of the Lustro Moonphase Silver in our Geneva salon — by appointment only. We will confirm within one business day.</p>
-            <form onSubmit={(e) => { e.preventDefault(); setReserveOpen(false); }}>
+            <form onSubmit={(e) => { e.preventDefault(); setReserveOpen(false); toast.success('Appointment request received — our boutique will confirm shortly.'); }}>
               <label>Full name<input required placeholder="Your name" /></label>
               <label>Email address<input required type="email" placeholder="you@example.com" /></label>
               <label>Preferred date<input type="date" required /></label>

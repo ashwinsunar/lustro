@@ -1,3 +1,63 @@
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+from .models import Brand, Category, Watch, WatchImage
 
-# Create your tests here.
+
+class WatchAPITests(APITestCase):
+    def setUp(self):
+        self.roleplay = Brand.objects.create(name='Rolex', slug='rolex', country='Switzerland')
+        self.omega = Brand.objects.create(name='Omega', slug='omega', country='Switzerland')
+        self.dive = Category.objects.create(name='Dive')
+        self.dress = Category.objects.create(name='Dress')
+
+        self.sub = Watch.objects.create(
+            title='Submariner', slug='rolex-submariner', brand=self.roleplay, category=self.dive,
+            price=10250, reference_number='126610LN', movement='automatic',
+            case_size='41mm', case_material='Steel', dial_color='Black',
+            strap_material='Steel', water_resistance='300m', description='Dive icon.',
+        )
+        self.sm = Watch.objects.create(
+            title='Speedmaster', slug='omega-speedmaster', brand=self.omega, category=self.dress,
+            price=9950, discount_price=7950, reference_number='310.30', movement='manual',
+            case_size='42mm', case_material='Steel', dial_color='Black',
+            strap_material='Leather', water_resistance='50m', description='Moonwatch.',
+            is_featured=True, is_trending=True, in_stock=True,
+        )
+
+    def test_list_paginated(self):
+        resp = self.client.get(reverse('watch-list'))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data['count'], 2)
+
+    def test_multi_brand_filter(self):
+        resp = self.client.get(reverse('watch-list'), {'brands': 'rolex,omega'})
+        self.assertEqual(resp.data['count'], 2)
+        resp = self.client.get(reverse('watch-list'), {'brands': 'omega'})
+        self.assertEqual(resp.data['count'], 1)
+
+    def test_on_sale_filter(self):
+        resp = self.client.get(reverse('watch-list'), {'on_sale': 'true'})
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['title'], 'Speedmaster')
+
+    def test_search(self):
+        resp = self.client.get(reverse('watch-list'), {'search': 'submariner'})
+        self.assertEqual(resp.data['count'], 1)
+
+    def test_exclude_filter(self):
+        resp = self.client.get(reverse('watch-list'), {'exclude': self.sub.id})
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['id'], self.sm.id)
+
+    def test_brand_has_watch_count(self):
+        resp = self.client.get(f"{reverse('brand-list')}rolex/")
+        self.assertEqual(resp.data['watch_count'], 1)
+
+    def test_detail_serializer_has_images(self):
+        resp = self.client.get(reverse('watch-detail', args=[self.sub.slug]))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIn('images', resp.data)
+        self.assertIn('brand', resp.data)
+        self.assertIn('collection', resp.data)

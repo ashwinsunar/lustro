@@ -3,7 +3,7 @@ from io import BytesIO
 from uuid import uuid4
 from django.core.management.base import BaseCommand
 from django.core.files.images import ImageFile
-from watches.models import Brand, Category, Watch, WatchImage
+from watches.models import Brand, Category, Collection, Watch, WatchImage
 
 # Free-license watch photography (Unsplash). Rotated across all watches.
 IMAGE_POOL = [
@@ -23,17 +23,36 @@ IMAGE_POOL = [
 ]
 
 BRANDS = [
-    {'name': 'Rolex', 'founded_year': 1905, 'country': 'Switzerland'},
-    {'name': 'Omega', 'founded_year': 1848, 'country': 'Switzerland'},
-    {'name': 'Patek Philippe', 'founded_year': 1839, 'country': 'Switzerland'},
-    {'name': 'Audemars Piguet', 'founded_year': 1875, 'country': 'Switzerland'},
-    {'name': 'IWC', 'founded_year': 1868, 'country': 'Switzerland'},
-    {'name': 'Breitling', 'founded_year': 1884, 'country': 'Switzerland'},
-    {'name': 'Cartier', 'founded_year': 1847, 'country': 'France'},
-    {'name': 'TAG Heuer', 'founded_year': 1860, 'country': 'Switzerland'},
-    {'name': 'Tudor', 'founded_year': 1926, 'country': 'Switzerland'},
-    {'name': 'Jaeger-LeCoultre', 'founded_year': 1833, 'country': 'Switzerland'},
+    {'name': 'Rolex', 'founded_year': 1905, 'country': 'Switzerland', 'description': 'The most recognized name in horology, Rolex builds Oystersteel instruments of peerless robustness that define the luxury sports watch.', 'collection': 'The Icons'},
+    {'name': 'Omega', 'founded_year': 1848, 'country': 'Switzerland', 'description': 'From the Moon to the depths of the ocean, Omega calibres have measured humanity\u2019s boldest moments since 1848.', 'collection': 'Heritage'},
+    {'name': 'Patek Philippe', 'founded_year': 1839, 'country': 'Switzerland', 'description': 'Geneva\u2019s last independent family watchmaker, maker of the world\u2019s most coveted complications since 1839.', 'collection': 'The Icons'},
+    {'name': 'Audemars Piguet', 'founded_year': 1875, 'country': 'Switzerland', 'description': 'Creators of the Royal Oak \u2014 the octagonal icon that invented the luxury steel sports watch in 1972.', 'collection': 'The Icons'},
+    {'name': 'IWC', 'founded_year': 1868, 'country': 'Switzerland', 'description': 'Schaffhausen engineering for pilots and explorers \u2014 Swiss watchmaking with an engineer\u2019s mind.', 'collection': 'Aviation'},
+    {'name': 'Breitling', 'founded_year': 1884, 'country': 'Switzerland', 'description': 'Instruments for professionals, built for the skies \u2014 Navitimer and SuperOcean stand among aviation\u2019s legends.', 'collection': 'Aviation'},
+    {'name': 'Cartier', 'founded_year': 1847, 'country': 'France', 'description': 'Historians of time and the jeweller of kings \u2014 icons like the Tank and Santos are pure design statements.', 'collection': 'Parisian Rarity'},
+    {'name': 'TAG Heuer', 'founded_year': 1860, 'country': 'Switzerland', 'description': 'The racing chronograph since 1860 \u2014 Carrera and Monaco carry the spirit of the track.', 'collection': 'Sport'},
+    {'name': 'Tudor', 'founded_year': 1926, 'country': 'Switzerland', 'description': 'Rolex\u2019s younger sibling builds tool-watch honesty: Black Bay rivals cost three times more.', 'collection': 'Sport'},
+    {'name': 'Jaeger-LeCoultre', 'founded_year': 1833, 'country': 'Switzerland', 'description': 'The watchmaker\u2019s watchmaker \u2014 over a thousand calibres, from the Reverso to the Master Grande.', 'collection': 'Heritage'},
 ]
+
+COLLECTIONS = [
+    {'name': 'The Icons', 'description': 'The undisputed legends of haute horlogerie \u2014 references that define their categories and hold value for generations.', 'featured': True},
+    {'name': 'Heritage', 'description': 'Timepieces with deep manufacture roots, celebrating heritage calibres and timeless dials.', 'featured': True},
+    {'name': 'Aviation', 'description': 'Pilot instruments and professional tools, engineered for the skies and adventure.', 'featured': False},
+    {'name': 'Sport', 'description': 'Performance-driven sport watches for land, sea and racing.', 'featured': False},
+    {'name': 'Parisian Rarity', 'description': 'Joaillerie-meets-horology \u2014 rare dials and quiet statement pieces.', 'featured': False},
+]
+
+GENDER_OVERRIDES = {
+    'Panthère': 'women',
+    'Twenty-4': 'women',
+    'Tank Louis': 'unisex',
+    'Ballon Bleu': 'women',
+    'Reverso Classic': 'unisex',
+    'Nautilus 5712/1A': 'unisex',
+    'Royal Oak Jumbo': 'unisex',
+    'Santos de Cartier': 'unisex',
+}
 
 CATEGORIES = ['Dress', 'Sport', 'Dive', 'Pilot', 'Chronograph', 'GMT']
 
@@ -132,30 +151,47 @@ class Command(BaseCommand):
         WatchImage.objects.all().delete()
         Brand.objects.all().delete()
         Category.objects.all().delete()
+        Collection.objects.all().delete()
 
         cats = {}
         for c in CATEGORIES:
             cats[c] = Category.objects.create(name=c)
 
+        collections = {}
+        for col in COLLECTIONS:
+            collections[col['name']] = Collection.objects.create(
+                name=col['name'], description=col['description'], featured=col['featured']
+            )
+
         brands = {}
         for b in BRANDS:
-            brands[b['name']] = Brand.objects.create(name=b['name'], founded_year=b['founded_year'], country=b['country'])
+            brands[b['name']] = Brand.objects.create(
+                name=b['name'],
+                founded_year=b['founded_year'],
+                country=b['country'],
+                description=b['description'],
+            )
 
         created = 0
         idx = 0
-        for bname, models in MODELS.items():
-            brand = brands[bname]
-            for (title, cat_key, ref, movement, size, material, dial, strap, wr, price) in models:
+        for bi in BRANDS:
+            brand = brands[bi['name']]
+            collection = collections[bi['collection']]
+            for (title, cat_key, ref, movement, size, material, dial, strap, wr, price) in MODELS[bi['name']]:
                 idx += 1
                 ix = idx % len(IMAGE_POOL)
                 category = cats[cat_key]
                 desc = BASE_DESCS[cat_key].format(brand=brand.name, title=title, material=material, strap=strap, wr=wr, movement=movement)
+                discount = None
+                if ix % 3 == 0 and price > 3000:
+                    discount = round(price * (1 - (0.08 + (ix % 4) / 100)), 2)
                 watch = Watch.objects.create(
-                    title=title, brand=brand, category=category, price=price,
+                    title=title, brand=brand, category=category, collection=collection, price=price,
+                    discount_price=discount,
                     reference_number=ref, movement=movement,
                     case_size=size, case_material=material, dial_color=dial,
                     strap_material=strap, water_resistance=wr,
-                    gender='unisex', warranty_period='5 Years',
+                    gender=GENDER_OVERRIDES.get(title, 'men'), warranty_period='5 Years',
                     description=desc, in_stock=True, stock_count=25,
                     rating=round(4 + (ix % 10) / 10, 2),
                     review_count=8 + (ix * 3) % 40,

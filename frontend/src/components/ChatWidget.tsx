@@ -1,33 +1,116 @@
-import { MessageCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { MessageCircle, Send, X } from 'lucide-react';
+import api from '../services/api';
+import { useUiStore } from '../store/uiStore';
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 export default function ChatWidget() {
-  const [isOpen, setIsOpen] = useState(false);
+  const { chatOpen, openChat, closeChat } = useUiStore();
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: 'assistant',
+      content:
+        'Welcome to Lustro. Ask me for a recommendation by brand, budget, or style — e.g. “a GMT under 15,000 CHF”.',
+    },
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const conversationId = useRef<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+  }, [messages, chatOpen]);
+
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+    setInput('');
+    setMessages((prev) => [...prev, { role: 'user', content: text }]);
+    setLoading(true);
+    try {
+      const { data } = await api.post<{ reply: string; conversation_id: number }>('/api/v1/chat/', {
+        message: text,
+        conversation_id: conversationId.current,
+      });
+      conversationId.current = data.conversation_id;
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Apologies — I could not reach the boutique right now. Please try again in a moment.' },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
-      {isOpen ? (
-        <div className="w-80 h-96 bg-zinc-900 border border-white/10 rounded-sm shadow-2xl flex flex-col overflow-hidden">
+      {chatOpen ? (
+        <div className="w-80 md:w-[28rem] h-[32rem] max-h-[80vh] bg-zinc-900 border border-white/10 rounded-sm shadow-2xl flex flex-col overflow-hidden">
           <div className="bg-zinc-950 p-4 border-b border-white/5 flex justify-between items-center">
-            <h3 className="font-space tracking-widest text-sm text-gold uppercase">Lustro Assistant</h3>
-            <button onClick={() => setIsOpen(false)} className="text-white/50 hover:text-white">✕</button>
+            <div>
+              <h3 className="font-space tracking-widest text-sm text-gold uppercase">Lustro Assistant</h3>
+              <p className="text-[10px] text-white/40">Your private boutique concierge</p>
+            </div>
+            <button onClick={closeChat} className="text-white/50 hover:text-white" aria-label="Close chat">
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <div className="flex-1 p-4 overflow-y-auto text-sm text-white/60 flex items-center justify-center text-center">
-            AI Assistant integration coming soon.
+          <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto space-y-4">
+            {messages.map((m, i) => (
+              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  className={`max-w-[80%] px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${
+                    m.role === 'user'
+                      ? 'bg-gold text-black'
+                      : 'bg-zinc-800 text-white/90 border border-white/5'
+                  }`}
+                >
+                  {m.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="bg-zinc-800 text-white/70 border border-white/5 px-4 py-3 text-sm">…</div>
+              </div>
+            )}
           </div>
-          <div className="p-4 border-t border-white/5">
-            <input 
-              type="text" 
-              placeholder="Ask a question..." 
-              className="w-full bg-zinc-800 border-none rounded-sm px-3 py-2 text-sm text-white focus:outline-none"
-              disabled
+          <form
+            className="p-4 border-t border-white/5 flex gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendMessage();
+            }}
+          >
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask about a watch, brand, or budget..."
+              className="flex-1 bg-zinc-800 border border-white/10 rounded-sm px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-gold/50"
             />
-          </div>
+            <button
+              type="submit"
+              disabled={loading || !input.trim()}
+              className="w-10 h-10 bg-gold text-black rounded-sm flex items-center justify-center hover:brightness-110 transition-all disabled:opacity-40"
+              aria-label="Send message"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
         </div>
       ) : (
-        <button 
-          onClick={() => setIsOpen(true)}
+        <button
+          onClick={openChat}
           className="w-14 h-14 bg-gold text-black rounded-full shadow-2xl flex items-center justify-center hover:scale-105 transition-transform"
+          aria-label="Open assistant"
         >
           <MessageCircle className="w-6 h-6" />
         </button>

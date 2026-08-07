@@ -2,18 +2,18 @@ import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { useInView } from 'react-intersection-observer';
 import { WatchGrid, WatchCard, WatchCardSkeleton } from '../components/watch';
 import { Section, Container } from '../components/layout';
-import { fetchFeaturedWatches, fetchNewArrivals, fetchTrending, fetchBestSellers } from '../services/watches';
+import { fetchFeaturedWatches, fetchTrending } from '../services/watches';
 import { fetchBrands } from '../services/brands';
 import { Button } from '../components/ui';
 import { cn } from '../lib/utils';
+import { useUiStore } from '../store/uiStore';
 
 export default function HomePage() {
-  
+  const openChat = useUiStore((s) => s.openChat);
+
   const { data: featured = [], isLoading: loadingFeatured } = useQuery({ queryKey: ['watches', 'featured'], queryFn: fetchFeaturedWatches });
-  const { data: newArrivals = [], isLoading: loadingNew } = useQuery({ queryKey: ['watches', 'new'], queryFn: fetchNewArrivals });
   const { data: trending = [], isLoading: loadingTrending } = useQuery({ queryKey: ['watches', 'trending'], queryFn: fetchTrending });
   const { data: brands = [] } = useQuery({ queryKey: ['brands'], queryFn: fetchBrands });
 
@@ -94,7 +94,7 @@ export default function HomePage() {
         <div className="flex whitespace-nowrap animate-marquee">
           {[1, 2].map((group) => (
             <div key={group} className="flex items-center gap-12 px-6">
-              {['ROLEX', 'OMEGA', 'TAG HEUER', 'PATEK PHILIPPE', 'IWC', 'BREITLING', 'CARTIER', 'AUDEMARS PIGUET'].map((brand, idx) => (
+              {(brands.length ? brands.map((b) => b.name.toUpperCase()) : ['ROLEX', 'OMEGA', 'TAG HEUER', 'PATEK PHILIPPE', 'IWC', 'BREITLING', 'CARTIER', 'AUDEMARS PIGUET']).map((brand, idx) => (
                 <div key={idx} className="flex items-center gap-12 text-white/60 font-space tracking-widest text-sm uppercase">
                   <span>{brand}</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-gold/50" />
@@ -145,7 +145,7 @@ export default function HomePage() {
               <p className="text-white/60 mb-10 text-balance leading-relaxed">
                 Not sure what you're looking for? Chat with our AI watch expert to get personalized recommendations based on your style, lifestyle, and budget.
               </p>
-              <Button size="lg" className="px-10">
+              <Button size="lg" className="px-10" onClick={openChat}>
                 Chat With AI Assistant
               </Button>
             </motion.div>

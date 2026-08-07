@@ -18,7 +18,7 @@ export default function Navbar() {
   const { totalItems } = useCartStore();
   const { count: wishlistCount } = useWishlistStore();
   const { isAuthenticated, logout, user } = useAuthStore();
-  const { isSearchOpen, openSearch, closeSearch, query, setQuery, suggestions } = useSearchStore();
+  const { isSearchOpen, openSearch, closeSearch, query, setQuery } = useSearchStore();
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,10 +52,16 @@ export default function Navbar() {
     navigate('/login');
   };
 
+  const submitSearch = (term?: string) => {
+    const q = (term ?? query).trim();
+    closeSearch();
+    if (q) navigate(`/shop?search=${encodeURIComponent(q)}`);
+  };
+
   const collections = [
     { name: 'Dress Watches', image: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400&q=80', slug: 'dress' },
     { name: 'Sport Watches', image: 'https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=400&q=80', slug: 'sport' },
-    { name: 'Dive Watches', image: 'https://images.unsplash.com/photo-1548685913-fe6678b816bf?w=400&q=80', slug: 'dive' },
+    { name: 'Dive Watches', image: 'https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=400&q=80', slug: 'dive' },
     { name: 'Pilot Watches', image: 'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=400&q=80', slug: 'pilot' },
   ];
 
@@ -229,17 +235,20 @@ export default function Navbar() {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') submitSearch();
+                  }}
                   placeholder="Search timepieces, brands..."
                   className="w-full bg-transparent border-b-2 border-white/20 pb-4 pl-12 text-3xl md:text-5xl font-light text-white placeholder:text-white/20 focus:outline-none focus:border-gold transition-colors font-space"
                 />
               </div>
               
-              {/* Search Suggestions (Mocked for now) */}
+              {/* Search Suggestions */}
               <div className="w-full mt-16 text-left">
                 <p className="text-xs font-space tracking-widest uppercase text-white/40 mb-6">Popular Searches</p>
                 <div className="flex flex-wrap gap-4">
-                  {['Rolex Daytona', 'Omega Speedmaster', 'Dive Watches', 'Gold Watches', 'Patek Philippe Nautilus'].map(term => (
-                    <button key={term} onClick={() => setQuery(term)} className="px-6 py-3 border border-white/10 rounded-full text-sm hover:border-gold hover:text-gold transition-colors">
+                  {['Rolex Daytona', 'Omega Speedmaster', 'Dive Watches', 'GMT', 'Patek Philippe Nautilus'].map(term => (
+                    <button key={term} onClick={() => submitSearch(term)} className="px-6 py-3 border border-white/10 rounded-full text-sm hover:border-gold hover:text-gold transition-colors">
                       {term}
                     </button>
                   ))}

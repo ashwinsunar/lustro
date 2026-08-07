@@ -19,6 +19,11 @@ export const fetchWatches = async (params?: Partial<WatchFilters>): Promise<Pagi
     if (params.maxPrice) queryParams.append('max_price', params.maxPrice.toString());
     if (params.inStockOnly) queryParams.append('in_stock', 'true');
     if (params.onSaleOnly) queryParams.append('on_sale', 'true');
+
+    if (params.newArrival) queryParams.append('new_arrival', 'true');
+    if (params.trending) queryParams.append('trending', 'true');
+    if (params.featured) queryParams.append('featured', 'true');
+    if (params.bestSeller) queryParams.append('best_seller', 'true');
   }
 
   const { data } = await api.get<PaginatedResponse<WatchListItem>>(`/api/v1/watches/?${queryParams.toString()}`);
