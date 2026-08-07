@@ -134,8 +134,8 @@ export default function Navbar() {
 
           {/* Logo (Center) */}
           <div className="w-1/3 flex justify-center">
-            <Link to="/" className="text-2xl md:text-3xl font-space font-bold tracking-[0.3em] text-gold hover:text-white transition-colors">
-              LUSTRO
+            <Link to="/" className="flex items-center transition-opacity hover:opacity-80">
+              <img src="/logo.png" alt="Lustro" className="h-10 md:h-12 w-auto" />
             </Link>
           </div>
 
@@ -261,7 +261,7 @@ export default function Navbar() {
             className="fixed inset-0 z-50 bg-zinc-950 flex flex-col lg:hidden"
           >
             <div className="p-6 flex justify-between items-center border-b border-white/10">
-              <div className="text-xl font-space font-bold tracking-[0.2em] text-gold">LUSTRO</div>
+              <img src="/logo.png" alt="Lustro" className="h-9 w-auto" />
               <button onClick={() => setIsMobileMenuOpen(false)} className="text-white">
                 <X className="w-6 h-6" />
               </button>
