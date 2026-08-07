@@ -1,12 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Minus, Plus, Trash2, ArrowRight, Bookmark, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
 import { Container } from '../components/layout';
 import { Button } from '../components/ui';
 import { useCartStore } from '../store/cartStore';
+import { useAuthStore } from '../store/authStore';
 import { getImageUrl, formatPrice } from '../lib/utils';
 
 export default function CartPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
   const {
     items,
     savedForLater,
@@ -137,7 +140,17 @@ export default function CartPage() {
                   <span className="text-sm font-space uppercase tracking-widest text-white">Total</span>
                   <span className="text-2xl font-space text-gold">{formatPrice(totalPrice())}</span>
                 </div>
-                <Button className="w-full mb-4" onClick={() => toast.info('Checkout is handled by our concierge — concierge@lustro.ch will contact you.')}>
+                <Button
+                  className="w-full mb-4"
+                  onClick={() => {
+                    if (!isAuthenticated()) {
+                      toast.error('Please sign in to checkout.');
+                      navigate('/login', { state: { from: '/checkout' } });
+                      return;
+                    }
+                    navigate('/checkout');
+                  }}
+                >
                   Proceed to Checkout <ArrowRight className="w-4 h-4" />
                 </Button>
                 <Link to="/shop" className="block text-center text-xs font-space tracking-widest uppercase text-white/40 hover:text-gold transition-colors">

@@ -67,10 +67,10 @@ export default function ProfilePage() {
             <Package className="w-5 h-5 text-gold" strokeWidth={1.5} /> Orders
           </h3>
           <p className="text-white/50 text-sm mb-6">
-            You have no orders yet. When you reserve a timepiece, it will appear here.
+            Track your acquisitions, review your timepieces, and manage deliveries.
           </p>
-          <Link to="/shop">
-            <Button variant="outline">Start Shopping</Button>
+          <Link to="/profile/orders">
+            <Button variant="outline">View my orders</Button>
           </Link>
         </div>
       </Container>

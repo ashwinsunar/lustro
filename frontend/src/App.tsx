@@ -17,6 +17,9 @@ import BrandDetailPage from './pages/BrandDetailPage';
 import WishlistPage from './pages/WishlistPage';
 import ComparePage from './pages/ComparePage';
 import ProfilePage from './pages/ProfilePage';
+import OrdersPage from './pages/OrdersPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ChatWidget from './components/ChatWidget';
 
@@ -74,7 +77,9 @@ function Shell() {
           <Route path="/brands" element={<PageTransition><BrandsPage /></PageTransition>} />
           <Route path="/brands/:slug" element={<PageTransition><BrandDetailPage /></PageTransition>} />
           <Route path="/profile" element={<PageTransition><ProfilePage /></PageTransition>} />
-          <Route path="/profile/orders" element={<PageTransition><ProfilePage /></PageTransition>} />
+          <Route path="/profile/orders" element={<PageTransition><OrdersPage /></PageTransition>} />
+          <Route path="/checkout" element={<PageTransition><CheckoutPage /></PageTransition>} />
+          <Route path="/order/:orderNumber" element={<PageTransition><OrderConfirmationPage /></PageTransition>} />
           <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
           <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFoundPage /></PageTransition>} />

@@ -124,22 +124,14 @@ export interface CartItem {
 // ---------- Review ----------
 export interface Review {
   id: number;
-  user: {
-    id: number;
-    first_name: string;
-    last_name: string;
-    avatar?: string | null;
-  };
-  watch: number;
+  user: number | null;
+  first_name: string;
   rating: number;
   title: string;
   body: string;
   is_verified_purchase: boolean;
   helpful_count: number;
-  photos?: string[];
   created_at: string;
-  reply?: string | null;
-  reply_at?: string | null;
 }
 
 // ---------- User ----------
@@ -177,31 +169,45 @@ export type OrderStatus =
   | 'cancelled'
   | 'refunded';
 
+export type PaymentMethod = 'card' | 'cod';
+
 export interface OrderItem {
   id: number;
-  watch: WatchListItem;
+  watch: number;
+  title: string;
+  brand_name: string;
+  image: string;
   quantity: number;
   unit_price: string;
   total_price: string;
 }
 
 export interface Order {
-  id: number;
   order_number: string;
-  user: User;
-  items: OrderItem[];
-  shipping_address: Address;
   status: OrderStatus;
-  payment_method: string;
-  payment_status: string;
+  payment_method: PaymentMethod;
+  payment_status: 'pending' | 'paid' | 'failed';
   subtotal: string;
-  shipping_fee: string;
   discount: string;
+  shipping_fee: string;
   total: string;
-  notes?: string;
+  full_name: string;
+  email: string;
+  phone_number: string;
+  address_line: string;
+  city: string;
+  postal_code: string;
+  country: string;
   gift_wrapping: boolean;
+  notes: string;
+  items: OrderItem[];
   created_at: string;
-  updated_at: string;
+}
+
+export interface Coupon {
+  id: number;
+  code: string;
+  discount_percent: number;
 }
 
 // ---------- Pagination ----------

@@ -1,5 +1,7 @@
-from rest_framework import serializers
-from .models import Brand, Category, Collection, Watch, WatchImage, WatchVideo
+from rest_framework import serializers, status
+from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
+from .models import Brand, Category, Collection, Watch, WatchImage, WatchVideo, Review
 
 class BrandSerializer(serializers.ModelSerializer):
     watch_count = serializers.IntegerField(read_only=True, default=0)
@@ -53,3 +55,37 @@ class WatchDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Watch
         fields = '__all__'
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = [
+            'id', 'user', 'first_name', 'rating', 'title', 'body',
+            'is_verified_purchase', 'helpful_count', 'created_at',
+        ]
+        read_only_fields = ('is_verified_purchase', 'helpful_count', 'user')
+        extra_kwargs = {'first_name': {'required': False}}
+
+class ReviewViewSet(ViewSet):
+    def list(self, request, watch_slug):
+        from .models import Watch
+        watch = Watch.objects.filter(slug=watch_slug).first()
+        if watch is None:
+            return Response({'detail': 'Not found.'}, status=404)
+        reviews = watch.reviews.all()
+        return Response(ReviewSerializer(reviews, many=True).data)
+
+    def create(self, request, watch_slug):
+        from .models import Watch
+        watch = Watch.objects.filter(slug=watch_slug).first()
+        if watch is None:
+            return Response({'detail': 'Not found.'}, status=404)
+        user = request.user if request.user.is_authenticated else None
+        if user and watch.reviews.filter(user=user).exists():
+            return Response({'detail': 'You have already reviewed this timepiece.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ReviewSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+        first_name = (user.first_name if user else request.data.get('first_name', 'A Collector')).strip() or 'A Collector'
+        review = serializer.save(user=user, watch=watch, first_name=first_name)
+        return Response(ReviewSerializer(review).data, status=201)

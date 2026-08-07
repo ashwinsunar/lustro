@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Brand, Category, Collection, Watch, WatchImage, WatchVideo
+from .models import Brand, Category, Collection, Watch, WatchImage, WatchVideo, Review
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
@@ -39,3 +39,9 @@ class WatchImageAdmin(admin.ModelAdmin):
 @admin.register(WatchVideo)
 class WatchVideoAdmin(admin.ModelAdmin):
     list_display = ('id', 'watch', 'title')
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'watch', 'rating', 'is_verified_purchase', 'created_at')
+    list_filter = ('rating', 'is_verified_purchase')
+    search_fields = ('first_name', 'watch__title', 'body')

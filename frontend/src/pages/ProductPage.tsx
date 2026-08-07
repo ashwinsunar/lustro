@@ -2,25 +2,33 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Minus, Plus, Heart, Truck, ShieldCheck, RotateCcw, Star, Check } from 'lucide-react';
+import { Minus, Plus, Heart, Truck, ShieldCheck, RotateCcw, Star, Check, BadgeCheck } from 'lucide-react';
 
 import { Container } from '../components/layout';
 import { Button, Badge } from '../components/ui';
 import { WatchCard, WatchCardSkeleton } from '../components/watch';
 import { fetchWatch, fetchRelated } from '../services/watches';
+import { fetchReviews, createReview } from '../services/reviews';
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useCompareStore } from '../store/compareStore';
-import { cn, getImageUrl, formatPrice, getDiscountPercent } from '../lib/utils';
+import { useAuthStore } from '../store/authStore';
+import { cn, getImageUrl, formatPrice, getDiscountPercent, formatDate } from '../lib/utils';
+import type { Review } from '../types';
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewBody, setReviewBody] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   const { addItem } = useCartStore();
   const { isWishlisted, toggleItem } = useWishlistStore();
   const { isComparing, toggleItem: toggleCompare } = useCompareStore();
+  const { isAuthenticated } = useAuthStore();
 
   const { data: watch, isLoading, isError } = useQuery({
     queryKey: ['watch', slug],
@@ -32,6 +40,12 @@ export default function ProductPage() {
     queryKey: ['watches', 'related', watch?.id, watch?.brand?.slug],
     queryFn: () => fetchRelated(watch!.id, watch!.brand.slug),
     enabled: !!watch,
+  });
+
+  const { data: reviews = [], refetch: refetchReviews } = useQuery({
+    queryKey: ['reviews', slug],
+    queryFn: () => fetchReviews(slug as string),
+    enabled: !!slug,
   });
 
   if (isLoading) {
@@ -80,8 +94,33 @@ export default function ProductPage() {
     toast.success(`${watch.title} added to your cart`);
   };
 
+  const handleSubmitReview = async () => {
+    if (!reviewBody.trim()) {
+      toast.error('Please write a few words about the watch.');
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      const created = await createReview(slug as string, {
+        rating: reviewRating,
+        title: reviewTitle.trim() || undefined,
+        body: reviewBody.trim(),
+      });
+      toast.success('Thank you — your review is live.');
+      setReviewRating(5);
+      setReviewTitle('');
+      setReviewBody('');
+      refetchReviews();
+      void created;
+    } catch (e: any) {
+      const detail = e?.response?.data?.detail;
+      toast.error(detail || 'Unable to submit review.');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   const specRows: Array<[string, string]> = [
-    ['Reference', watch.reference_number],
     ['Movement', watch.movement.replace('_', ' ')],
     ['Case', `${watch.case_size} · ${watch.case_material}`],
     ['Dial', watch.dial_color],
@@ -176,7 +215,7 @@ export default function ProductPage() {
                 )}
               </div>
 
-              <div className="flex items-baseline gap-4 mb-10">
+              <div className="flex items-baseline gap-4 mb-3">
                 {watch.discount_price ? (
                   <>
                     <span className="text-3xl font-space text-gold">{formatPrice(watch.discount_price)}</span>
@@ -184,6 +223,24 @@ export default function ProductPage() {
                   </>
                 ) : (
                   <span className="text-3xl font-space text-white">{formatPrice(watch.price)}</span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 mb-10 text-sm">
+                {watch.in_stock ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-400" strokeWidth={2} />
+                    <span className="text-white/70">In stock</span>
+                    {watch.stock_count > 0 && watch.stock_count <= 5 && (
+                      <span className="text-amber-400/90">· Only {watch.stock_count} left</span>
+                    )}
+                    <span className="text-white/40">· Ships within 24h</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-destructive/90 font-medium">Out of stock</span>
+                    <span className="text-white/40">· Notify me when available</span>
+                  </>
                 )}
               </div>
 
@@ -275,6 +332,115 @@ export default function ProductPage() {
                   </div>
                 ))}
               </dl>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews */}
+        <div className="mt-24">
+          <div className="flex items-end justify-between mb-10">
+            <div>
+              <h2 className="text-3xl font-light mb-2">Collector Reviews</h2>
+              <div className="flex items-center gap-3">
+                {parseFloat(watch.rating) > 0 ? (
+                  <>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-5 h-5 fill-gold text-gold" />
+                      <span className="text-lg font-space text-white">{watch.rating}</span>
+                    </div>
+                    <span className="text-white/40 text-sm">{watch.review_count} verified reviews</span>
+                  </>
+                ) : (
+                  <span className="text-white/40 text-sm">No reviews yet — be the first.</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-12">
+            {/* Write review */}
+            <div>
+              {isAuthenticated() ? (
+                <div className="border border-white/10 bg-zinc-900/40 p-8 lg:sticky lg:top-32 space-y-5">
+                  <h3 className="text-sm font-space uppercase tracking-widest text-white">Share your experience</h3>
+                  <div>
+                    <span className="block mb-2 text-xs font-space tracking-widest uppercase text-white/60">Your rating</span>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => setReviewRating(n)}
+                          className="p-1 transition-transform hover:scale-110"
+                          aria-label={`${n} stars`}
+                        >
+                          <Star className={cn('w-6 h-6', n <= reviewRating ? 'fill-gold text-gold' : 'text-white/30')} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <input
+                    value={reviewTitle}
+                    onChange={(e) => setReviewTitle(e.target.value)}
+                    placeholder="Review headline (optional)"
+                    className="w-full h-11 rounded-sm border border-white/10 bg-zinc-900 px-4 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:border-gold/50 font-space"
+                  />
+                  <textarea
+                    value={reviewBody}
+                    onChange={(e) => setReviewBody(e.target.value)}
+                    placeholder="What do you love about this timepiece?"
+                    rows={4}
+                    className="w-full rounded-sm border border-white/10 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-white/30 focus-visible:outline-none focus-visible:border-gold/50 resize-none"
+                  />
+                  <Button className="w-full" onClick={handleSubmitReview} isLoading={submittingReview}>
+                    Submit review
+                  </Button>
+                </div>
+              ) : (
+                <div className="border border-white/10 bg-zinc-900/40 p-8 lg:sticky lg:top-24">
+                  <h3 className="text-sm font-space uppercase tracking-widest text-white mb-4">Own this watch?</h3>
+                  <p className="text-white/50 text-sm mb-6">Sign in to share your experience with fellow collectors.</p>
+                  <Link to="/login" state={{ from: `/watch/${watch.slug}` }}>
+                    <Button variant="outline" className="w-full">Sign in to review</Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Review list */}
+            <div className="lg:col-span-2 space-y-6">
+              {reviews.length === 0 ? (
+                <p className="text-white/40 border border-white/5 bg-zinc-900/30 p-10 text-center">
+                  No reviews yet. Be the first collector to share your thoughts.
+                </p>
+              ) : (
+                reviews.map((review: Review) => (
+                  <div key={review.id} className="border border-white/10 bg-zinc-900/40 p-8">
+                    <div className="flex items-start justify-between gap-6 mb-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-medium text-white">{review.first_name}</span>
+                          {review.is_verified_purchase && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-space tracking-widest uppercase text-emerald-400">
+                              <BadgeCheck className="w-3.5 h-3.5" /> Verified purchase
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((n) => (
+                            <Star key={n} className={cn('w-3.5 h-3.5', n <= review.rating ? 'fill-gold text-gold' : 'text-white/20')} />
+                          ))}
+                          {review.helpful_count > 0 && (
+                            <span className="ml-3 text-xs text-white/40">{review.helpful_count} found this helpful</span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-xs text-white/30 whitespace-nowrap">{formatDate(review.created_at)}</span>
+                    </div>
+                    {review.title && <h4 className="text-white font-medium mb-2">{review.title}</h4>}
+                    <p className="text-white/60 leading-relaxed text-sm">{review.body}</p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

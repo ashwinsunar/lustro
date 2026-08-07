@@ -209,6 +209,12 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f'Done: {created} watches, {len(BRANDS)} brands'))
 
+        from orders.models import Coupon
+        Coupon.objects.update_or_create(
+            code='LUSTRO10', defaults={'discount_percent': 10, 'active': True, 'expires_at': None}
+        )
+        self.stdout.write(self.style.SUCCESS('Coupon LUSTRO10 (-10%) ready.'))
+
     def fetch(self, url):
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { Container } from '../components/layout';
@@ -13,6 +13,8 @@ interface LoginResponse {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from;
   const setTokens = useAuthStore((s) => s.setTokens);
   const setUser = useAuthStore((s) => s.setUser);
 
@@ -29,7 +31,7 @@ export default function LoginPage() {
       const { data } = await api.post<LoginResponse>('/api/v1/auth/login/', { email, password });
       setTokens(data.tokens.access, data.tokens.refresh);
       setUser(data.user);
-      navigate('/');
+      navigate(from || '/');
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } }).response?.status;
       setError(

@@ -124,3 +124,34 @@ class WatchVideo(models.Model):
     
     def __str__(self):
         return f"Video for {self.watch.title}"
+
+
+class Review(models.Model):
+    watch = models.ForeignKey(Watch, related_name='reviews', on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        'users.User',
+        related_name='reviews',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    first_name = models.CharField(max_length=80)
+    rating = models.PositiveIntegerField(default=5)
+    title = models.CharField(max_length=120, blank=True)
+    body = models.TextField()
+    is_verified_purchase = models.BooleanField(default=False)
+    helpful_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['watch', 'user'],
+                name='unique_product_review_per_user',
+                condition=models.Q(user__isnull=False),
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.first_name} · {self.watch.title} ({self.rating}★)"
