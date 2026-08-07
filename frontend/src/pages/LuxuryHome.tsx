@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useCartStore } from '../store/cartStore';
 import { fetchFeaturedWatches } from '../services/watches';
 import api from '../services/api';
+import Watch3DScene from '../components/three/Watch3DScene';
 import { getImageUrl, formatPrice } from '../lib/utils';
 import type { CartItem } from '../types';
 
@@ -107,6 +108,14 @@ export default function LuxuryHome() {
 
   return (
     <div className="min-h-screen bg-[#030304] text-white antialiased selection:bg-white/20 selection:text-white bg-grid overflow-x-hidden">
+      {/* 3D watch — fixed cinematic background */}
+      <Watch3DScene
+        id="canvas-container"
+        wordmark="L U S T R O"
+        targets={{ overview: 'top', specs: 'calibre', technology: 'tech', features: 'features' }}
+        className="fixed top-0 left-0 w-full h-screen z-0 outline-none"
+      />
+
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50 px-6 py-6 flex justify-between items-center mix-blend-difference">
         <button onClick={() => scrollTo('top')} className="flex items-center gap-3">
@@ -223,7 +232,7 @@ export default function LuxuryHome() {
         </section>
 
         {/* ============ FEATURES & BUY ============ */}
-        <section className="min-h-screen w-full flex flex-col items-center justify-center py-32 px-6 border-t border-white/5">
+        <section id="features" className="min-h-screen w-full flex flex-col items-center justify-center py-32 px-6 border-t border-white/5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full mb-32">
             {FEATURES.map((f) => (
               <div key={f.title} className="glass-panel p-6 rounded-lg flex flex-col justify-between h-48 hover:bg-white/5 transition-colors group">
