@@ -416,7 +416,7 @@ export default function ChronosPage() {
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       {/* 3D background */}
-      <div ref={canvasRef} id="chronos-canvas" className="cursor-grab fixed top-0 left-0 h-screen w-full z-0 outline-none" />
+      <div ref={canvasRef} id="canvas-container" className="cursor-grab-custom fixed top-0 left-0 h-screen w-full z-0 outline-none" />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50 px-6 py-6 flex justify-between items-center mix-blend-difference">
@@ -461,7 +461,7 @@ export default function ChronosPage() {
             <h1 className="text-7xl leading-[0.9] font-medium tracking-tighter text-white md:text-9xl">
               TIME
               <br />
-              <span className="text-zinc-700">REDEFINED.</span>
+              <span className="text-zinc-600">REDEFINED.</span>
             </h1>
 
             <p className="max-w-sm text-base font-light leading-relaxed tracking-tight text-zinc-400 md:text-lg">
@@ -554,7 +554,7 @@ export default function ChronosPage() {
               <p className="text-sm text-zinc-500">Select your configuration.</p>
             </div>
 
-            <div className="flex gap-1 rounded-lg bg-white/5 p-1 backdrop-blur-sm">
+            <div className="flex gap-4 rounded-lg bg-white/5 p-1 backdrop-blur-sm">
               {VARIANTS.map((v, i) => (
                 <button
                   key={v.key}

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .models import Brand, Category, Watch, WatchImage
+from .models import Brand, Category, Watch, WatchImage, StockNotify
 
 
 class WatchAPITests(APITestCase):
@@ -61,3 +61,39 @@ class WatchAPITests(APITestCase):
         self.assertIn('images', resp.data)
         self.assertIn('brand', resp.data)
         self.assertIn('collection', resp.data)
+
+class StockNotifyAPITests(APITestCase):
+    def setUp(self):
+        self.brand = Brand.objects.create(name='Rolex', slug='rolex')
+        self.cat = Category.objects.create(name='GMT')
+        self.watch = Watch.objects.create(
+            title='GMT-Master II', slug='rolex-gmt', brand=self.brand, category=self.cat,
+            price=13000, reference_number='126710BLRO', movement='automatic',
+            case_size='40mm', case_material='Steel', dial_color='Black/Red',
+            strap_material='Oyster', water_resistance='100m', description='Pepsi.',
+        )
+
+    def url(self):
+        return reverse('stock-notify-list', kwargs={'watch_slug': self.watch.slug})
+
+    def test_join_waitlist(self):
+        resp = self.client.post(self.url(), {'email': 'wait@list.com'}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(StockNotify.objects.filter(email='wait@list.com', watch=self.watch).exists())
+
+    def test_duplicate_email_same_watch(self):
+        self.client.post(self.url(), {'email': 'wait@list.com'}, format='json')
+        resp = self.client.post(self.url(), {'email': 'wait@list.com'}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(StockNotify.objects.filter(email='wait@list.com').count(), 1)
+
+    def test_unknown_watch_404(self):
+        resp = self.client.post(
+            reverse('stock-notify-list', kwargs={'watch_slug': 'does-not-exist'}),
+            {'email': 'x@y.com'}, format='json',
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_missing_email_400(self):
+        resp = self.client.post(self.url(), {}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)

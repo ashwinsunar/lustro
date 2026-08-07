@@ -20,6 +20,13 @@ class OrderAdmin(admin.ModelAdmin):
         return True
 
 
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('order', 'title', 'watch', 'quantity', 'unit_price', 'total_price')
+    search_fields = ('order__order_number', 'title', 'brand_name')
+    readonly_fields = ('order', 'title', 'brand_name', 'watch', 'quantity', 'unit_price', 'total_price')
+
+
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
     list_display = ('code', 'discount_percent', 'active', 'expires_at')

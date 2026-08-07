@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.urls import reverse
-from .models import Conversation, ChatMessage
+from .models import Conversation, ChatMessage, Appointment
 
 
 class ChatAPITests(APITestCase):
@@ -46,3 +46,24 @@ class ChatAPITests(APITestCase):
             format='json',
         )
         self.assertIn('GMT-Master', resp.data['reply'])
+
+
+class AppointmentAPITests(APITestCase):
+    def test_create_appointment(self):
+        resp = self.client.post(
+            reverse('appointments'),
+            {
+                'full_name': 'Ada Lovelace',
+                'email': 'ada@example.com',
+                'date': '2026-09-01',
+                'preference': 'Virtual appointment',
+                'message': 'Interested in the Moonphase.',
+            },
+            format='json',
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Appointment.objects.filter(email='ada@example.com').exists())
+
+    def test_appointment_requires_name_and_email(self):
+        resp = self.client.post(reverse('appointments'), {'email': 'x@y.com'}, format='json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)

@@ -169,6 +169,19 @@
   }
 
   /* Chronos concept page */
+  .cursor-grab-custom {
+    cursor: grab;
+  }
+  .cursor-grab-custom:active {
+    cursor: grabbing;
+  }
+
+  .text-gradient {
+    background: linear-gradient(to bottom right, #ffffff, #a1a1aa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
   .glass-panel {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(16px);

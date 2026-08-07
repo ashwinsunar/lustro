@@ -2,7 +2,8 @@ import re
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from .models import Conversation, ChatMessage
+from .models import Conversation, ChatMessage, Appointment
+from .serializers import AppointmentSerializer
 from watches.models import Watch, Brand
 
 def _find_brand(text):
@@ -134,3 +135,20 @@ class ChatbotView(APIView):
         ChatMessage.objects.create(conversation=conversation, role='assistant', content=reply)
 
         return Response({"reply": reply, "conversation_id": conversation.id})
+
+
+class AppointmentView(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = AppointmentSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+        appointment = serializer.save()
+        return Response(
+            {
+                "id": appointment.id,
+                "detail": "Appointment request received — our boutique will confirm shortly.",
+            },
+            status=201,
+        )

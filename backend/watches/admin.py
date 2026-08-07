@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Brand, Category, Collection, Watch, WatchImage, WatchVideo, Review
+from .models import Brand, Category, Collection, Watch, WatchImage, WatchVideo, Review, StockNotify
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
@@ -45,3 +45,8 @@ class ReviewAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'watch', 'rating', 'is_verified_purchase', 'created_at')
     list_filter = ('rating', 'is_verified_purchase')
     search_fields = ('first_name', 'watch__title', 'body')
+
+@admin.register(StockNotify)
+class StockNotifyAdmin(admin.ModelAdmin):
+    list_display = ('email', 'watch', 'name', 'created_at')
+    search_fields = ('email', 'watch__title')

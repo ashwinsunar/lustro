@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Minus, Plus, Heart, Truck, ShieldCheck, RotateCcw, Star, Check, BadgeCheck } from 'lucide-react';
+import { Minus, Plus, Heart, Truck, ShieldCheck, RotateCcw, Star, Check, BadgeCheck, Bell, Loader2 } from 'lucide-react';
 
 import { Container } from '../components/layout';
 import { Button, Badge } from '../components/ui';
 import { WatchCard, WatchCardSkeleton } from '../components/watch';
 import { fetchWatch, fetchRelated } from '../services/watches';
 import { fetchReviews, createReview } from '../services/reviews';
+import api from '../services/api';
 import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useCompareStore } from '../store/compareStore';
@@ -24,6 +25,8 @@ export default function ProductPage() {
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewBody, setReviewBody] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState('');
+  const [submittingNotify, setSubmittingNotify] = useState(false);
 
   const { addItem } = useCartStore();
   const { isWishlisted, toggleItem } = useWishlistStore();
@@ -243,6 +246,45 @@ export default function ProductPage() {
                   </>
                 )}
               </div>
+
+              {!watch.in_stock && (
+                <div className="mb-10 border border-white/10 rounded-lg p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Bell className="w-4 h-4 text-gold" />
+                    <span className="text-sm font-medium">Join the waitlist</span>
+                  </div>
+                  <p className="text-xs text-white/50 mb-4">This timepiece is currently sold out. Leave your email and we'll let you know the moment it's back.</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      required
+                      placeholder="you@example.com"
+                      value={notifyEmail}
+                      onChange={(e) => setNotifyEmail(e.target.value)}
+                      className="flex-1 bg-white/5 border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/40 focus:outline-none focus:border-gold/60 transition-colors"
+                    />
+                    <Button
+                      size="lg"
+                      disabled={submittingNotify}
+                      onClick={async () => {
+                        if (!notifyEmail) return;
+                        setSubmittingNotify(true);
+                        try {
+                          await api.post(`/api/v1/watches/${watch.slug}/notify/`, { email: notifyEmail });
+                          toast.success('You are on the waitlist — we will notify you when it is back in stock.');
+                          setNotifyEmail('');
+                        } catch {
+                          toast.error('Could not join the waitlist. Please try again.');
+                        } finally {
+                          setSubmittingNotify(false);
+                        }
+                      }}
+                    >
+                      {submittingNotify ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Notify me'}
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               <p className="text-white/60 leading-relaxed mb-10">{watch.description}</p>
 

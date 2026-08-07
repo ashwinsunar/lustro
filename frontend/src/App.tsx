@@ -1,28 +1,29 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 
 import Navbar from './components/Navbar';
 import { Footer, PageTransition } from './components/layout';
-import HomePage from './pages/HomePage';
-import LuxuryHome from './pages/LuxuryHome';
-import ChronosPage from './pages/ChronosPage';
-import ShopPage from './pages/ShopPage';
-import ProductPage from './pages/ProductPage';
-import CartPage from './pages/CartPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import BrandsPage from './pages/BrandsPage';
-import BrandDetailPage from './pages/BrandDetailPage';
-import WishlistPage from './pages/WishlistPage';
-import ComparePage from './pages/ComparePage';
-import ProfilePage from './pages/ProfilePage';
-import OrdersPage from './pages/OrdersPage';
-import CheckoutPage from './pages/CheckoutPage';
-import OrderConfirmationPage from './pages/OrderConfirmationPage';
-import NotFoundPage from './pages/NotFoundPage';
 import ChatWidget from './components/ChatWidget';
+
+const LuxuryHome = lazy(() => import('./pages/LuxuryHome'));
+const ChronosPage = lazy(() => import('./pages/ChronosPage'));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ShopPage = lazy(() => import('./pages/ShopPage'));
+const ProductPage = lazy(() => import('./pages/ProductPage'));
+const CartPage = lazy(() => import('./pages/CartPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const BrandsPage = lazy(() => import('./pages/BrandsPage'));
+const BrandDetailPage = lazy(() => import('./pages/BrandDetailPage'));
+const WishlistPage = lazy(() => import('./pages/WishlistPage'));
+const ComparePage = lazy(() => import('./pages/ComparePage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const OrdersPage = lazy(() => import('./pages/OrdersPage'));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
+const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -58,6 +59,14 @@ function ScrollToTop() {
   return null;
 }
 
+function RouteFallback() {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="w-8 h-8 rounded-full border border-white/15 border-t-white animate-spin" />
+    </div>
+  );
+}
+
 function Shell() {
   const { pathname } = useLocation();
   const isImmersive = pathname === '/' || pathname === '/chronos';
@@ -67,25 +76,27 @@ function Shell() {
       {!isImmersive && <Navbar />}
 
       <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<PageTransition><LuxuryHome /></PageTransition>} />
-          <Route path="/chronos" element={<PageTransition><ChronosPage /></PageTransition>} />
-          <Route path="/legacy" element={<PageTransition><HomePage /></PageTransition>} />
-          <Route path="/shop" element={<PageTransition><ShopPage /></PageTransition>} />
-          <Route path="/watch/:slug" element={<PageTransition><ProductPage /></PageTransition>} />
-          <Route path="/cart" element={<PageTransition><CartPage /></PageTransition>} />
-          <Route path="/wishlist" element={<PageTransition><WishlistPage /></PageTransition>} />
-          <Route path="/compare" element={<PageTransition><ComparePage /></PageTransition>} />
-          <Route path="/brands" element={<PageTransition><BrandsPage /></PageTransition>} />
-          <Route path="/brands/:slug" element={<PageTransition><BrandDetailPage /></PageTransition>} />
-          <Route path="/profile" element={<PageTransition><ProfilePage /></PageTransition>} />
-          <Route path="/profile/orders" element={<PageTransition><OrdersPage /></PageTransition>} />
-          <Route path="/checkout" element={<PageTransition><CheckoutPage /></PageTransition>} />
-          <Route path="/order/:orderNumber" element={<PageTransition><OrderConfirmationPage /></PageTransition>} />
-          <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
-          <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
-          <Route path="*" element={<PageTransition><NotFoundPage /></PageTransition>} />
-        </Routes>
+        <Suspense fallback={<RouteFallback />}>
+          <Routes>
+            <Route path="/" element={<PageTransition><LuxuryHome /></PageTransition>} />
+            <Route path="/chronos" element={<PageTransition><ChronosPage /></PageTransition>} />
+            <Route path="/legacy" element={<PageTransition><HomePage /></PageTransition>} />
+            <Route path="/shop" element={<PageTransition><ShopPage /></PageTransition>} />
+            <Route path="/watch/:slug" element={<PageTransition><ProductPage /></PageTransition>} />
+            <Route path="/cart" element={<PageTransition><CartPage /></PageTransition>} />
+            <Route path="/wishlist" element={<PageTransition><WishlistPage /></PageTransition>} />
+            <Route path="/compare" element={<PageTransition><ComparePage /></PageTransition>} />
+            <Route path="/brands" element={<PageTransition><BrandsPage /></PageTransition>} />
+            <Route path="/brands/:slug" element={<PageTransition><BrandDetailPage /></PageTransition>} />
+            <Route path="/profile" element={<PageTransition><ProfilePage /></PageTransition>} />
+            <Route path="/profile/orders" element={<PageTransition><OrdersPage /></PageTransition>} />
+            <Route path="/checkout" element={<PageTransition><CheckoutPage /></PageTransition>} />
+            <Route path="/order/:orderNumber" element={<PageTransition><OrderConfirmationPage /></PageTransition>} />
+            <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+            <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
+            <Route path="*" element={<PageTransition><NotFoundPage /></PageTransition>} />
+          </Routes>
+        </Suspense>
       </main>
 
       {!isImmersive && <Footer />}

@@ -155,3 +155,22 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.first_name} · {self.watch.title} ({self.rating}★)"
+
+
+class StockNotify(models.Model):
+    watch = models.ForeignKey(Watch, related_name='stock_notifies', on_delete=models.CASCADE)
+    email = models.EmailField()
+    name = models.CharField(max_length=120, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['watch', 'email'],
+                name='unique_stock_notify_per_email',
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.email} · {self.watch.title}"

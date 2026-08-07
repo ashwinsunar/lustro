@@ -1,7 +1,8 @@
 from rest_framework import serializers, status
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ViewSet
-from .models import Brand, Category, Collection, Watch, WatchImage, WatchVideo, Review
+from .models import Brand, Category, Collection, Watch, WatchImage, WatchVideo, Review, StockNotify
 
 class BrandSerializer(serializers.ModelSerializer):
     watch_count = serializers.IntegerField(read_only=True, default=0)
@@ -89,3 +90,30 @@ class ReviewViewSet(ViewSet):
         first_name = (user.first_name if user else request.data.get('first_name', 'A Collector')).strip() or 'A Collector'
         review = serializer.save(user=user, watch=watch, first_name=first_name)
         return Response(ReviewSerializer(review).data, status=201)
+
+class StockNotifySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StockNotify
+        fields = ['id', 'email', 'name', 'created_at']
+        extra_kwargs = {'name': {'required': False}}
+
+class StockNotifyView(ViewSet):
+    permission_classes = [AllowAny]
+
+    def create(self, request, watch_slug):
+        from .models import Watch
+        try:
+            watch = Watch.objects.get(slug=watch_slug)
+        except Watch.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=404)
+        serializer = StockNotifySerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+        notify, created = StockNotify.objects.get_or_create(
+            watch=watch,
+            email=serializer.validated_data['email'].lower(),
+            defaults={'name': serializer.validated_data.get('name', '')},
+        )
+        if created:
+            return Response({'detail': 'We will notify you when this timepiece is back in stock.'}, status=201)
+        return Response({'detail': 'You are already on the waitlist for this timepiece.'}, status=200)

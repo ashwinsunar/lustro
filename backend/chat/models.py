@@ -34,3 +34,23 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.role}: {self.content[:60]}"
+
+
+class Appointment(models.Model):
+    PAYMENT_CHOICES = (
+        ('bank', 'Bank transfer'),
+        ('card', 'Card'),
+    )
+    full_name = models.CharField(max_length=120)
+    email = models.EmailField()
+    date = models.DateField(null=True, blank=True)
+    preference = models.CharField(max_length=120, default='Private salon, Geneva')
+    payment = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default='bank')
+    message = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Appointment · {self.full_name} · {self.date or 'any date'}"
