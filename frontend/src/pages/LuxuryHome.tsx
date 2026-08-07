@@ -358,6 +358,7 @@ export default function LuxuryHome() {
             <button onClick={() => setReserveOpen(true)}>Book a private viewing</button>
             <button onClick={() => navigate('/shop')}>Servicing & repairs</button>
             <button onClick={() => navigate('/shop')}>Warranty registration</button>
+            <button onClick={() => navigate('/chronos')}>Chronos Obsidian concept</button>
           </div>
           <div>
             <span>Boutiques</span>

@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import { Footer, PageTransition } from './components/layout';
 import HomePage from './pages/HomePage';
 import LuxuryHome from './pages/LuxuryHome';
+import ChronosPage from './pages/ChronosPage';
 import ShopPage from './pages/ShopPage';
 import ProductPage from './pages/ProductPage';
 import CartPage from './pages/CartPage';
@@ -59,15 +60,16 @@ function ScrollToTop() {
 
 function Shell() {
   const { pathname } = useLocation();
-  const isLuxuryHome = pathname === '/';
+  const isImmersive = pathname === '/' || pathname === '/chronos';
   return (
     <div className="min-h-screen bg-zinc-950 text-white selection:bg-gold/30 selection:text-white dark flex flex-col">
       <ScrollToTop />
-      {!isLuxuryHome && <Navbar />}
+      {!isImmersive && <Navbar />}
 
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<PageTransition><LuxuryHome /></PageTransition>} />
+          <Route path="/chronos" element={<PageTransition><ChronosPage /></PageTransition>} />
           <Route path="/legacy" element={<PageTransition><HomePage /></PageTransition>} />
           <Route path="/shop" element={<PageTransition><ShopPage /></PageTransition>} />
           <Route path="/watch/:slug" element={<PageTransition><ProductPage /></PageTransition>} />
@@ -86,7 +88,7 @@ function Shell() {
         </Routes>
       </main>
 
-      {!isLuxuryHome && <Footer />}
+      {!isImmersive && <Footer />}
       <ChatWidget />
     </div>
   );
