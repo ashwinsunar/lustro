@@ -54,47 +54,100 @@ class Watch(models.Model):
         ('quartz', 'Quartz'),
         ('spring_drive', 'Spring Drive'),
     )
-    
+    MOVEMENT_TYPE_CHOICES = (
+        ('', 'Unknown'),
+        ('mechanical', 'Mechanical'),
+        ('quartz', 'Quartz'),
+        ('solar', 'Solar'),
+        ('hybrid', 'Hybrid'),
+    )
+
     GENDER_CHOICES = (
         ('men', 'Men'),
         ('women', 'Women'),
         ('unisex', 'Unisex'),
     )
-    
+
+    AVAILABILITY_CHOICES = (
+        ('', 'Unknown'),
+        ('in_stock', 'In stock'),
+        ('pre_order', 'Pre-order'),
+        ('out_of_stock', 'Out of stock'),
+        ('discontinued', 'Discontinued'),
+    )
+
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True, blank=True)
     brand = models.ForeignKey(Brand, related_name='watches', on_delete=models.CASCADE)
     category = models.ForeignKey(Category, related_name='watches', on_delete=models.SET_NULL, null=True)
     collection = models.ForeignKey(Collection, related_name='watches', on_delete=models.SET_NULL, null=True, blank=True)
-    
+
     price = models.DecimalField(max_digits=12, decimal_places=2)
     discount_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    
+    currency = models.CharField(max_length=3, default='CHF')
+
     reference_number = models.CharField(max_length=100, unique=True)
+    sku = models.CharField(max_length=120, blank=True)
     movement = models.CharField(max_length=50, choices=MOVEMENT_CHOICES)
-    case_size = models.CharField(max_length=50) # e.g. "41mm"
+    movement_type = models.CharField(max_length=50, choices=MOVEMENT_TYPE_CHOICES, blank=True)
+    caliber = models.CharField(max_length=100, blank=True)
+    power_reserve = models.CharField(max_length=50, blank=True)  # e.g. "72 hours"
+    case_size = models.CharField(max_length=50)  # e.g. "41mm" (display string)
+    case_shape = models.CharField(max_length=100, blank=True)
+    case_diameter_mm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    case_thickness_mm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    lug_to_lug_mm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
     case_material = models.CharField(max_length=100)
+    crystal = models.CharField(max_length=100, blank=True)
+    bezel = models.CharField(max_length=100, blank=True)
     dial_color = models.CharField(max_length=100)
     strap_material = models.CharField(max_length=100)
-    water_resistance = models.CharField(max_length=50)
+    bracelet_material = models.CharField(max_length=100, blank=True)
+    clasp = models.CharField(max_length=100, blank=True)
+    water_resistance = models.CharField(max_length=50)  # display string e.g. "300m"
+    water_resistance_m = models.IntegerField(null=True, blank=True)
+    functions = models.TextField(blank=True)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='unisex')
+    year = models.CharField(max_length=20, blank=True)
+    limited_edition = models.BooleanField(default=False)
     warranty_period = models.CharField(max_length=50, default='2 Years')
-    
+    country = models.CharField(max_length=100, blank=True)  # market/origin if known
+
     description = models.TextField()
-    
+
     is_featured = models.BooleanField(default=False)
     is_trending = models.BooleanField(default=False)
     is_new_arrival = models.BooleanField(default=False)
     is_best_seller = models.BooleanField(default=False)
-    
+
     in_stock = models.BooleanField(default=True)
     stock_count = models.IntegerField(default=10)
-    
+    availability = models.CharField(max_length=20, choices=AVAILABILITY_CHOICES, blank=True)
+
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)
     review_count = models.IntegerField(default=0)
-    
+
+    # ---- Source & licensing (ingestion) ----
+    source = models.CharField(max_length=60, blank=True, db_index=True)  # primary/active source slug, e.g. "watches_of_switzerland"
+    source_product_id = models.CharField(max_length=200, blank=True, db_index=True)
+    source_url = models.URLField(blank=True)
+    sources = models.TextField(blank=True)  # comma-separated list of sources that supplied this catalogue row
+    image_url = models.URLField(blank=True)  # original retailer image URL (never downloaded/redistributed)
+    image_license = models.CharField(max_length=40, blank=True)
+    image_attribution = models.CharField(max_length=200, blank=True)
+    data_quality = models.CharField(max_length=16, default='ok')  # ok | partial | flagged
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['source', 'source_product_id'],
+                name='uniq_watch_source_product',
+                condition=~models.Q(source=''),
+            ),
+        ]
 
     def save(self, *args, **kwargs):
         if not self.slug:
