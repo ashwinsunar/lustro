@@ -1,0 +1,2319 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="argentum-v3-assets/aura-runtime-6a524977f1.js"></script>
+
+<style id="collection3d-critical-fix">
+#s7 .collection3d-track { transform: none !important; }
+#s7 .collection3d-card {
+  transform-origin: center center !important;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: transform 900ms cubic-bezier(.19,1,.22,1), opacity 700ms ease, filter 700ms ease !important;
+}
+#s7 .collection3d-stage { cursor: grab; }
+#s7 .collection3d-stage.is-dragging { cursor: grabbing; }
+#s7 .collection3d-nav, #s7 .collection3d-arrow { position: relative; z-index: 5000; pointer-events: auto !important; }
+</style>
+
+<style id="craftsmanship-lab-v2">
+  #s6.craft-lab {
+    position: relative;
+    height: 560vh;
+    isolation: isolate;
+  }
+
+  #s6 .craft-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    background:
+      radial-gradient(circle at 50% 48%, rgba(137,164,196,.12), transparent 25%),
+      linear-gradient(90deg, rgba(218,228,244,.035) 1px, transparent 1px),
+      #04070d;
+    background-size: auto, 12.5% 100%, auto;
+  }
+
+  #s6 .craft-sticky::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 12% 24%, rgba(255,255,255,.6) 0 1px, transparent 1.5px),
+      radial-gradient(circle at 78% 20%, rgba(180,205,232,.45) 0 1px, transparent 1.6px),
+      radial-gradient(circle at 63% 72%, rgba(255,255,255,.35) 0 1px, transparent 1.5px);
+    background-size: 260px 230px, 310px 270px, 220px 210px;
+    opacity: .22;
+    animation: craftDust 30s linear infinite;
+  }
+
+  #s6 .craft-head {
+    position: relative;
+    z-index: 6;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 30px;
+    padding: clamp(34px, 5vh, 62px) 6vw 16px;
+  }
+
+  #s6 .craft-title {
+    margin: 0;
+    max-width: 840px;
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 500;
+    font-size: clamp(42px, 5.3vw, 86px);
+    line-height: .9;
+    color: #f4f6fa;
+  }
+
+  #s6 .craft-title em {
+    font-weight: 400;
+    color: #bcc7d7;
+  }
+
+  #s6 .craft-kicker {
+    padding-bottom: 8px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: .42em;
+    color: #7f8999;
+    white-space: nowrap;
+  }
+
+  #s6 .craft-stage {
+    position: relative;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  #s6 .craft-orbit {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(46vw, 680px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(211,224,242,.14);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 12px rgba(210,225,245,.018),
+      0 0 90px rgba(125,154,190,.09);
+    pointer-events: none;
+  }
+
+  #s6 .craft-orbit::before,
+  #s6 .craft-orbit::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    inset: 12%;
+    border: 1px dashed rgba(211,224,242,.12);
+    animation: craftSpin 24s linear infinite;
+  }
+
+  #s6 .craft-orbit::after {
+    inset: 31%;
+    border-style: solid;
+    border-color: rgba(211,224,242,.2);
+    animation-direction: reverse;
+    animation-duration: 15s;
+  }
+
+  #s6 .craft-core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(17vw, 248px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, rgba(199,216,237,.16), rgba(11,17,27,.92) 55%, rgba(4,7,13,.98) 72%);
+    border: 1px solid rgba(218,230,246,.24);
+    box-shadow: 0 0 80px rgba(134,164,202,.16);
+    pointer-events: none;
+  }
+
+  #s6 .craft-core::before {
+    content: "";
+    position: absolute;
+    inset: 18%;
+    border: 1px solid rgba(218,230,246,.28);
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent, rgba(218,230,246,.18), transparent 34%);
+    animation: craftSpin 8s linear infinite;
+  }
+
+  #s6 .craft-core-label {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    gap: 8px;
+    text-align: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .3em;
+    color: #8f9bad;
+  }
+
+  #s6 .craft-core-label strong {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(28px, 3vw, 48px);
+    font-weight: 400;
+    letter-spacing: 0;
+    color: #f0f3f8;
+  }
+
+  #s6 #track {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: clamp(52px, 7vw, 116px);
+    width: max-content;
+    padding: 0 38vw 0 8vw;
+    will-change: transform;
+  }
+
+  #s6 .craft-node {
+    position: relative;
+    width: clamp(360px, 36vw, 590px);
+    height: clamp(390px, 54vh, 610px);
+    flex: 0 0 auto;
+    border: 1px solid rgba(208,222,241,.14);
+    border-radius: 34px;
+    overflow: hidden;
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.065), transparent 28%),
+      rgba(6,11,19,.79);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.06),
+      0 38px 90px rgba(0,0,0,.54);
+    backdrop-filter: blur(18px);
+    transform-style: preserve-3d;
+  }
+
+  #s6 .craft-node:nth-of-type(even) {
+    transform: translateY(6vh);
+  }
+
+  #s6 .craft-node:nth-of-type(odd) {
+    transform: translateY(-4vh);
+  }
+
+  #s6 .craft-node::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.07), transparent 62%);
+    transform: translateX(-110%);
+    animation: craftGlass 6.5s ease-in-out infinite;
+  }
+
+  #s6 .craft-node-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 28px 30px 0;
+  }
+
+  #s6 .craft-index {
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(66px, 7vw, 106px);
+    line-height: .72;
+    font-weight: 400;
+    color: rgba(211,224,243,.2);
+  }
+
+  #s6 .craft-meta {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .32em;
+    color: #8390a2;
+    text-align: right;
+  }
+
+  #s6 .craft-visual {
+    position: relative;
+    height: 49%;
+    margin: 22px 28px 0;
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid rgba(210,224,243,.09);
+    background:
+      linear-gradient(rgba(210,224,243,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(210,224,243,.045) 1px, transparent 1px),
+      linear-gradient(145deg, #121a27, #070b12 68%);
+    background-size: 28px 28px, 28px 28px, auto;
+  }
+
+  #s6 .craft-copy {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px 24px;
+    padding: 25px 30px 30px;
+  }
+
+  #s6 .craft-copy h3 {
+    margin: 0;
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(27px, 2.35vw, 40px);
+    font-weight: 500;
+    line-height: 1;
+    color: #f1f3f7;
+  }
+
+  #s6 .craft-copy p {
+    grid-column: 1 / -1;
+    margin: 0;
+    max-width: 48ch;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #9ba6b6;
+  }
+
+  #s6 .craft-status {
+    align-self: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .25em;
+    color: #c5cfdd;
+  }
+
+  #s6 .craft-status::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 9px;
+    border-radius: 50%;
+    background: #d9e3ef;
+    box-shadow: 0 0 12px rgba(217,227,239,.75);
+    animation: craftPulse 2.4s ease-in-out infinite;
+  }
+
+  #s6 .craft-rail {
+    position: relative;
+    z-index: 6;
+    display: grid;
+    grid-template-columns: auto minmax(180px, 520px) auto;
+    align-items: center;
+    gap: 24px;
+    padding: 10px 6vw 30px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .28em;
+    color: #788395;
+  }
+
+  #s6 .craft-rail-line {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(215,226,242,.72), rgba(215,226,242,.08));
+  }
+
+  #s6 .craft-rail-count {
+    color: #d6deea;
+  }
+
+  #s6 .craft-part {
+    position: absolute;
+    border: 1px solid rgba(218,230,246,.42);
+    border-radius: 50%;
+    box-shadow: inset 0 0 24px rgba(218,230,246,.06);
+  }
+
+  #s6 .craft-part.one {
+    width: 132px; height: 132px; left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    animation: craftSpin 8s linear infinite;
+  }
+
+  #s6 .craft-part.two {
+    width: 72px; height: 72px; left: 66%; top: 26%;
+    animation: craftSpin 5s linear reverse infinite;
+  }
+
+  #s6 .craft-part.three {
+    width: 42px; height: 42px; left: 25%; top: 64%;
+    background: conic-gradient(rgba(223,232,244,.3), transparent, rgba(223,232,244,.08));
+    animation: craftSpin 3.6s linear infinite;
+  }
+
+  #s6 .craft-scan {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(227,235,246,.8), transparent);
+    box-shadow: 0 0 18px rgba(227,235,246,.45);
+    animation: craftScan 3.5s ease-in-out infinite;
+  }
+
+  #s6 .craft-wave {
+    position: absolute;
+    left: 7%;
+    right: 7%;
+    bottom: 18%;
+    height: 46%;
+  }
+
+  #s6 .craft-wave svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  #s6 .craft-dial {
+    position: absolute;
+    width: min(52%, 210px);
+    aspect-ratio: 1;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid rgba(220,231,245,.42);
+    background:
+      repeating-conic-gradient(from 0deg, rgba(220,231,245,.28) 0 1deg, transparent 1deg 15deg),
+      radial-gradient(circle, rgba(151,176,205,.12), transparent 65%);
+    animation: craftSpin 18s linear infinite;
+  }
+
+  #s6 .craft-dial::before,
+  #s6 .craft-dial::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform-origin: 0 50%;
+    height: 1px;
+    background: rgba(235,241,249,.82);
+  }
+
+  #s6 .craft-dial::before { width: 37%; transform: rotate(-48deg); }
+  #s6 .craft-dial::after { width: 28%; transform: rotate(38deg); }
+
+  #s6 .craft-strap {
+    position: absolute;
+    width: 23%;
+    height: 130%;
+    left: 50%;
+    top: -15%;
+    transform: translateX(-50%);
+    border: 1px solid rgba(220,231,245,.16);
+    border-radius: 30px;
+    background:
+      linear-gradient(90deg, transparent 48%, rgba(220,231,245,.08) 49% 51%, transparent 52%),
+      repeating-linear-gradient(0deg, rgba(220,231,245,.035) 0 2px, transparent 2px 8px),
+      #0a0f17;
+  }
+
+  #s6 .craft-stamp {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 145px;
+    height: 145px;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(224,234,246,.34);
+    border-radius: 50%;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px;
+    letter-spacing: .24em;
+    color: #c7d1de;
+    animation: craftPulse 3.2s ease-in-out infinite;
+  }
+
+  #s6 .craft-stamp::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px dashed rgba(224,234,246,.26);
+    border-radius: 50%;
+    animation: craftSpin 10s linear infinite;
+  }
+
+  @keyframes craftSpin { to { rotate: 360deg; } }
+  @keyframes craftScan { 0%,100% { top: 18%; opacity: .2; } 50% { top: 82%; opacity: 1; } }
+  @keyframes craftPulse { 0%,100% { opacity: .45; transform: scale(.98); } 50% { opacity: 1; transform: scale(1.02); } }
+  @keyframes craftGlass { 0%,24% { transform: translateX(-110%); } 50%,100% { transform: translateX(110%); } }
+  @keyframes craftDust { to { transform: translate3d(-80px,-60px,0); } }
+
+  @media (max-width: 820px) {
+    #s6.craft-lab { height: 620vh; }
+    #s6 .craft-head { align-items: flex-start; padding-inline: 20px; }
+    #s6 .craft-kicker { display: none; }
+    #s6 .craft-title { font-size: clamp(42px, 14vw, 68px); }
+    #s6 .craft-orbit { width: 88vw; opacity: .55; }
+    #s6 .craft-core { width: 42vw; }
+    #s6 #track { padding-left: 10vw; padding-right: 40vw; gap: 36px; }
+    #s6 .craft-node {
+      width: 82vw;
+      min-width: 300px;
+      height: 56vh;
+      min-height: 440px;
+      border-radius: 25px;
+    }
+    #s6 .craft-node:nth-of-type(even),
+    #s6 .craft-node:nth-of-type(odd) { transform: none; }
+    #s6 .craft-copy { grid-template-columns: 1fr; }
+    #s6 .craft-status { display: none; }
+    #s6 .craft-rail { padding-inline: 20px; }
+  }
+</style>
+
+</head>
+<body>
+
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+  <style>/* cyrillic-ext */
+/* cyrillic */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* greek-ext */
+/* greek */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* greek-ext */
+/* greek */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* greek-ext */
+/* greek */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* greek-ext */
+/* greek */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* greek-ext */
+/* greek */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* greek */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+/* cyrillic-ext */
+/* cyrillic */
+/* greek */
+/* vietnamese */
+/* latin-ext */
+/* latin */
+</style>
+  <style>
+    html, body { margin: 0; padding: 0; background: #04060b; }
+    body { font-family: 'Inter', sans-serif; color: #eef1f6; -webkit-font-smoothing: antialiased; }
+    a { color: #dfe5ee; text-decoration: none; transition: color 300ms ease; }
+    a:hover { color: #ffffff; }
+    ::selection { background: rgba(190,205,230,0.25); color: #ffffff; }
+    @keyframes moonspin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes gearspin { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+    @keyframes sweep { 0% { transform: translateX(-160%) skewX(-18deg); } 60% { transform: translateX(240%) skewX(-18deg); } 100% { transform: translateX(240%) skewX(-18deg); } }
+    @keyframes texzoom { 0% { transform: scale(1); } 50% { transform: scale(1.14); } 100% { transform: scale(1); } }
+    @keyframes hintdrift { 0% { transform: translateY(0); opacity: 0.9; } 70% { transform: translateY(14px); opacity: 0; } 100% { transform: translateY(0); opacity: 0; } }
+    @keyframes floaty { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
+    @keyframes oscillate { 0% { transform: rotate(-32deg); } 50% { transform: rotate(32deg); } 100% { transform: rotate(-32deg); } }
+    @keyframes drawpath { 0% { stroke-dashoffset: 100; } 55% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: 0; } }
+    @keyframes marchdash { to { stroke-dashoffset: -24; } }
+    @keyframes stitchmove { to { background-position: 22px 50%; } }
+    @keyframes needleswing { 0% { transform: rotate(-58deg); } 55% { transform: rotate(42deg); } 100% { transform: rotate(-58deg); } }
+    @keyframes scanline { 0% { top: 4%; } 50% { top: 82%; } 100% { top: 4%; } }
+    @keyframes fillbar { 0% { width: 8%; } 55% { width: 92%; } 100% { width: 8%; } }
+    @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+  
+    /* ===== 3D COLLECTION CAROUSEL ===== */
+    #s7.collection-3d {
+      --collection-glow-x: 50%;
+      position: relative;
+      min-height: 100vh;
+      padding: 15vh 4vw 10vh;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at var(--collection-glow-x) 55%, rgba(164,188,220,.15), transparent 26rem),
+        linear-gradient(180deg, rgba(4,6,11,.15), rgba(4,6,11,.78));
+    }
+    #s7.collection-3d::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse at 50% 82%, transparent 0 41%, rgba(215,226,242,.32) 41.2% 41.5%, transparent 41.8%),
+        radial-gradient(ellipse at 50% 84%, rgba(170,195,226,.09), transparent 38%);
+      opacity: .82;
+    }
+    .collection3d-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 24px;
+      margin: 0 2vw 34px;
+    }
+    .collection3d-title {
+      margin: 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(42px, 5.3vw, 82px);
+      font-weight: 500;
+      line-height: .95;
+      color: #f2f4f8;
+    }
+    .collection3d-title em { font-weight: 400; color: #c8d0dd; }
+    .collection3d-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .42em;
+      color: #8b94a6;
+      white-space: nowrap;
+    }
+    .collection3d-stage {
+      position: relative;
+      height: clamp(570px, 69vh, 760px);
+      max-width: 1700px;
+      margin: 0 auto;
+      perspective: 1500px;
+      transform-style: preserve-3d;
+      touch-action: pan-y;
+      user-select: none;
+    }
+    .collection3d-track { position: absolute; inset: 0; transform-style: preserve-3d; }
+    .collection3d-card {
+      --cx: 0px; --cz: 0px; --cry: 0deg; --cscale: 1; --calpha: 1; --cblur: 0px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: clamp(260px, 27vw, 430px);
+      min-height: clamp(455px, 58vh, 650px);
+      padding: clamp(14px, 1.4vw, 20px);
+      overflow: hidden;
+      border: 1px solid rgba(210,222,244,.18);
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(11,16,27,.96), rgba(5,9,17,.96));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 30px 80px rgba(0,0,0,.55);
+      opacity: var(--calpha);
+      filter: blur(var(--cblur)) saturate(calc(.72 + var(--calpha) * .28));
+      transform:
+        translate(-50%, -50%)
+        translateX(var(--cx))
+        translateZ(var(--cz))
+        rotateY(var(--cry))
+        scale(var(--cscale));
+      transform-style: preserve-3d;
+      will-change: transform, opacity, filter;
+      cursor: pointer;
+      transition:
+        transform 1000ms cubic-bezier(.19,1,.22,1),
+        opacity 1000ms cubic-bezier(.19,1,.22,1),
+        filter 1000ms cubic-bezier(.19,1,.22,1),
+        border-color 300ms ease,
+        box-shadow 300ms ease;
+    }
+    .collection3d-card::after {
+      content: '';
+      position: absolute;
+      inset: -30% -70%;
+      pointer-events: none;
+      background: linear-gradient(105deg, transparent 43%, rgba(255,255,255,.14) 49%, transparent 55%);
+      transform: translateX(-45%);
+      opacity: 0;
+    }
+    .collection3d-card.is-active {
+      border-color: rgba(231,239,249,.72);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 42px 110px rgba(0,0,0,.7), 0 0 56px rgba(170,196,228,.16);
+      cursor: grab;
+    }
+    .collection3d-card.is-active::after { opacity: 1; animation: collectionSheen 5.5s ease-in-out infinite; }
+    .collection3d-media {
+      position: relative;
+      height: clamp(255px, 37vh, 410px);
+      overflow: hidden;
+      border-radius: 17px;
+      background: #060b13;
+      border: 1px solid rgba(255,255,255,.05);
+    }
+    .collection3d-media img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transform: scale(1.02);
+      animation: collectionFloat 5.6s ease-in-out infinite;
+    }
+    .collection3d-media::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 58%, rgba(3,7,13,.52));
+      pointer-events: none;
+    }
+    .collection3d-badge {
+      position: absolute; z-index: 2; top: 16px; left: 16px;
+      padding: 7px 14px; border-radius: 999px;
+      background: #dfe5ee; color: #04060b;
+      font: 700 9px/1 'JetBrains Mono', monospace;
+      letter-spacing: .24em;
+      opacity: 0; transform: translateY(-5px);
+      transition: opacity 350ms ease, transform 350ms ease;
+    }
+    .collection3d-card.is-active .collection3d-badge { opacity: 1; transform: translateY(0); }
+    .collection3d-copy { padding: 18px 4px 2px; text-align: center; transition: opacity 500ms ease; }
+    .collection3d-card:not(.is-active) .collection3d-copy { opacity: .68; }
+    .collection3d-name {
+      margin: 0; font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(23px, 2vw, 32px); font-weight: 500; color: #f2f4f8;
+    }
+    .collection3d-desc { margin: 8px 0 0; font-size: 12px; color: #9aa3b2; }
+    .collection3d-price { margin: 15px 0 0; font: 500 14px/1 'JetBrains Mono', monospace; letter-spacing: .12em; color: #dfe5ee; }
+    .collection3d-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 20px; }
+    .collection3d-action {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 46px; border-radius: 999px; cursor: pointer;
+      font: 600 9px/1 'JetBrains Mono', monospace; letter-spacing: .2em; text-transform: uppercase;
+      transition: transform 220ms ease, background 220ms ease, border-color 220ms ease;
+    }
+    .collection3d-action:hover { transform: translateY(-2px); }
+    .collection3d-action.primary { color: #04060b; background: #dfe5ee; }
+    .collection3d-action.secondary { color: #dfe5ee; border: 1px solid rgba(210,222,244,.22); }
+    .collection3d-card:not(.is-active) .collection3d-actions { opacity: .48; transform: scale(.94); }
+    .collection3d-nav {
+      display: grid; grid-template-columns: auto minmax(180px, 430px) auto;
+      align-items: center; justify-content: center; gap: clamp(18px, 4vw, 50px);
+      margin-top: -12px;
+    }
+    .collection3d-arrow {
+      width: 66px; height: 66px; border-radius: 50%;
+      border: 1px solid rgba(210,222,244,.25); background: rgba(255,255,255,.025);
+      color: #eef1f6; font-size: 25px; cursor: pointer;
+      transition: background 220ms ease, border-color 220ms ease, transform 220ms ease;
+    }
+    .collection3d-arrow:hover { transform: scale(1.04); background: rgba(255,255,255,.07); border-color: rgba(230,238,250,.55); }
+    .collection3d-indicator { display: grid; justify-items: center; gap: 14px; }
+    .collection3d-count { font-family: 'Cormorant Garamond', serif; font-size: 30px; color: #eef1f6; }
+    .collection3d-count span { color: #596271; font-size: .7em; }
+    .collection3d-progress { width: min(100%, 420px); height: 2px; background: rgba(210,222,244,.18); overflow: hidden; }
+    .collection3d-progress i { display: block; height: 100%; width: 25%; background: #dfe5ee; transition: width 700ms cubic-bezier(.19,1,.22,1); }
+    .collection3d-hint { font: 600 9px/1 'JetBrains Mono', monospace; letter-spacing: .45em; color: #6d7686; }
+    @keyframes collectionFloat { 0%,100%{transform:translateY(-2px) scale(1.02)} 50%{transform:translateY(5px) scale(1.02)} }
+    @keyframes collectionSheen { 0%,20%{transform:translateX(-45%)} 55%,100%{transform:translateX(45%)} }
+    @media (max-width: 820px) {
+      #s7.collection-3d { padding: 12vh 16px 9vh; }
+      .collection3d-head { display: grid; margin-inline: 4px; }
+      .collection3d-kicker { white-space: normal; line-height: 1.7; }
+      .collection3d-stage { height: 610px; perspective: 1050px; }
+      .collection3d-card { width: min(82vw, 335px); min-height: 495px; }
+      .collection3d-actions { grid-template-columns: 1fr; }
+      .collection3d-nav { grid-template-columns: auto 1fr auto; gap: 10px; }
+      .collection3d-arrow { width: 52px; height: 52px; }
+    }
+</style>
+</helmet>
+
+<div style="position: relative; background: #04060b; overflow-x: clip;">
+
+  <!-- fixed atmosphere layers -->
+  <canvas id="dust" style="position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;"></canvas>
+  <div id="gridlines" style="position: fixed; inset: 0; z-index: 1; pointer-events: none; display: flex; justify-content: space-evenly;">
+    <div style="width: 1px; height: 100%; background: rgba(210,222,244,0.045);"></div>
+    <div style="width: 1px; height: 100%; background: rgba(210,222,244,0.045);"></div>
+    <div style="width: 1px; height: 100%; background: rgba(210,222,244,0.045);"></div>
+  </div>
+
+  <!-- nav -->
+  <nav id="nav" style="position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 22px 48px; transition: background 500ms ease, border-color 500ms ease, backdrop-filter 500ms ease; border-bottom: 1px solid rgba(210,222,244,0); background: rgba(4,6,11,0);">
+    <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; letter-spacing: 0.32em; font-weight: 500; color: #eef1f6;">LUSTRO</div>
+    <div style="display: flex; align-items: center; gap: 40px;">
+      <a href="#collection" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #9aa3b2;">Collection</a>
+      <a href="#craft" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #9aa3b2;">Craftsmanship</a>
+      <a href="#showcase" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #9aa3b2;">The Watch</a>
+      <div onclick="{{ openCart }}" style="display: flex; align-items: center; gap: 9px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #dfe5ee; border: 1px solid rgba(210,222,244,0.2); padding: 10px 20px; border-radius: 9999px; cursor: pointer; transition: border-color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.5);">Cart<span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #04060b; background: #dfe5ee; border-radius: 9999px; min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px;">{{ cartCount }}</span></div>
+      <div style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 12px 26px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">Reserve</div>
+    </div>
+  </nav>
+
+  <!-- ============ SECTION 1 — HERO ============ -->
+  <section id="s1" data-screen-label="01 Hero" style="position: relative; height: 420vh;">
+    <div style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
+      <video id="v1" src="argentum-v3-assets/video-01-6587d79bd4.mp4" muted="{{ true }}" playsinline="{{ true }}" preload="auto" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 46%; will-change: transform;"></video>
+      <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(0,0,0,0) 30%, rgba(3,5,10,0.75) 100%);"></div>
+      <div id="s1dark" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,6,11,0.4) 0%, rgba(4,6,11,0.1) 35%, rgba(4,6,11,0.7) 100%); opacity: 0.3;"></div>
+      <div id="fade1" style="position: absolute; inset: 0; background: #04060b; opacity: 0; pointer-events: none; z-index: 5;"></div>
+
+      <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 3; pointer-events: none;">
+        <div id="s1eyebrow" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.5em; color: #8b94a6; margin-bottom: 28px;">MANUFACTURE · SINCE 1948</div>
+        <div style="display: flex; gap: 0.35em; align-items: baseline; white-space: nowrap;">
+          <span id="h1a" style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(52px, 9vw, 148px); letter-spacing: 0.06em; color: #f2f4f8; display: inline-block; will-change: transform, opacity; text-shadow: 0 4px 60px rgba(0,0,0,0.6);">LUSTRO</span>
+          <span id="h1b" style="font-family: 'Cormorant Garamond', serif; font-weight: 400; font-style: italic; font-size: clamp(52px, 9vw, 148px); letter-spacing: 0.04em; color: #c8d0dd; display: inline-block; will-change: transform, opacity; text-shadow: 0 4px 60px rgba(0,0,0,0.6);">Genève</span>
+        </div>
+        <div id="s1sub" style="margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 40px; will-change: transform, opacity; pointer-events: auto;">
+          <div style="font-size: 14px; font-weight: 300; letter-spacing: 0.34em; text-transform: uppercase; color: #aab2c2;">Precision shaped by time</div>
+          <div style="display: flex; gap: 18px;">
+            <a href="#collection" style="display: inline-block; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 17px 38px; border-radius: 9999px; transition: background 300ms ease;" style-hover="background: #ffffff; color: #04060b;">Explore Collection</a>
+            <a href="#showcase" style="display: inline-block; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #eef1f6; background: rgba(255,255,255,0.07); border: 1px solid rgba(230,238,250,0.28); padding: 16px 38px; border-radius: 9999px; backdrop-filter: blur(24px) saturate(160%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), inset 0 -8px 20px rgba(0,0,0,0.35), 0 8px 30px rgba(0,0,0,0.45); transition: border-color 300ms ease, background 300ms ease, color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.55); background: rgba(255,255,255,0.12); color: #ffffff;">Reserve Now</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="s1hint" style="position: absolute; bottom: 34px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.4em; color: #6d7686;">SCROLL</div>
+        <div style="width: 1px; height: 44px; background: linear-gradient(180deg, rgba(210,222,244,0.5), rgba(210,222,244,0)); overflow: hidden;">
+          <div style="width: 1px; height: 100%; background: #eef1f6; animation: hintdrift 2.4s ease-in-out infinite;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2 — MACRO MECHANICAL ============ -->
+  <section id="s2" data-screen-label="02 Macro Mechanics" style="position: relative; height: 420vh; margin-top: -1px;">
+    <div style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
+      <video id="v2" src="argentum-v3-assets/video-02-5948fc4804.mp4" muted="{{ true }}" playsinline="{{ true }}" preload="auto" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform;"></video>
+      <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 62% 52% at 50% 48%, rgba(0,0,0,0) 34%, rgba(3,5,10,0.82) 100%);"></div>
+      <div id="fade2" style="position: absolute; inset: 0; background: #04060b; opacity: 1; pointer-events: none; z-index: 5;"></div>
+
+      <div id="s2title" style="position: absolute; top: 9vh; left: 0; right: 0; text-align: center; z-index: 3; will-change: transform, opacity;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.5em; color: #8b94a6; margin-bottom: 14px;">CALIBRE AG-72</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(30px, 3.6vw, 54px); font-weight: 500; color: #f2f4f8;">The mechanics of <em style="font-weight: 400; color: #c8d0dd;">quiet obsession</em></div>
+      </div>
+
+      <div data-panel="0" data-dx="-140" data-dy="-30" data-spd="0.8" style="position: absolute; left: 5vw; top: 24vh; z-index: 4; width: 250px; background: rgba(10,14,24,0.82); border: 1px solid rgba(210,222,244,0.14); border-radius: 18px; padding: 22px 24px; box-shadow: 0 18px 45px -8px rgba(0,0,0,0.9); will-change: transform, opacity;">
+        <div data-line="0" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">01 — COMPLICATION</div>
+        <div data-line="1" style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; color: #f2f4f8; margin-top: 10px;">Moonphase Display</div>
+        <div data-line="2" style="font-size: 12px; line-height: 1.7; color: #9aa3b2; margin-top: 8px;">A 122-year accurate lunar disc, hand-finished in rhodium.</div>
+        <div style="position: absolute; top: 50%; right: -60px; width: 60px; height: 1px; background: linear-gradient(90deg, rgba(210,222,244,0.4), rgba(210,222,244,0));"></div>
+      </div>
+
+      <div data-panel="1" data-dx="150" data-dy="-50" data-spd="1.25" style="position: absolute; right: 5vw; top: 21vh; z-index: 4; width: 250px; background: rgba(10,14,24,0.82); border: 1px solid rgba(210,222,244,0.14); border-radius: 18px; padding: 22px 24px; box-shadow: 0 18px 45px -8px rgba(0,0,0,0.9); will-change: transform, opacity;">
+        <div data-line="0" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">02 — MOVEMENT</div>
+        <div data-line="1" style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; color: #f2f4f8; margin-top: 10px;">Open-Heart Movement</div>
+        <div data-line="2" style="font-size: 12px; line-height: 1.7; color: #9aa3b2; margin-top: 8px;">The escapement beats in open view — 28,800 vibrations per hour.</div>
+        <div style="position: absolute; top: 50%; left: -60px; width: 60px; height: 1px; background: linear-gradient(270deg, rgba(210,222,244,0.4), rgba(210,222,244,0));"></div>
+      </div>
+
+      <div data-panel="2" data-dx="-150" data-dy="60" data-spd="1.5" style="position: absolute; left: 6vw; bottom: 18vh; z-index: 4; width: 240px; background: rgba(10,14,24,0.82); border: 1px solid rgba(210,222,244,0.14); border-radius: 18px; padding: 22px 24px; box-shadow: 0 18px 45px -8px rgba(0,0,0,0.9); will-change: transform, opacity;">
+        <div data-line="0" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">03 — AUTONOMY</div>
+        <div data-line="1" style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; color: #f2f4f8; margin-top: 10px;">72h Power Reserve</div>
+        <div data-line="2" style="font-size: 12px; line-height: 1.7; color: #9aa3b2; margin-top: 8px;">A full weekend off the wrist, indicated at nine o'clock.</div>
+      </div>
+
+      <div data-panel="3" data-dx="150" data-dy="80" data-spd="0.9" style="position: absolute; right: 6vw; bottom: 16vh; z-index: 4; width: 240px; background: rgba(10,14,24,0.82); border: 1px solid rgba(210,222,244,0.14); border-radius: 18px; padding: 22px 24px; box-shadow: 0 18px 45px -8px rgba(0,0,0,0.9); will-change: transform, opacity;">
+        <div data-line="0" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">04 — CALIBRE</div>
+        <div data-line="1" style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; color: #f2f4f8; margin-top: 10px;">Swiss Automatic Calibre</div>
+        <div data-line="2" style="font-size: 12px; line-height: 1.7; color: #9aa3b2; margin-top: 8px;">In-house Calibre AG-72, assembled and adjusted in Geneva.</div>
+      </div>
+
+      <div data-panel="4" data-dx="0" data-dy="130" data-spd="1.1" style="position: absolute; left: 50%; bottom: 6vh; margin-left: -135px; z-index: 4; width: 270px; text-align: center; background: rgba(10,14,24,0.82); border: 1px solid rgba(210,222,244,0.14); border-radius: 18px; padding: 18px 24px; box-shadow: 0 18px 45px -8px rgba(0,0,0,0.9); will-change: transform, opacity;">
+        <div data-line="0" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">05 — PROTECTION</div>
+        <div data-line="1" style="font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; color: #f2f4f8; margin-top: 8px;">Sapphire Crystal</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 3 — EDITORIAL PHILOSOPHY ============ -->
+  <section id="s3" data-screen-label="03 Philosophy" style="position: relative; height: 300vh; background: linear-gradient(180deg, #04060b 0%, #070b14 50%, #04060b 100%);">
+    <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: center; gap: 5vw; padding: 0 6vw; box-sizing: border-box;">
+      <div style="position: relative; z-index: 3;">
+        <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 42px;">
+          <div style="width: 48px; height: 1px; background: rgba(210,222,244,0.3);"></div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.44em; color: #8b94a6; writing-mode: horizontal-tb;">DESIGN PHILOSOPHY</div>
+        </div>
+        <h2 id="s3h" style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(34px, 3.9vw, 62px); line-height: 1.25; color: #f2f4f8; margin: 0; max-width: 15em;">Crafted for those who measure life in moments, not minutes.</h2>
+        <p id="s3p" style="font-size: 14px; font-weight: 300; line-height: 2; color: #9aa3b2; max-width: 46ch; margin: 44px 0 0 0; will-change: clip-path, opacity;">Every Lustro case begins as a single billet of 904L steel, brushed by hand until the grain runs unbroken from lug to lug. The dial is stamped, lacquered and stoned seventeen times before a hand ever touches it. Nothing is decorated. Everything is finished — a distinction our watchmakers consider absolute.</p>
+        <div style="display: flex; align-items: center; gap: 26px; margin-top: 52px;">
+          <div style="width: 100%; max-width: 320px; height: 1px; background: linear-gradient(90deg, rgba(210,222,244,0.28), rgba(210,222,244,0));"></div>
+        </div>
+      </div>
+      <div id="s3vis" style="position: relative; height: 66vh; border-radius: 20px; overflow: hidden; border: 1px solid rgba(210,222,244,0.12); box-shadow: 0 18px 45px -8px rgba(0,0,0,0.9); will-change: transform;">
+        <video id="v3" src="argentum-v3-assets/video-02-5948fc4804.mp4" muted="{{ true }}" playsinline="{{ true }}" autoplay="{{ true }}" loop="{{ true }}" preload="metadata" style="position: absolute; width: 100%; height: 120%; top: -10%; left: 0; object-fit: cover; transform: scale(1.3);"></video>
+        <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,6,11,0.25), rgba(4,6,11,0) 40%, rgba(4,6,11,0.55));"></div>
+        <div style="position: absolute; bottom: 20px; left: 22px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.34em; color: #aab2c2;">CASE DETAIL · 904L</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 4 — FEATURE BENTO ============ -->
+  <section id="s4" data-screen-label="04 Features" style="position: relative; height: 300vh;">
+    <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 0 6vw; box-sizing: border-box; perspective: 1400px;">
+      <div id="s4head" style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 34px; will-change: transform, opacity;">
+        <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(28px, 3vw, 46px); color: #f2f4f8; margin: 0;">Eight decisions, <em style="font-weight: 400; color: #c8d0dd;">no compromises</em></h2>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.4em; color: #8b94a6;">SPECIFICATION</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(150px, 19vh); gap: 14px;">
+
+        <div data-bento="0" data-tx="-160" data-ty="-90" data-rz="-6" style="grid-column: span 2; grid-row: span 2; position: relative; overflow: hidden; background: rgba(10,14,24,0.72); border: 1px solid rgba(210,222,244,0.13); border-radius: 20px; padding: 28px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 45px -8px rgba(0,0,0,0.8); will-change: transform, opacity;">
+          <div style="position: absolute; right: -46px; top: -46px; width: 210px; height: 210px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #dfe5ee 0%, #8b94a6 28%, #232a38 62%, #0a0f1a 100%); box-shadow: 0 0 80px rgba(160,180,220,0.22); animation: moonspin 42s linear infinite;"></div>
+          <div style="position: absolute; right: -46px; top: -46px; width: 210px; height: 210px; border-radius: 50%; background: radial-gradient(circle at 70% 70%, rgba(4,6,11,0.9) 0%, rgba(4,6,11,0) 55%);"></div>
+          <div style="position: absolute; right: -71px; top: -71px; width: 260px; height: 260px; border-radius: 50%; border: 1px dashed rgba(210,222,244,0.14); animation: gearspin 24s linear infinite;"><div style="position: absolute; left: 50%; top: -3px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: #dfe5ee; box-shadow: 0 0 12px rgba(200,215,245,0.9);"></div></div>
+          <div style="position: absolute; left: 28px; top: 26px; width: 3px; height: 3px; border-radius: 50%; background: rgba(220,232,250,0.8); animation: pulse 3.2s ease-in-out infinite;"></div>
+          <div style="position: absolute; left: 96px; top: 54px; width: 2px; height: 2px; border-radius: 50%; background: rgba(220,232,250,0.6); animation: pulse 4.4s ease-in-out 1s infinite;"></div>
+          <div style="position: absolute; left: 56px; top: 108px; width: 2px; height: 2px; border-radius: 50%; background: rgba(220,232,250,0.5); animation: pulse 5.1s ease-in-out 2s infinite;"></div>
+          <div style="position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; justify-content: flex-end;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">COMPLICATION</div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 500; color: #f2f4f8; margin-top: 8px;">Moonphase complication</div>
+            <div style="font-size: 12px; line-height: 1.7; color: #9aa3b2; margin-top: 6px; max-width: 34ch;">The lunar disc deviates by a single day every 122 years.</div>
+            <div style="display: flex; gap: 14px; margin-top: 16px; align-items: center; flex-wrap: wrap;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6d7686;">LUNATION 29.53 D</div>
+              <div style="width: 1px; height: 12px; background: rgba(210,222,244,0.2);"></div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6d7686;">AGE 12.4 D</div>
+              <div style="width: 1px; height: 12px; background: rgba(210,222,244,0.2);"></div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6d7686;">WAXING GIBBOUS</div>
+            </div>
+          </div>
+        </div>
+
+        <div data-bento="1" data-tx="120" data-ty="-140" data-rz="5" style="grid-column: span 2; position: relative; overflow: hidden; background: rgba(10,14,24,0.72); border: 1px solid rgba(210,222,244,0.13); border-radius: 20px; padding: 26px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 45px -8px rgba(0,0,0,0.8); will-change: transform, opacity;">
+          <div style="position: absolute; right: 22px; top: 50%; transform: translateY(-50%);">
+            <div style="width: 86px; height: 86px; border-radius: 50%; border: 1px dashed rgba(210,222,244,0.4); animation: gearspin 26s linear infinite;"></div>
+            <div style="position: absolute; right: 60px; top: 42px; width: 52px; height: 52px; border-radius: 50%; border: 1px dashed rgba(210,222,244,0.28); animation: moonspin 16s linear infinite;"></div>
+            <div style="position: absolute; right: 16px; top: 16px; width: 54px; height: 54px; border-radius: 50%; border-top: 2px solid rgba(223,229,238,0.75); border-right: 2px solid rgba(223,229,238,0.12); border-bottom: 2px solid transparent; border-left: 2px solid rgba(223,229,238,0.12); animation: oscillate 0.9s ease-in-out infinite;"></div>
+          </div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">MOVEMENT</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 500; color: #f2f4f8; margin-top: 8px;">Open-heart automatic</div>
+          <div style="font-size: 12px; color: #9aa3b2; margin-top: 6px;">Balance wheel exposed at six o'clock.</div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px;">
+            <div style="width: 5px; height: 5px; border-radius: 50%; background: #dfe5ee; animation: pulse 0.9s ease-in-out infinite;"></div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6d7686;">28,800 VPH · 4 HZ · 31 JEWELS</div>
+          </div>
+        </div>
+
+        <div data-bento="2" data-tx="200" data-ty="-40" data-rz="-4" style="position: relative; overflow: hidden; background: linear-gradient(115deg, #141a26 0%, #1e2634 42%, #12171f 100%); border: 1px solid rgba(210,222,244,0.13); border-radius: 20px; padding: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 18px 45px -8px rgba(0,0,0,0.8); will-change: transform, opacity;">
+          <div style="position: absolute; inset: 0; background: repeating-linear-gradient(100deg, rgba(230,238,250,0.05) 0px, rgba(230,238,250,0) 2px, rgba(230,238,250,0) 5px);"></div>
+          <div style="position: absolute; inset: 0; overflow: hidden;"><div style="position: absolute; top: -20%; bottom: -20%; width: 40%; background: linear-gradient(90deg, rgba(230,238,250,0) 0%, rgba(230,238,250,0.14) 50%, rgba(230,238,250,0) 100%); animation: sweep 5.5s ease-in-out infinite;"></div></div>
+          <div style="position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; justify-content: flex-end;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">CASE</div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 500; color: #f2f4f8; margin-top: 6px;">Brushed silver case</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6d7686; margin-top: 8px;">904L STEEL · Ø 40.5 MM · H 11.2 MM</div>
+          </div>
+        </div>
+
+        <div data-bento="3" data-tx="90" data-ty="120" data-rz="7" style="position: relative; overflow: hidden; background: rgba(8,12,22,0.55); border: 1px solid rgba(210,222,244,0.13); border-radius: 20px; padding: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 45px -8px rgba(0,0,0,0.8); will-change: transform, opacity;">
+          <div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(200,212,232,0.09) 1.4px, transparent 1.4px); background-size: 13px 13px; animation: texzoom 9s ease-in-out infinite;"></div>
+          <div style="position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; justify-content: flex-end;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">STRAP</div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 500; color: #f2f4f8; margin-top: 6px;">Black crocodile leather</div>
+            <div style="height: 6px; margin-top: 12px; background-image: linear-gradient(90deg, rgba(223,229,238,0.7) 0 10px, transparent 10px 22px); background-size: 22px 2px; background-repeat: repeat-x; background-position: 0 50%; animation: stitchmove 1.6s linear infinite;"></div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6d7686; margin-top: 6px;">HAND-STITCHED · 142 PASSES</div>
+          </div>
+        </div>
+
+        <div data-bento="4" data-tx="-190" data-ty="70" data-rz="5" style="position: relative; overflow: hidden; background: rgba(10,14,24,0.72); border: 1px solid rgba(210,222,244,0.13); border-radius: 20px; padding: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 45px -8px rgba(0,0,0,0.8); will-change: transform, opacity;">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 42px; font-weight: 500; color: #dfe5ee; letter-spacing: -0.02em;">72<span style="font-size: 18px; color: #8b94a6;">H</span></div>
+            <div style="position: relative; width: 74px; height: 42px; overflow: hidden;">
+              <div style="position: absolute; left: 0; top: 0; width: 72px; height: 72px; border-radius: 50%; border: 1px solid rgba(210,222,244,0.25);"></div>
+              <div style="position: absolute; left: 50%; bottom: -2px; width: 2px; height: 30px; margin-left: -1px; background: #dfe5ee; transform-origin: 50% 100%; animation: needleswing 5.5s ease-in-out infinite;"></div>
+              <div style="position: absolute; left: 3px; bottom: 0; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #6d7686;">E</div>
+              <div style="position: absolute; right: 3px; bottom: 0; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #6d7686;">F</div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; margin-top: 14px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">RESERVE</div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; color: #f2f4f8; margin-top: 6px;">Power reserve indicator</div>
+          </div>
+        </div>
+
+        <div data-bento="5" data-tx="-80" data-ty="150" data-rz="-7" style="position: relative; overflow: hidden; background: rgba(10,14,24,0.72); border: 1px solid rgba(210,222,244,0.13); border-radius: 20px; padding: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 45px -8px rgba(0,0,0,0.8); will-change: transform, opacity;">
+          <div style="position: relative; width: 62px; height: 62px;">
+            <div style="position: absolute; inset: -8px; border-radius: 50%; border: 1px dashed rgba(210,222,244,0.22); animation: moonspin 30s linear infinite;"></div>
+            <div style="width: 62px; height: 62px; border-radius: 50%; border: 1px solid rgba(210,222,244,0.25); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 18px; color: #dfe5ee; box-sizing: border-box;">31</div>
+          </div>
+          <div style="display: flex; flex-direction: column; margin-top: 14px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">CALENDAR</div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; color: #f2f4f8; margin-top: 6px;">Date subdial</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6d7686; margin-top: 6px;">INSTANT JUMP · MIDNIGHT ±5 MIN</div>
+          </div>
+        </div>
+
+        <div data-bento="6" data-tx="160" data-ty="100" data-rz="4" style="position: relative; overflow: hidden; background: rgba(10,14,24,0.72); border: 1px solid rgba(210,222,244,0.13); border-radius: 20px; padding: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 45px -8px rgba(0,0,0,0.8); will-change: transform, opacity;">
+          <div style="position: absolute; left: 20%; top: -30%; width: 60%; height: 80%; border-radius: 50%; background: radial-gradient(ellipse at 50% 100%, rgba(190,208,236,0.14), rgba(190,208,236,0) 70%);"></div>
+          <div style="position: absolute; inset: 0; overflow: hidden;"><div style="position: absolute; top: -20%; bottom: -20%; width: 30%; background: linear-gradient(90deg, rgba(230,238,250,0) 0%, rgba(230,238,250,0.1) 50%, rgba(230,238,250,0) 100%); animation: sweep 7s ease-in-out 1.4s infinite;"></div></div>
+          <div style="position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; justify-content: flex-end;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.32em; color: #8b94a6;">GLASS</div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; color: #f2f4f8; margin-top: 6px;">Sapphire crystal</div>
+            <div style="font-size: 12px; color: #9aa3b2; margin-top: 4px;">Double-domed, anti-reflective.</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6d7686; margin-top: 8px;">HARDNESS 9 MOHS · AR COATING ×2</div>
+          </div>
+        </div>
+
+        <div data-bento="7" data-tx="-120" data-ty="-120" data-rz="6" style="position: relative; overflow: hidden; background: rgba(10,14,24,0.72); border: 1px solid rgba(210,222,244,0.13); border-radius: 20px; padding: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 18px 45px -8px rgba(0,0,0,0.8); will-change: transform, opacity;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="width: 8px; height: 8px; background: #dfe5ee;"></div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.4em; color: #dfe5ee;">SWISS MADE</div>
+          </div>
+          <div style="display: flex; flex-direction: column; margin-top: 14px;">
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; color: #f2f4f8;">Geneva finishing</div>
+            <div style="font-size: 12px; color: #9aa3b2; margin-top: 4px;">Côtes de Genève, perlage, anglage.</div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 12px;">
+              <div style="width: 5px; height: 5px; border-radius: 50%; background: #dfe5ee; animation: pulse 2.4s ease-in-out infinite;"></div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: #6d7686;">POINÇON DE GENÈVE · CERT. Nº 0448</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5 — 360 SHOWCASE / PRODUCT PAGE ============ -->
+  <section id="s5" data-screen-label="05 Product Showcase" style="position: relative; height: 380vh;">
+    <a id="showcase" style="position: absolute; top: 0;"></a>
+    <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: center; padding: 0 6vw; box-sizing: border-box; gap: 4vw;">
+      <div style="position: relative; height: 84vh; display: flex; flex-direction: column; align-items: center; justify-content: center; perspective: 1400px;">
+        <!-- split text opening around the product -->
+        <div id="s5ta" style="position: absolute; right: 50%; top: 40%; z-index: 0; font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(60px, 8vw, 150px); letter-spacing: 0.08em; color: rgba(210,222,244,0.16); line-height: 1; white-space: nowrap; pointer-events: none; will-change: transform, opacity;">MOON</div>
+        <div id="s5tb" style="position: absolute; left: 50%; top: 40%; z-index: 0; font-family: 'Cormorant Garamond', serif; font-weight: 400; font-style: italic; font-size: clamp(60px, 8vw, 150px); letter-spacing: 0.08em; color: rgba(210,222,244,0.16); line-height: 1; white-space: nowrap; pointer-events: none; will-change: transform, opacity;">PHASE</div>
+        <div id="s5glow" style="position: absolute; left: 50%; top: 50%; width: 60vmin; height: 60vmin; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(150,175,220,0.16) 0%, rgba(150,175,220,0) 65%); will-change: opacity;"></div>
+        <div id="s5frame" style="position: relative; z-index: 1; width: 100%; height: 72vh; border-radius: 24px; overflow: hidden; border: 1px solid rgba(210,222,244,0.12); box-shadow: 0 18px 45px -8px rgba(0,0,0,0.95); will-change: transform;">
+          <video id="v5" src="argentum-v3-assets/video-01-6587d79bd4.mp4" muted="{{ true }}" playsinline="{{ true }}" preload="metadata" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+          <img id="varimg1" src="argentum-v3-assets/image-01-9dcdd44636.jpg" alt="Lustro silver steel bracelet" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1); will-change: opacity;">
+          <img id="varimg2" src="argentum-v3-assets/image-02-dd7072c07d.jpg" alt="Lustro moonphase dial detail" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1); will-change: opacity;">
+          <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 75% 65% at 50% 45%, rgba(0,0,0,0) 45%, rgba(3,5,10,0.6) 100%); pointer-events: none;"></div>
+          <!-- cinematic light sweep, scroll-driven -->
+          <div id="s5sweep" style="position: absolute; inset: -10%; z-index: 2; pointer-events: none; background: linear-gradient(115deg, rgba(230,238,250,0) 34%, rgba(230,238,250,0.16) 50%, rgba(230,238,250,0) 66%); transform: translateX(-130%); will-change: transform;"></div>
+          <div id="varlabel" style="position: absolute; top: 18px; left: 20px; z-index: 3; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.34em; color: #aab2c2; transition: opacity 400ms ease;">360° · SCROLL TO ROTATE</div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 22px;">
+          <div data-variant="0" style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #04060b; background: #dfe5ee; border: 1px solid rgba(210,222,244,0.3); padding: 10px 20px; border-radius: 9999px; cursor: pointer; transition: all 300ms ease;">Black Leather</div>
+          <div data-variant="1" style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #9aa3b2; background: rgba(8,12,22,0.5); border: 1px solid rgba(210,222,244,0.16); padding: 10px 20px; border-radius: 9999px; cursor: pointer; transition: all 300ms ease;" style-hover="border-color: rgba(230,238,250,0.4); color: #eef1f6;">Silver Case</div>
+          <div data-variant="2" style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #9aa3b2; background: rgba(8,12,22,0.5); border: 1px solid rgba(210,222,244,0.16); padding: 10px 20px; border-radius: 9999px; cursor: pointer; transition: all 300ms ease;" style-hover="border-color: rgba(230,238,250,0.4); color: #eef1f6;">Moonphase Dial</div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0;">
+        <div data-spec="0" style="will-change: transform, opacity;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.4em; color: #8b94a6;">REF. AG-1948-MS</div>
+          <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(30px, 3vw, 46px); color: #f2f4f8; margin: 14px 0 0 0; line-height: 1.15;">Lustro Moonphase <em style="font-weight: 400; color: #c8d0dd;">Silver</em></h2>
+          <p style="font-size: 13px; font-weight: 300; line-height: 1.9; color: #9aa3b2; margin: 18px 0 0 0; max-width: 44ch;">A brushed silver case around a black textured dial, carrying a moonphase, a date subdial and an open heart — driven by our in-house automatic calibre.</p>
+        </div>
+        <div style="height: 1px; background: rgba(210,222,244,0.12); margin: 30px 0;"></div>
+        <div style="display: flex; flex-direction: column; gap: 13px;">
+          <div data-spec="1" style="display: flex; justify-content: space-between; will-change: transform, opacity;"><span style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #7d8595;">Case</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #dfe5ee;">40.5 mm · brushed 904L</span></div>
+          <div data-spec="2" style="display: flex; justify-content: space-between; will-change: transform, opacity;"><span style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #7d8595;">Movement</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #dfe5ee;">Calibre AG-72 · automatic</span></div>
+          <div data-spec="3" style="display: flex; justify-content: space-between; will-change: transform, opacity;"><span style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #7d8595;">Strap</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #dfe5ee;">Black crocodile leather</span></div>
+          <div data-spec="4" style="display: flex; justify-content: space-between; will-change: transform, opacity;"><span style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #7d8595;">Water resistance</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #dfe5ee;">5 ATM</span></div>
+          <div data-spec="5" style="display: flex; justify-content: space-between; will-change: transform, opacity;"><span style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #7d8595;">Power reserve</span><span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #dfe5ee;">72 hours</span></div>
+        </div>
+        <div style="height: 1px; background: rgba(210,222,244,0.12); margin: 30px 0;"></div>
+        <div data-spec="6" style="will-change: transform, opacity;">
+          <div id="s5price" style="font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 500; color: #ffffff; will-change: opacity;">CHF 24,500</div>
+          <div style="display: flex; gap: 14px; margin-top: 22px; flex-wrap: wrap;">
+            <div data-add="AG-1948-MS" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 17px 36px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">Add to Cart</div>
+            <div style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #dfe5ee; border: 1px solid rgba(210,222,244,0.22); padding: 16px 36px; border-radius: 9999px; cursor: pointer; transition: border-color 300ms ease, color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.5); color: #ffffff;">Reserve Appointment</div>
+          </div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.24em; color: #6d7686; margin-top: 18px;">COMPLIMENTARY DELIVERY · 5-YEAR INTERNATIONAL WARRANTY</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <!-- ============ SECTION 6 — CRAFTSMANSHIP LAB ============ -->
+  <section id="s6" class="craft-lab" data-screen-label="06 Craftsmanship">
+    <a id="craft" style="position:absolute;top:0"></a>
+
+    <div class="craft-sticky">
+      <header class="craft-head">
+        <h2 class="craft-title">The making of <em>an Lustro</em></h2>
+        <div class="craft-kicker">MANUFACTURE · GENEVA</div>
+      </header>
+
+      <div class="craft-stage">
+        <div class="craft-orbit" aria-hidden="true"></div>
+        <div class="craft-core" aria-hidden="true">
+          <div class="craft-core-label">
+            <span>CALIBRE</span>
+            <strong>A-01</strong>
+            <span>ASSEMBLY PATH</span>
+          </div>
+        </div>
+
+        <div id="track">
+          <article class="craft-node" data-step="0">
+            <div class="craft-node-head">
+              <div class="craft-index">01</div>
+              <div class="craft-meta">ATELIER 01<br>DRAWING ROOM</div>
+            </div>
+            <div class="craft-visual">
+              <div class="craft-dial"></div>
+              <div class="craft-scan"></div>
+            </div>
+            <div class="craft-copy">
+              <h3 data-steptitle="0">Design sketch</h3>
+              <div class="craft-status">ARCHIVED</div>
+              <p>Every reference begins as a full-scale study. Proportion, balance and light are resolved before a single tool touches metal.</p>
+            </div>
+          </article>
+
+          <article class="craft-node" data-step="1">
+            <div class="craft-node-head">
+              <div class="craft-index">02</div>
+              <div class="craft-meta">ATELIER 02<br>CASE ROOM</div>
+            </div>
+            <div class="craft-visual">
+              <div class="craft-part one"></div>
+              <div class="craft-part two"></div>
+              <div class="craft-part three"></div>
+              <div class="craft-scan"></div>
+            </div>
+            <div class="craft-copy">
+              <h3 data-steptitle="1">Case architecture</h3>
+              <div class="craft-status">MACHINING</div>
+              <p>The case is cut in controlled passes, then refined by hand until every transition feels continuous from lug to crown.</p>
+            </div>
+          </article>
+
+          <article class="craft-node" data-step="2">
+            <div class="craft-node-head">
+              <div class="craft-index">03</div>
+              <div class="craft-meta">ATELIER 03<br>FINISHING ROOM</div>
+            </div>
+            <div class="craft-visual">
+              <div class="craft-wave">
+                <svg viewBox="0 0 600 180" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M0 104 C54 18 106 164 164 82 S278 20 332 104 S446 164 504 76 S566 26 600 92"
+                    fill="none" stroke="rgba(222,232,245,.66)" stroke-width="2"
+                    pathLength="100" stroke-dasharray="100" style="animation:drawpath 6s ease-in-out infinite"/>
+                  <path d="M0 128 C64 76 108 146 170 112 S276 70 340 128 S450 146 512 102 S570 86 600 114"
+                    fill="none" stroke="rgba(167,190,218,.28)" stroke-width="1"/>
+                </svg>
+              </div>
+              <div class="craft-scan"></div>
+            </div>
+            <div class="craft-copy">
+              <h3 data-steptitle="2">Surface finishing</h3>
+              <div class="craft-status">HAND WORK</div>
+              <p>Brushed planes and polished edges are finished independently so every surface responds to light with intention.</p>
+            </div>
+          </article>
+
+          <article class="craft-node" data-step="3">
+            <div class="craft-node-head">
+              <div class="craft-index">04</div>
+              <div class="craft-meta">ATELIER 04<br>ASSEMBLY BENCH</div>
+            </div>
+            <div class="craft-visual">
+              <div class="craft-dial"></div>
+              <div class="craft-part two"></div>
+              <div class="craft-part three"></div>
+            </div>
+            <div class="craft-copy">
+              <h3 data-steptitle="3">Movement assembly</h3>
+              <div class="craft-status">CALIBRATING</div>
+              <p>Hundreds of components are assembled under magnification, adjusted by feel, then regulated across multiple positions.</p>
+            </div>
+          </article>
+
+          <article class="craft-node" data-step="4">
+            <div class="craft-node-head">
+              <div class="craft-index">05</div>
+              <div class="craft-meta">ATELIER 05<br>LEATHER ROOM</div>
+            </div>
+            <div class="craft-visual">
+              <div class="craft-strap"></div>
+              <div class="craft-scan"></div>
+            </div>
+            <div class="craft-copy">
+              <h3 data-steptitle="4">Strap finishing</h3>
+              <div class="craft-status">HAND STITCHED</div>
+              <p>Edges are sealed, folded and stitched by hand. The final curve is shaped to sit naturally against the wrist.</p>
+            </div>
+          </article>
+
+          <article class="craft-node" data-step="5">
+            <div class="craft-node-head">
+              <div class="craft-index">06</div>
+              <div class="craft-meta">ATELIER 06<br>CONTROL ROOM</div>
+            </div>
+            <div class="craft-visual">
+              <div class="craft-stamp">GENEVA<br>FINAL<br>CONTROL</div>
+            </div>
+            <div class="craft-copy">
+              <h3 data-steptitle="5">Final inspection</h3>
+              <div class="craft-status">PASSED</div>
+              <p>Accuracy, amplitude, sealing and finishing are observed over several weeks before the watch receives its final signature.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="craft-rail">
+        <span class="craft-rail-count">01 — 06</span>
+        <div class="craft-rail-line"></div>
+        <span>SCROLL TO FOLLOW THE CALIBRE</span>
+      </div>
+    </div>
+  </section>
+
+<!-- ============ SECTION 11 — ASSEMBLY FILM ============ -->
+  <section id="s11" data-screen-label="11 Assembly Film" style="position: relative; height: 400vh;">
+    <div style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
+      <video id="v11" src="argentum-v3-assets/video-03-2574601690.mp4" muted="{{ true }}" playsinline="{{ true }}" preload="metadata" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 50%; will-change: transform;"></video>
+      <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 64% 54% at 50% 46%, rgba(0,0,0,0) 32%, rgba(3,5,10,0.8) 100%);"></div>
+      <div id="fade11" style="position: absolute; inset: 0; background: #04060b; opacity: 1; pointer-events: none; z-index: 5;"></div>
+
+<!-- crosshair grid lines -->
+      <div id="s11vline" style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(210,222,244,0.14); transform: scaleY(0); transform-origin: 50% 0; z-index: 2; will-change: transform;"></div>
+      <div id="s11hline" style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(210,222,244,0.14); transform: scaleX(0); transform-origin: 0 50%; z-index: 2; will-change: transform;"></div>
+      <div style="position: absolute; left: 50%; top: 50%; width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px; z-index: 2; color: rgba(210,222,244,0.5); font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 13px; text-align: center;">+</div>
+
+      <!-- headline · top-left quadrant -->
+      <div id="s11title" style="position: absolute; top: 10vh; left: 6vw; z-index: 3; will-change: transform, opacity;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.5em; color: #8b94a6; margin-bottom: 20px;">CALIBRE AG-72</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: clamp(48px, 6.4vw, 110px); font-weight: 500; line-height: 1.02; color: #f2f4f8; text-shadow: 0 6px 60px rgba(0,0,0,0.7);">THE<br>ASSEMBLY</div>
+      </div>
+
+      <!-- intro paragraph · top-right quadrant -->
+      <div id="s11intro" style="position: absolute; top: 13vh; right: 6vw; z-index: 3; width: min(400px, 38vw); will-change: transform, opacity;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 2.1; letter-spacing: 0.06em; color: #c2cad8;">212 components are assembled by a single watchmaker, in sequence, over three weeks. Every wheel is seated, every jewel oiled, every bridge torqued by hand — then the whole calibre is taken apart, inspected, and built once more.</div>
+      </div>
+
+      <!-- numbered glass cards, one per quadrant -->
+      <div data-acard="0" style="position: absolute; left: 13vw; top: 52vh; z-index: 4; width: min(340px, 80vw); box-sizing: border-box; background: linear-gradient(150deg, rgba(24,32,48,0.5), rgba(10,14,24,0.65)); border: 1px solid rgba(210,222,244,0.14); border-radius: 8px; padding: 26px 30px 30px 30px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 24px 60px rgba(0,0,0,0.55); will-change: transform, opacity;">
+        <div style="display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #9aa3b2;"><span style="display: inline-block; width: 7px; height: 7px; background: #dfe5ee;"></span>001</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 500; letter-spacing: 0.06em; color: #f2f4f8; margin-top: 42px; text-align: right;">SEQUENCE</div>
+        <div style="font-size: 12.5px; line-height: 1.9; color: #9aa3b2; margin-top: 12px; text-align: right;">The going train is built first, then the escapement, then the complications — never in parallel, never rushed.</div>
+      </div>
+
+      <div data-acard="1" style="position: absolute; right: 11vw; top: 34vh; z-index: 4; width: min(340px, 80vw); box-sizing: border-box; background: linear-gradient(150deg, rgba(24,32,48,0.5), rgba(10,14,24,0.65)); border: 1px solid rgba(210,222,244,0.14); border-radius: 8px; padding: 26px 30px 30px 30px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 24px 60px rgba(0,0,0,0.55); will-change: transform, opacity;">
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #9aa3b2;">002<span style="display: inline-block; width: 7px; height: 7px; background: #dfe5ee;"></span></div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 500; letter-spacing: 0.06em; color: #f2f4f8; margin-top: 42px;">PRECISION</div>
+        <div style="font-size: 12.5px; line-height: 1.9; color: #9aa3b2; margin-top: 12px;">Tolerances are held to ±0.02 mm. If a part does not seat perfectly, it is remade — not adjusted.</div>
+      </div>
+
+      <div data-acard="2" style="position: absolute; right: 8vw; top: 70vh; z-index: 4; width: min(340px, 80vw); box-sizing: border-box; background: linear-gradient(150deg, rgba(24,32,48,0.5), rgba(10,14,24,0.65)); border: 1px solid rgba(210,222,244,0.14); border-radius: 8px; padding: 26px 30px 30px 30px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 24px 60px rgba(0,0,0,0.55); will-change: transform, opacity;">
+        <div style="display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #9aa3b2;"><span style="display: inline-block; width: 7px; height: 7px; background: #dfe5ee;"></span>003</div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 500; letter-spacing: 0.06em; color: #f2f4f8; margin-top: 42px; text-align: right;">CONTROL</div>
+        <div style="font-size: 12.5px; line-height: 1.9; color: #9aa3b2; margin-top: 12px; text-align: right;">Assembled twice: once to learn the movement, once to keep it. 217 checks before the dial goes on.</div>
+      </div>
+
+      <div style="position: absolute; bottom: 30px; left: 6vw; z-index: 3; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.34em; color: #6d7686;">FILM · SCROLL TO SCRUB</div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 7 — 3D COLLECTION ============ -->
+  <section id="s7" class="collection-3d" data-screen-label="07 Collection">
+    <a id="collection" style="position:absolute;top:0"></a>
+    <header class="collection3d-head">
+      <h2 class="collection3d-title">The <em>collection</em></h2>
+      <div class="collection3d-kicker">FOUR REFERENCES · MMXXVI</div>
+    </header>
+    <div class="collection3d-stage" id="collectionStage" aria-roledescription="carousel">
+      <div class="collection3d-track" id="collectionTrack"><article class="collection3d-card" data-collection-card="0" aria-label="Lustro Moonphase Silver">
+        <div class="collection3d-media"><div class="collection3d-badge">FEATURED</div><img src="argentum-v3-assets/image-03-cdbf78c96d.webp" alt="Lustro Moonphase Silver" loading="lazy"></div>
+        <div class="collection3d-copy">
+          <h3 class="collection3d-name">Lustro Moonphase Silver</h3>
+          <p class="collection3d-desc">Moonphase · open heart · brushed 904L</p>
+          <p class="collection3d-price">CHF 24,500</p>
+          <div class="collection3d-actions">
+            <div class="collection3d-action primary" data-add="AG-1948-MS">Add to Cart</div>
+            <div class="collection3d-action secondary" onclick="{{ viewMS }}">View Details</div>
+          </div>
+        </div>
+      </article><article class="collection3d-card" data-collection-card="1" aria-label="Lustro Black Ceramic">
+        <div class="collection3d-media"><img src="argentum-v3-assets/image-04-3853ba2679.webp" alt="Lustro Black Ceramic" loading="lazy"></div>
+        <div class="collection3d-copy">
+          <h3 class="collection3d-name">Lustro Black Ceramic</h3>
+          <p class="collection3d-desc">Matte ceramic case · rubber-lined strap</p>
+          <p class="collection3d-price">CHF 21,900</p>
+          <div class="collection3d-actions">
+            <div class="collection3d-action primary" data-add="AG-2100-BC">Add to Cart</div>
+            <div class="collection3d-action secondary" onclick="{{ viewBC }}">View Details</div>
+          </div>
+        </div>
+      </article><article class="collection3d-card" data-collection-card="2" aria-label="Lustro Open-Heart Steel">
+        <div class="collection3d-media"><img src="argentum-v3-assets/image-05-6a7b166042.webp" alt="Lustro Open-Heart Steel" loading="lazy"></div>
+        <div class="collection3d-copy">
+          <h3 class="collection3d-name">Lustro Open-Heart Steel</h3>
+          <p class="collection3d-desc">Skeletonised balance · steel bracelet</p>
+          <p class="collection3d-price">CHF 18,400</p>
+          <div class="collection3d-actions">
+            <div class="collection3d-action primary" data-add="AG-1877-OS">Add to Cart</div>
+            <div class="collection3d-action secondary" onclick="{{ viewOS }}">View Details</div>
+          </div>
+        </div>
+      </article><article class="collection3d-card" data-collection-card="3" aria-label="Lustro Classic Leather">
+        <div class="collection3d-media"><img src="argentum-v3-assets/image-06-e5a1f7de6f.webp" alt="Lustro Classic Leather" loading="lazy"></div>
+        <div class="collection3d-copy">
+          <h3 class="collection3d-name">Lustro Classic Leather</h3>
+          <p class="collection3d-desc">Time-only · 38 mm · calf leather</p>
+          <p class="collection3d-price">CHF 12,900</p>
+          <div class="collection3d-actions">
+            <div class="collection3d-action primary" data-add="AG-1602-CL">Add to Cart</div>
+            <div class="collection3d-action secondary" onclick="{{ viewCL }}">View Details</div>
+          </div>
+        </div>
+      </article></div>
+    </div>
+    <nav class="collection3d-nav" aria-label="Collection carousel controls">
+      <button class="collection3d-arrow" id="collectionPrev" type="button" aria-label="Previous watch">←</button>
+      <div class="collection3d-indicator" aria-live="polite">
+        <div class="collection3d-count"><strong id="collectionCurrent">01</strong> <span>/ 04</span></div>
+        <div class="collection3d-progress" aria-hidden="true"><i id="collectionProgress"></i></div>
+        <div class="collection3d-hint">DRAG TO EXPLORE</div>
+      </div>
+      <button class="collection3d-arrow" id="collectionNext" type="button" aria-label="Next watch">→</button>
+    </nav>
+  </section>
+
+  <!-- ============ SECTION 8 — FINAL CTA ============ -->
+  <section id="s8" data-screen-label="08 Final CTA" style="position: relative; height: 300vh;">
+    <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <video id="v8" src="argentum-v3-assets/video-01-6587d79bd4.mp4" muted="{{ true }}" playsinline="{{ true }}" preload="metadata" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform, opacity; transform-origin: 50% 46%;"></video>
+      <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 66% 55% at 50% 45%, rgba(0,0,0,0.05) 30%, rgba(3,5,10,0.88) 100%);"></div>
+      <div id="fade8" style="position: absolute; inset: 0; background: #04060b; opacity: 1; pointer-events: none; z-index: 5;"></div>
+      <div id="ring" style="position: absolute; left: 50%; top: 45%; width: 64vmin; height: 64vmin; transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid rgba(220,230,246,0.5); box-shadow: 0 0 60px rgba(160,185,225,0.18), inset 0 0 60px rgba(160,185,225,0.08); will-change: transform, opacity; opacity: 0;"></div>
+
+      <div style="position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6vw; margin-top: 30vh;">
+        <h2 id="s8h" style="font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(36px, 5vw, 84px); color: #f7f9fc; margin: 0; line-height: 1.15; text-shadow: 0 6px 70px rgba(0,0,0,0.8); will-change: filter, opacity;">Own the moment <em style="font-weight: 400; color: #c8d0dd;">before it passes.</em></h2>
+        <div id="s8sub" style="font-size: 13px; font-weight: 300; letter-spacing: 0.14em; line-height: 2; color: #aab2c2; max-width: 52ch; margin-top: 22px; will-change: transform, opacity;">A mechanical moonphase watch built for precision, presence, and quiet luxury.</div>
+        <div id="s8cta" style="display: flex; gap: 16px; margin-top: 40px; flex-wrap: wrap; justify-content: center; will-change: transform, opacity;">
+          <div data-add="AG-1948-MS" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 18px 40px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">Add to Cart</div>
+          <div style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #dfe5ee; border: 1px solid rgba(210,222,244,0.25); background: rgba(8,12,22,0.4); backdrop-filter: blur(12px); padding: 17px 40px; border-radius: 9999px; cursor: pointer; transition: border-color 300ms ease, color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.55); color: #ffffff;">Reserve Yours</div>
+          <div style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #9aa3b2; padding: 17px 20px; border-radius: 9999px; cursor: pointer; transition: color 300ms ease;" style-hover="color: #eef1f6;">Book a Private Viewing →</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <footer style="position: relative; z-index: 3; border-top: 1px solid rgba(210,222,244,0.1); background: #04060b; padding: 80px 6vw 0 6vw;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 48px; padding-bottom: 64px;">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; letter-spacing: 0.28em; color: #eef1f6;">LUSTRO GENÈVE</div>
+        <div style="font-size: 12px; font-weight: 300; line-height: 1.9; color: #7d8595; max-width: 34ch;">Manufacture d'horlogerie. Mechanical watches designed, assembled and regulated in Geneva since 1948.</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #8b94a6;">PRIVATE RELEASES</div>
+          <div style="display: flex; gap: 8px; border: 1px solid rgba(210,222,244,0.16); border-radius: 9999px; padding: 4px 4px 4px 18px; align-items: center; max-width: 320px;">
+            <input placeholder="Email address" style="flex: 1; background: transparent; border: none; outline: none; color: #eef1f6; font-family: 'Inter', sans-serif; font-size: 12px; min-width: 0;">
+            <div style="font-size: 13px; color: #04060b; background: #dfe5ee; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 300ms ease;" style-hover="background: #ffffff;">→</div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #8b94a6; margin-bottom: 4px;">COLLECTION</div>
+        <a href="#collection" style="font-size: 12px; color: #9aa3b2;">Moonphase Silver</a>
+        <a href="#collection" style="font-size: 12px; color: #9aa3b2;">Black Ceramic</a>
+        <a href="#collection" style="font-size: 12px; color: #9aa3b2;">Open-Heart Steel</a>
+        <a href="#collection" style="font-size: 12px; color: #9aa3b2;">Classic Leather</a>
+        <a href="#craft" style="font-size: 12px; color: #9aa3b2;">The Manufacture</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #8b94a6; margin-bottom: 4px;">CLIENT SERVICES</div>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Book a Private Viewing</a>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Servicing &amp; Repairs</a>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Warranty Registration</a>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Care Guide</a>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Certificate of Authenticity</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #8b94a6; margin-bottom: 4px;">BOUTIQUES</div>
+        <div style="font-size: 12px; color: #9aa3b2; line-height: 1.7;">Geneva — Rue du Rhône 17</div>
+        <div style="font-size: 12px; color: #9aa3b2; line-height: 1.7;">Zurich — Bahnhofstrasse 4</div>
+        <div style="font-size: 12px; color: #9aa3b2; line-height: 1.7;">London — Old Bond Street 9</div>
+        <div style="height: 1px; background: rgba(210,222,244,0.1); max-width: 180px; margin: 6px 0;"></div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #dfe5ee; letter-spacing: 0.08em;">+41 22 555 01 48</div>
+        <a href="#showcase" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9aa3b2; letter-spacing: 0.08em;">atelier@lustro-geneve.ch</a>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #6d7686; letter-spacing: 0.14em;">MON–SAT · 10:00–18:00 CET</div>
+      </div>
+    </div>
+    <div style="border-top: 1px solid rgba(210,222,244,0.08); padding: 26px 0 34px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.26em; color: #4d5462;">© MMXXVI LUSTRO GENÈVE SA · ALL RIGHTS RESERVED</div>
+      <div style="display: flex; gap: 26px;">
+        <a href="#collection" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.26em; color: #4d5462;">PRIVACY</a>
+        <a href="#collection" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.26em; color: #4d5462;">TERMS</a>
+        <a href="#collection" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.26em; color: #4d5462;">COOKIES</a>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 7px; height: 7px; background: #dfe5ee;"></div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.3em; color: #7d8595;">SWISS MADE</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- cart drawer -->
+  <div style="position: fixed; inset: 0; z-index: 90; pointer-events: none;">
+    <div id="cartoverlay" onclick="{{ closeCart }}" style="position: absolute; inset: 0; background: rgba(2,4,8,0.55); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity 500ms ease;"></div>
+    <div id="cartdrawer" style="position: absolute; top: 0; right: 0; bottom: 0; width: min(440px, 94vw); background: rgba(6,9,16,0.94); backdrop-filter: blur(30px) saturate(140%); border-left: 1px solid rgba(210,222,244,0.14); box-shadow: -30px 0 80px rgba(0,0,0,0.6); display: flex; flex-direction: column; pointer-events: auto; transform: translateX(112%); transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 26px 30px; border-bottom: 1px solid rgba(210,222,244,0.1);">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.4em; color: #dfe5ee;">CART · {{ cartCount }}</div>
+        <div onclick="{{ closeCart }}" style="font-size: 15px; color: #9aa3b2; cursor: pointer; padding: 4px 10px; transition: color 300ms ease;" style-hover="color: #ffffff;">✕</div>
+      </div>
+      <div style="flex: 1; overflow-y: auto; padding: 8px 30px;">
+        <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 70px 0; display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center;">
+            <div style="width: 54px; height: 54px; border-radius: 50%; border: 1px dashed rgba(210,222,244,0.3);"></div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #c8d0dd;">Your cart is empty</div>
+            <div style="font-size: 12px; color: #7d8595;">Time waits — briefly.</div>
+          </div>
+        </sc-if>
+        <sc-for list="{{ cartItems }}" as="ci" hint-placeholder-count="0">
+          <div style="display: flex; gap: 16px; padding: 22px 0; border-bottom: 1px solid rgba(210,222,244,0.08);">
+            <div style="width: 64px; height: 76px; border-radius: 10px; background: linear-gradient(135deg, #11161f, #1a2130); border: 1px solid rgba(210,222,244,0.12); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #8b94a6; flex-shrink: 0;">A</div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #f2f4f8;">{{ ci.name }}</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em; color: #6d7686;">REF. {{ ci.ref }}</div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+                <div style="display: flex; align-items: center; border: 1px solid rgba(210,222,244,0.16); border-radius: 9999px;">
+                  <div onclick="{{ ci.dec }}" style="padding: 4px 12px; cursor: pointer; color: #9aa3b2; font-size: 13px; transition: color 300ms ease;" style-hover="color: #ffffff;">−</div>
+                  <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #dfe5ee; min-width: 18px; text-align: center;">{{ ci.qty }}</div>
+                  <div onclick="{{ ci.inc }}" style="padding: 4px 12px; cursor: pointer; color: #9aa3b2; font-size: 13px; transition: color 300ms ease;" style-hover="color: #ffffff;">+</div>
+                </div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #dfe5ee;">{{ ci.lineTotal }}</div>
+              </div>
+            </div>
+            <div onclick="{{ ci.remove }}" style="align-self: flex-start; font-size: 12px; color: #4d5462; cursor: pointer; transition: color 300ms ease;" style-hover="color: #eef1f6;">✕</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding: 24px 30px 30px 30px; border-top: 1px solid rgba(210,222,244,0.12); display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;">
+          <div style="font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: #7d8595;">Subtotal</div>
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 27px; color: #ffffff;">{{ cartSubtotal }}</div>
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: #6d7686; line-height: 1.8;">COMPLIMENTARY INSURED DELIVERY · TAXES INCLUDED · 5-YEAR WARRANTY</div>
+        <div onclick="{{ checkout }}" style="text-align: center; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 17px 20px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">{{ checkoutLabel }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- product detail modal -->
+  <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 92;">
+      <div onclick="{{ closeDetail }}" style="position: absolute; inset: 0; background: rgba(2,4,8,0.62); backdrop-filter: blur(10px);"></div>
+      <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(600px, 92vw); max-height: 86vh; overflow-y: auto; background: rgba(7,10,18,0.92); backdrop-filter: blur(30px) saturate(140%); border: 1px solid rgba(210,222,244,0.16); border-radius: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 40px 90px rgba(0,0,0,0.7); padding: 38px 42px; box-sizing: border-box;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;">
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.4em; color: #8b94a6;">REF. {{ detailRef }}</div>
+            <div style="font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 500; color: #f2f4f8; line-height: 1.15;">{{ detailName }}</div>
+          </div>
+          <div onclick="{{ closeDetail }}" style="font-size: 15px; color: #9aa3b2; cursor: pointer; padding: 4px 10px; transition: color 300ms ease;" style-hover="color: #ffffff;">✕</div>
+        </div>
+        <p style="font-size: 13px; font-weight: 300; line-height: 1.9; color: #9aa3b2; margin: 18px 0 0 0;">{{ detailDesc }}</p>
+        <div style="height: 1px; background: rgba(210,222,244,0.12); margin: 26px 0;"></div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <sc-for list="{{ detailSpecs }}" as="sp" hint-placeholder-count="4">
+            <div style="display: flex; justify-content: space-between; gap: 20px;">
+              <span style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #7d8595;">{{ sp.k }}</span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #dfe5ee; text-align: right;">{{ sp.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="height: 1px; background: rgba(210,222,244,0.12); margin: 26px 0;"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;">
+          <div style="font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 500; color: #ffffff;">{{ detailPrice }}</div>
+          <div style="display: flex; gap: 12px;">
+            <div onclick="{{ detailAdd }}" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 15px 30px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">Add to Cart</div>
+            <div onclick="{{ closeDetail }}" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #dfe5ee; border: 1px solid rgba(210,222,244,0.22); padding: 14px 26px; border-radius: 9999px; cursor: pointer; transition: border-color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.5);">Close</div>
+          </div>
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em; color: #6d7686; margin-top: 18px;">COMPLIMENTARY INSURED DELIVERY · 5-YEAR INTERNATIONAL WARRANTY</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- toast -->
+  <div id="toast" style="position: fixed; left: 50%; bottom: 36px; z-index: 95; transform: translateX(-50%) translateY(20px); opacity: 0; transition: opacity 500ms cubic-bezier(0.4, 0, 0.2, 1), transform 500ms cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; background: rgba(8,12,20,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(210,222,244,0.18); border-radius: 9999px; padding: 13px 26px; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.24em; color: #dfe5ee;"></div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;particles&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Atmosphere&quot;}, &quot;scrubSmoothing&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 0.14, &quot;min&quot;: 0.05, &quot;max&quot;: 0.35, &quot;step&quot;: 0.01, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Motion&quot;}}">
+class Component extends DCLogic {
+  state = { cart: [], confirmed: false, detail: null };
+
+  products = {
+    'AG-1948-MS': {
+      name: 'Lustro Moonphase Silver', price: 24500,
+      desc: 'The house reference. A brushed 904L silver case around a black textured dial carrying moonphase, date subdial and an open heart — driven by the in-house Calibre AG-72.',
+      specs: [
+        { k: 'Case', v: '40.5 mm · brushed 904L steel' },
+        { k: 'Movement', v: 'Calibre AG-72 · automatic' },
+        { k: 'Complications', v: 'Moonphase · date · open heart' },
+        { k: 'Power reserve', v: '72 hours' },
+        { k: 'Strap', v: 'Black crocodile leather' },
+        { k: 'Water resistance', v: '5 ATM' },
+        { k: 'Crystal', v: 'Double-domed sapphire, AR ×2' },
+      ],
+    },
+    'AG-2100-BC': {
+      name: 'Lustro Black Ceramic', price: 21900,
+      desc: 'The moonphase movement in a matte black ceramic case — scratch-proof, feather-light, and near-invisible in low light. Rubber-lined strap for daily wear.',
+      specs: [
+        { k: 'Case', v: '41 mm · matte black ceramic' },
+        { k: 'Movement', v: 'Calibre AG-72 · automatic' },
+        { k: 'Complications', v: 'Moonphase · date' },
+        { k: 'Power reserve', v: '72 hours' },
+        { k: 'Strap', v: 'Rubber-lined calf leather' },
+        { k: 'Water resistance', v: '10 ATM' },
+        { k: 'Crystal', v: 'Flat sapphire, AR ×2' },
+      ],
+    },
+    'AG-1877-OS': {
+      name: 'Lustro Open-Heart Steel', price: 18400,
+      desc: 'The skeletonised balance takes centre stage at six o\'clock, framed by a polished steel bracelet. The purist\'s entry to the manufacture.',
+      specs: [
+        { k: 'Case', v: '40 mm · polished 904L steel' },
+        { k: 'Movement', v: 'Calibre AG-70 · automatic' },
+        { k: 'Complications', v: 'Open heart · small seconds' },
+        { k: 'Power reserve', v: '68 hours' },
+        { k: 'Bracelet', v: '904L steel, micro-adjust clasp' },
+        { k: 'Water resistance', v: '5 ATM' },
+        { k: 'Crystal', v: 'Double-domed sapphire' },
+      ],
+    },
+    'AG-1602-CL': {
+      name: 'Lustro Classic Leather', price: 12900,
+      desc: 'Time only, 38 millimetres, hand-stitched calf. The quietest watch in the collection — and the one our watchmakers wear.',
+      specs: [
+        { k: 'Case', v: '38 mm · brushed 904L steel' },
+        { k: 'Movement', v: 'Calibre AG-60 · automatic' },
+        { k: 'Complications', v: 'None — hours, minutes, seconds' },
+        { k: 'Power reserve', v: '60 hours' },
+        { k: 'Strap', v: 'Hand-stitched calf leather' },
+        { k: 'Water resistance', v: '5 ATM' },
+        { k: 'Crystal', v: 'Domed sapphire' },
+      ],
+    },
+  };
+
+  componentDidMount() {
+    this.smooth = this.props.scrubSmoothing ?? 0.14;
+    this.dustSpeed = 1;
+    this.$ = (id) => document.getElementById(id);
+    this.vids = {};
+    ['v1', 'v2', 'v5', 'v8', 'v11'].forEach((id) => {
+      const el = this.$(id);
+      if (el) { el.muted = true; el.pause(); this.vids[id] = { el, cur: 0 }; }
+    });
+    // ambient loop video: only decode while on screen
+    const v3 = this.$('v3');
+    if (v3) {
+      v3.muted = true;
+      const io3 = new IntersectionObserver((es) => {
+        es.forEach((e) => { if (e.isIntersecting) v3.play().catch(() => {}); else v3.pause(); });
+      }, { rootMargin: '200px' });
+      io3.observe(v3);
+    }
+
+    this.splitWords();
+    this.setupParticles();
+    this.setupCards();
+    this.setupVariants();
+    this.setupCartButtons();
+    this.cacheDom();
+    this.measure();
+    // re-measure after late layout shifts (fonts, images)
+    setTimeout(() => this.measure(), 2000);
+    setTimeout(() => this.measure(), 6000);
+    this.onResize = () => { this.sizeCanvas(); this.measure(); };
+    window.addEventListener('resize', this.onResize);
+    this.raf = requestAnimationFrame(this.tick);
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.raf);
+    window.removeEventListener('resize', this.onResize);
+  }
+
+  // ---------- helpers ----------
+  clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
+  sub(p, a, b) { return this.clamp((p - a) / (b - a), 0, 1); }
+  ez(t) { return 1 - Math.pow(1 - t, 3); }
+  prog(id) {
+    const m = this.metrics && this.metrics[id];
+    if (m) return this.clamp((window.scrollY - m.top) / Math.max(1, m.h - window.innerHeight), 0, 1);
+    const el = this.$(id);
+    if (!el) return 0;
+    const r = el.getBoundingClientRect();
+    const total = el.offsetHeight - window.innerHeight;
+    return this.clamp(-r.top / Math.max(1, total), 0, 1);
+  }
+  // cached section geometry — avoids per-frame getBoundingClientRect
+  measure() {
+    this.metrics = {};
+    ['s1', 's2', 's3', 's4', 's5', 's6', 's11', 's9', 's10', 's8'].forEach((id) => {
+      const el = this.$(id);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      this.metrics[id] = { top: r.top + window.scrollY, h: el.offsetHeight };
+    });
+    const track = this.$('track');
+    this.trackMax = track ? Math.max(0, track.scrollWidth - window.innerWidth) : 0;
+  }
+  // section near viewport? sections outside are skipped entirely each frame
+  vis(id, sy, vh) {
+    const m = this.metrics && this.metrics[id];
+    if (!m) return true;
+    const pad = vh * 0.6;
+    return sy + vh + pad > m.top && sy - pad < m.top + m.h;
+  }
+  // one-time DOM caches with pre-parsed data attributes
+  cacheDom() {
+    const q = (sel) => Array.from(document.querySelectorAll(sel));
+    this.dom = {
+      panels: q('#s2 [data-panel]').map((el) => ({
+        el, i: +el.getAttribute('data-panel'), dx: +el.getAttribute('data-dx'),
+        dy: +el.getAttribute('data-dy'), spd: +el.getAttribute('data-spd'),
+        lines: Array.from(el.querySelectorAll('[data-line]')),
+      })),
+      bento: q('#s4 [data-bento]').map((el) => ({
+        el, i: +el.getAttribute('data-bento'), tx: +el.getAttribute('data-tx'),
+        ty: +el.getAttribute('data-ty'), rz: +el.getAttribute('data-rz'),
+      })),
+      specs: q('#s5 [data-spec]'),
+      steps: q('#s6 [data-steptitle]'),
+      acards: q('#s11 [data-acard]'),
+      quotes: q('#s9 [data-quote]'),
+      qticks: q('#s9 [data-qtick]'),
+      miles: q('#s10 [data-mile]'),
+    };
+  }
+  scrub(key, p) {
+    const v = this.vids[key];
+    if (!v || v.el.readyState < 1 || !isFinite(v.el.duration)) return;
+    const target = p * Math.max(0, v.el.duration - 0.08);
+    v.cur += (target - v.cur) * this.smooth;
+    if (Math.abs(v.el.currentTime - v.cur) > 0.008) {
+      try { v.el.currentTime = v.cur; } catch (e) {}
+    }
+  }
+
+  // ---------- setup ----------
+  splitWords() {
+    const h = this.$('s3h');
+    if (!h) return;
+    const words = h.textContent.trim().split(/\s+/);
+    h.textContent = '';
+    this.s3words = words.map((w, i) => {
+      const s = document.createElement('span');
+      s.textContent = w;
+      s.style.cssText = 'display:inline-block;margin-right:0.26em;opacity:0.15;filter:blur(6px);transform:translateY(22px);will-change:transform,opacity,filter;';
+      h.appendChild(s);
+      return s;
+    });
+    const p = this.$('s3p');
+    if (p) { p.style.clipPath = 'inset(0 0 100% 0)'; p.style.opacity = '0'; }
+  }
+
+  setupParticles() {
+    const c = this.$('dust');
+    if (!c) return;
+    this.dustCtx = c.getContext('2d');
+    this.sizeCanvas();
+    const n = 64;
+    this.parts = Array.from({ length: n }, () => ({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() < 0.14 ? 5 + Math.random() * 11 : 0.5 + Math.random() * 1.8,
+      a: 0.03 + Math.random() * 0.12,
+      vx: (Math.random() - 0.5) * 0.00012,
+      vy: -0.00004 - Math.random() * 0.00012,
+      tw: Math.random() * Math.PI * 2,
+    }));
+  }
+  sizeCanvas() {
+    const c = this.$('dust');
+    if (!c) return;
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+  }
+  drawParticles(t) {
+    if (!this.dustCtx || (this.props.particles === false)) return;
+    const ctx = this.dustCtx, w = ctx.canvas.width, h = ctx.canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    const sp = this.dustSpeed;
+    for (const p of this.parts) {
+      p.x += p.vx * sp * 16; p.y += p.vy * sp * 16;
+      if (p.y < -0.05) { p.y = 1.05; p.x = Math.random(); }
+      if (p.x < -0.05) p.x = 1.05; if (p.x > 1.05) p.x = -0.05;
+      const tw = 0.7 + 0.3 * Math.sin(t * 0.0008 + p.tw);
+      const big = p.r > 4;
+      if (big) {
+        const g = ctx.createRadialGradient(p.x * w, p.y * h, 0, p.x * w, p.y * h, p.r * 3);
+        g.addColorStop(0, 'rgba(175,195,230,' + (p.a * tw * 0.5) + ')');
+        g.addColorStop(1, 'rgba(175,195,230,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(p.x * w, p.y * h, p.r * 3, 0, 7); ctx.fill();
+      } else {
+        ctx.fillStyle = 'rgba(200,215,240,' + (p.a * tw) + ')';
+        ctx.beginPath(); ctx.arc(p.x * w, p.y * h, p.r, 0, 7); ctx.fill();
+      }
+    }
+  }
+
+  // ---------- cart ----------
+  fmt(n) { return 'CHF ' + n.toLocaleString('en-US'); }
+
+  setupCartButtons() {
+    document.querySelectorAll('[data-add]').forEach((el) => {
+      el.addEventListener('click', () => this.addToCart(el.getAttribute('data-add')));
+    });
+  }
+
+  addToCart(ref) {
+    const p = this.products[ref];
+    if (!p) return;
+    this.setState((s) => {
+      const cart = s.cart.map((it) => ({ ...it }));
+      const ex = cart.find((it) => it.ref === ref);
+      if (ex) ex.qty += 1; else cart.push({ ref, name: p.name, price: p.price, qty: 1 });
+      return { cart };
+    });
+    this.showToast(p.name.toUpperCase() + ' — ADDED TO CART');
+  }
+
+  changeQty(ref, d) {
+    this.setState((s) => ({
+      cart: s.cart
+        .map((it) => (it.ref === ref ? { ...it, qty: it.qty + d } : { ...it }))
+        .filter((it) => it.qty > 0),
+    }));
+  }
+
+  removeItem(ref) {
+    this.setState((s) => ({ cart: s.cart.filter((it) => it.ref !== ref) }));
+  }
+
+  openCart() {
+    const ov = this.$('cartoverlay'), dr = this.$('cartdrawer');
+    if (ov) { ov.style.opacity = '1'; ov.style.pointerEvents = 'auto'; }
+    if (dr) dr.style.transform = 'translateX(0%)';
+  }
+
+  closeCart() {
+    const ov = this.$('cartoverlay'), dr = this.$('cartdrawer');
+    if (ov) { ov.style.opacity = '0'; ov.style.pointerEvents = 'none'; }
+    if (dr) dr.style.transform = 'translateX(112%)';
+  }
+
+  showToast(msg) {
+    const t = this.$('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0px)';
+    clearTimeout(this.toastT);
+    this.toastT = setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(-50%) translateY(20px)';
+    }, 2300);
+  }
+
+  checkout() {
+    if (this.state.cart.length === 0) { this.showToast('YOUR CART IS EMPTY'); return; }
+    this.setState({ confirmed: true });
+    this.showToast('ORDER REQUEST SENT — OUR CONCIERGE WILL CONTACT YOU');
+    clearTimeout(this.confirmT);
+    this.confirmT = setTimeout(() => this.setState({ confirmed: false }), 3000);
+  }
+
+  setupCards() {
+    const cards = Array.from(document.querySelectorAll('[data-card]'));
+    cards.forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(90px) scale(0.97)';
+    });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        const el = en.target;
+        const i = +el.getAttribute('data-card');
+        el.style.transition = 'opacity 1s cubic-bezier(0.4, 0, 0.2, 1) ' + (i * 120) + 'ms, transform 1s cubic-bezier(0.4, 0, 0.2, 1) ' + (i * 120) + 'ms';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0) scale(1)';
+        io.unobserve(el);
+        setTimeout(() => { el.style.transition = 'box-shadow 400ms ease, border-color 400ms ease'; }, 1300 + i * 120);
+      });
+    }, { threshold: 0.15 });
+    cards.forEach((el) => io.observe(el));
+    // hover tilt + glow
+    cards.forEach((el) => {
+      const glow = el.querySelector('[data-cardglow]');
+      const img = el.querySelector('[data-cardimg]');
+      el.addEventListener('mousemove', (e) => {
+        const r = el.getBoundingClientRect();
+        const nx = (e.clientX - r.left) / r.width - 0.5;
+        const ny = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = 'perspective(900px) rotateX(' + (-ny * 5) + 'deg) rotateY(' + (nx * 6) + 'deg) translateY(-4px)';
+        if (glow) {
+          glow.style.opacity = '1';
+          glow.style.background = 'radial-gradient(circle 240px at ' + ((nx + 0.5) * 100) + '% ' + ((ny + 0.5) * 100) + '%, rgba(160,185,225,0.14), rgba(160,185,225,0) 70%)';
+        }
+        if (img) img.style.transform = 'translateZ(30px) scale(1.03)';
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = 'perspective(900px) rotateX(0) rotateY(0) translateY(0)';
+        if (glow) glow.style.opacity = '0';
+        if (img) img.style.transform = 'translateZ(0) scale(1)';
+      });
+    });
+  }
+
+  setupVariants() {
+    const chips = Array.from(document.querySelectorAll('[data-variant]'));
+    const labels = ['360° · SCROLL TO ROTATE', 'SILVER CASE · STEEL BRACELET', 'MOONPHASE DIAL · MACRO'];
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const i = +chip.getAttribute('data-variant');
+        chips.forEach((c) => {
+          c.style.background = 'rgba(8,12,22,0.5)';
+          c.style.color = '#9aa3b2';
+          c.style.borderColor = 'rgba(210,222,244,0.16)';
+        });
+        chip.style.background = '#dfe5ee';
+        chip.style.color = '#04060b';
+        chip.style.borderColor = 'rgba(210,222,244,0.3)';
+        const i1 = this.$('varimg1'), i2 = this.$('varimg2'), lb = this.$('varlabel');
+        if (i1) i1.style.opacity = i === 1 ? '1' : '0';
+        if (i2) i2.style.opacity = i === 2 ? '1' : '0';
+        if (lb) lb.textContent = labels[i] || labels[0];
+      });
+    });
+  }
+
+  // ---------- frame loop ----------
+  tick = (t) => {
+    const sy = window.scrollY;
+    const vh = window.innerHeight;
+    const D = this.dom || {};
+
+    // nav — write only when state flips
+    const navOn = sy > 60;
+    if (navOn !== this._navOn) {
+      this._navOn = navOn;
+      const nav = this.$('nav');
+      if (nav) {
+        nav.style.background = navOn ? 'rgba(5,8,14,0.6)' : 'rgba(4,6,11,0)';
+        nav.style.backdropFilter = navOn ? 'blur(20px) saturate(140%)' : 'none';
+        nav.style.borderBottomColor = navOn ? 'rgba(210,222,244,0.1)' : 'rgba(210,222,244,0)';
+      }
+    }
+
+    // S1 hero
+    if (this.vis('s1', sy, vh)) {
+      const p1 = this.prog('s1');
+      this.scrub('v1', this.sub(p1, 0, 0.88));
+      const v1 = this.vids.v1 && this.vids.v1.el;
+      if (v1) v1.style.transform = 'scale(' + (1 + this.ez(p1) * 0.3) + ') rotate(' + (this.ez(p1) * 4) + 'deg) translateY(' + (Math.sin(t * 0.0006) * 5) + 'px)';
+      const fade1 = this.$('fade1');
+      if (fade1) fade1.style.opacity = this.sub(p1, 0.9, 1);
+      const d = this.ez(this.sub(p1, 0.04, 0.6));
+      const fadeH = 1 - this.sub(p1, 0.5, 0.82);
+      const h1a = this.$('h1a'), h1b = this.$('h1b');
+      if (h1a) { h1a.style.transform = 'translateX(' + (-d * 30) + 'vw)'; h1a.style.opacity = fadeH; }
+      if (h1b) { h1b.style.transform = 'translateX(' + (d * 30) + 'vw)'; h1b.style.opacity = fadeH; }
+      const eb = this.$('s1eyebrow');
+      if (eb) eb.style.opacity = 1 - this.sub(p1, 0.03, 0.2);
+      const s1sub = this.$('s1sub');
+      if (s1sub) {
+        const k = this.sub(p1, 0.03, 0.26);
+        s1sub.style.opacity = 1 - k;
+        s1sub.style.transform = 'translateY(' + (-k * 90) + 'px)';
+        s1sub.style.pointerEvents = k > 0.5 ? 'none' : 'auto';
+      }
+      const dark = this.$('s1dark');
+      if (dark) dark.style.opacity = 0.3 + this.sub(p1, 0.3, 1) * 0.55;
+      const hint = this.$('s1hint');
+      if (hint) hint.style.opacity = 1 - this.sub(p1, 0.01, 0.1);
+    }
+
+    // S2 macro
+    if (this.vis('s2', sy, vh)) {
+      const p2 = this.prog('s2');
+      this.scrub('v2', p2);
+      const v2 = this.vids.v2 && this.vids.v2.el;
+      if (v2) v2.style.transform = 'scale(' + (1.28 - this.ez(p2) * 0.22) + ') rotate(' + ((1 - this.ez(this.sub(p2, 0, 0.35))) * -4) + 'deg)';
+      const fade2 = this.$('fade2');
+      if (fade2) fade2.style.opacity = this.clamp((1 - this.sub(p2, 0, 0.08)) + this.sub(p2, 0.94, 1), 0, 1);
+      const s2t = this.$('s2title');
+      if (s2t) {
+        const k = this.sub(p2, 0.02, 0.14);
+        s2t.style.opacity = k * (1 - this.sub(p2, 0.85, 1));
+        s2t.style.transform = 'translateY(' + ((1 - k) * 30) + 'px)';
+      }
+      (D.panels || []).forEach((pn) => {
+        const start = 0.1 + pn.i * 0.11;
+        const k = this.ez(this.sub(p2, start, start + 0.26));
+        const par = (p2 - 0.5) * pn.spd * -70;
+        pn.el.style.opacity = k;
+        pn.el.style.transform = 'translate(' + (pn.dx * (1 - k)) + 'px,' + (pn.dy * (1 - k) + par) + 'px) scale(' + (0.93 + 0.07 * k) + ')';
+        pn.lines.forEach((ln, j) => {
+          const lk = this.sub(p2, start + 0.06 + j * 0.045, start + 0.16 + j * 0.045);
+          ln.style.opacity = 0.05 + 0.95 * lk;
+          ln.style.transform = 'translateY(' + ((1 - lk) * 14) + 'px)';
+        });
+      });
+    }
+
+    // S3 editorial
+    if (this.vis('s3', sy, vh)) {
+      const p3 = this.prog('s3');
+      if (this.s3words) {
+        this.s3words.forEach((s, i) => {
+          const k = this.sub(p3, 0.04 + i * 0.05, 0.2 + i * 0.05);
+          s.style.opacity = 0.15 + 0.85 * k;
+          s.style.filter = 'blur(' + ((1 - k) * 6) + 'px)';
+          s.style.transform = 'translateY(' + ((1 - k) * 22) + 'px)';
+          s.style.color = k > 0.65 ? '#f6f8fb' : '#8b94a6';
+        });
+      }
+      const s3p = this.$('s3p');
+      if (s3p) {
+        const k = this.ez(this.sub(p3, 0.58, 0.82));
+        s3p.style.clipPath = 'inset(0 0 ' + ((1 - k) * 100) + '% 0)';
+        s3p.style.opacity = k;
+      }
+      const s3vis = this.$('s3vis');
+      if (s3vis) s3vis.style.transform = 'translateY(' + ((0.5 - p3) * 90) + 'px)';
+      // camera push-in toward the dial
+      const v3el = this.$('v3');
+      if (v3el) v3el.style.transform = 'scale(' + (1.3 + this.ez(p3) * 0.45) + ')';
+    }
+
+    // S4 bento
+    if (this.vis('s4', sy, vh)) {
+      const p4 = this.prog('s4');
+      const s4h = this.$('s4head');
+      if (s4h) {
+        const k = this.sub(p4, 0.02, 0.14);
+        s4h.style.opacity = k;
+        s4h.style.transform = 'translateY(' + ((1 - k) * 26) + 'px)';
+      }
+      (D.bento || []).forEach((b) => {
+        const k = this.ez(this.sub(p4, 0.06 + b.i * 0.055, 0.34 + b.i * 0.055));
+        b.el.style.opacity = 0.05 + 0.95 * k;
+        b.el.style.transform = 'translate3d(' + (b.tx * (1 - k)) + 'px,' + (b.ty * (1 - k)) + 'px,' + ((1 - k) * -180) + 'px) rotateZ(' + (b.rz * (1 - k)) + 'deg)';
+      });
+    }
+
+    // S5 showcase
+    if (this.vis('s5', sy, vh)) {
+      const p5 = this.prog('s5');
+      this.scrub('v5', p5);
+      const glow = this.$('s5glow');
+      if (glow) glow.style.opacity = 0.4 + 0.6 * Math.abs(Math.sin(p5 * Math.PI));
+      const frame = this.$('s5frame');
+      if (frame && frame.style.transform) frame.style.transform = '';
+      // cinematic light sweep across the watch
+      const sw = this.$('s5sweep');
+      if (sw) sw.style.transform = 'translateX(' + (-130 + this.ez(this.sub(p5, 0.15, 0.75)) * 260) + '%)';
+      // split text opens around the product
+      const ta = this.$('s5ta'), tb = this.$('s5tb');
+      if (ta && tb) {
+        const open = this.ez(this.sub(p5, 0.02, 0.4));
+        const px = open * Math.min(220, window.innerWidth * 0.12);
+        ta.style.transform = 'translateX(' + (-40 - px) + 'px)';
+        tb.style.transform = 'translateX(' + (40 + px) + 'px)';
+        ta.style.opacity = 0.25 + open * 0.75;
+        tb.style.opacity = 0.25 + open * 0.75;
+      }
+      (D.specs || []).forEach((el, i) => {
+        const k = this.ez(this.sub(p5, 0.06 + i * 0.09, 0.2 + i * 0.09));
+        el.style.opacity = k;
+        el.style.transform = 'translateY(' + ((1 - k) * 36) + 'px)';
+      });
+      const price = this.$('s5price');
+      if (price) price.style.opacity = this.sub(p5, 0.72, 0.88);
+    }
+
+    // S6 timeline
+    if (this.vis('s6', sy, vh)) {
+      const p6 = this.prog('s6');
+      const track = this.$('track');
+      if (track) track.style.transform = 'translateX(' + (-p6 * (this.trackMax || 0)) + 'px)';
+      (D.steps || []).forEach((el, i) => {
+        const k = this.sub(p6, i / 7, i / 7 + 0.1);
+        el.style.transform = 'translateY(' + ((1 - k) * 110) + '%)';
+      });
+    }
+
+    // S11 assembly film
+    if (this.vis('s11', sy, vh)) {
+      const p11 = this.prog('s11');
+      this.scrub('v11', p11);
+      const v11 = this.vids.v11 && this.vids.v11.el;
+      if (v11) v11.style.transform = 'scale(' + (1.02 + this.ez(p11) * 0.08) + ')';
+      const fade11 = this.$('fade11');
+      if (fade11) fade11.style.opacity = this.clamp((1 - this.sub(p11, 0, 0.08)) + this.sub(p11, 0.94, 1), 0, 1);
+      // crosshair lines draw in
+      const vl = this.$('s11vline'), hl = this.$('s11hline');
+      if (vl) vl.style.transform = 'scaleY(' + this.ez(this.sub(p11, 0.03, 0.2)) + ')';
+      if (hl) hl.style.transform = 'scaleX(' + this.ez(this.sub(p11, 0.06, 0.24)) + ')';
+      // headline: rises in, drifts up slowly (parallax), never fully leaves
+      const s11t = this.$('s11title');
+      if (s11t) {
+        const kin = this.ez(this.sub(p11, 0.04, 0.18));
+        s11t.style.opacity = kin;
+        s11t.style.transform = 'translateY(' + ((1 - kin) * 50 - this.sub(p11, 0.2, 1) * 60) + 'px)';
+      }
+      // intro paragraph: fades in after headline, drifts slower
+      const s11i = this.$('s11intro');
+      if (s11i) {
+        const kin = this.ez(this.sub(p11, 0.12, 0.26));
+        s11i.style.opacity = kin;
+        s11i.style.transform = 'translateY(' + ((1 - kin) * 34 - this.sub(p11, 0.26, 1) * 30) + 'px)';
+      }
+      // numbered cards drift up through quadrants at different speeds
+      (D.acards || []).forEach((el, i) => {
+        // staggered windows: each card fades out as the next settles (max ~2 visible)
+        const start = 0.28 + i * 0.2;
+        const kin = this.ez(this.sub(p11, start, start + 0.14));
+        const kout = i === 2 ? this.sub(p11, 0.9, 1) : this.ez(this.sub(p11, start + 0.24, start + 0.36));
+        const drift = this.sub(p11, start, 1) * (70 + i * 15);
+        el.style.opacity = kin * (1 - kout);
+        el.style.transform = 'translateY(' + ((1 - kin) * 70 - drift - kout * 60) + 'px)';
+        el.style.pointerEvents = kin > 0.5 && kout < 0.5 ? 'auto' : 'none';
+      });
+    }
+
+    // S9 testimonials
+    if (this.vis('s9', sy, vh)) {
+      const p9 = this.prog('s9');
+      const quotes = D.quotes || [];
+      let activeQ = 0, bestD = 1e9;
+      const R = vh * 0.62;
+      const step = 38;
+      const rot = p9 * step * (quotes.length - 1);
+      quotes.forEach((el, i) => {
+        const th = i * step - rot;
+        const ad = Math.abs(th);
+        if (ad < bestD) { bestD = ad; activeQ = i; }
+        const k = this.clamp(ad / 40, 0, 1);
+        el.style.opacity = 1 - this.ez(k);
+        el.style.transform =
+          'translate(-50%, -50%) rotate(' + th + 'deg) translateY(' + (-R) + 'px) rotate(' + (-th) + 'deg) scale(' + (1 - 0.1 * k) + ')';
+        el.style.filter = 'blur(' + (k * 7) + 'px)';
+        el.style.pointerEvents = ad < 12 ? 'auto' : 'none';
+      });
+      if (activeQ !== this._activeQ) {
+        this._activeQ = activeQ;
+        (D.qticks || []).forEach((el, i) => {
+          el.style.background = i === activeQ ? 'rgba(223,229,238,0.9)' : 'rgba(210,222,244,0.18)';
+        });
+      }
+    }
+
+    // S10 heritage
+    if (this.vis('s10', sy, vh)) {
+      const p10 = this.prog('s10');
+      const yn = this.$('yearnum');
+      if (yn) {
+        const txt = String(Math.round(1948 + this.ez(p10) * (2026 - 1948)));
+        if (yn.textContent !== txt) yn.textContent = txt;
+      }
+      const yb = this.$('yearbar');
+      if (yb) yb.style.width = (p10 * 100) + '%';
+      const yl = this.$('yearlab');
+      if (yl) {
+        const labs = ['ATELIER FOUNDED · GENEVA', 'CALIBRE AG-31 · FIRST MOONPHASE', 'CASE MANUFACTURE · IN-HOUSE', 'CALIBRE AG-72 · THE OPEN HEART'];
+        const li = Math.min(3, Math.floor(p10 * 4));
+        if (yl.textContent !== labs[li]) yl.textContent = labs[li];
+      }
+      (D.miles || []).forEach((el, i) => {
+        const c = (i + 0.5) / 4;
+        const k = Math.max(0, 1 - Math.abs(p10 - c) * 3.4);
+        el.style.opacity = k;
+        el.style.transform = 'translateY(' + ((1 - k) * 26) + 'px)';
+      });
+    }
+
+    // S8 final
+    if (this.vis('s8', sy, vh)) {
+      const p8 = this.prog('s8');
+      this.dustSpeed = 1 - this.sub(p8, 0.3, 1) * 0.75;
+      const v8 = this.vids.v8 && this.vids.v8.el;
+      if (v8) {
+        if (!this.v8set && v8.readyState >= 1 && isFinite(v8.duration)) { try { v8.currentTime = v8.duration * 0.12; this.v8set = true; } catch (e) {} }
+        v8.style.transform = 'scale(' + (0.92 + this.ez(p8) * 0.22) + ') rotate(' + ((1 - this.ez(p8)) * -3) + 'deg)';
+        v8.style.opacity = 0.35 + this.sub(p8, 0, 0.3) * 0.65;
+      }
+      const fade8 = this.$('fade8');
+      if (fade8) fade8.style.opacity = 1 - this.sub(p8, 0, 0.1);
+      const s8h = this.$('s8h');
+      if (s8h) {
+        const k = this.sub(p8, 0.12, 0.42);
+        s8h.style.opacity = k;
+        s8h.style.filter = 'blur(' + ((1 - k) * 12) + 'px)';
+      }
+      const s8sub = this.$('s8sub');
+      if (s8sub) {
+        const k = this.sub(p8, 0.28, 0.52);
+        s8sub.style.opacity = k;
+        s8sub.style.transform = 'translateY(' + ((1 - k) * 26) + 'px)';
+      }
+      const s8cta = this.$('s8cta');
+      if (s8cta) {
+        const k = this.ez(this.sub(p8, 0.4, 0.66));
+        s8cta.style.opacity = k;
+        s8cta.style.transform = 'translateY(' + ((1 - k) * 50) + 'px)';
+      }
+      const ring = this.$('ring');
+      if (ring) {
+        const k = this.sub(p8, 0.3, 0.95);
+        ring.style.opacity = Math.min(1, k * 1.6) * 0.85;
+        ring.style.transform = 'translate(-50%, -50%) scale(' + (0.55 + k * 0.5) + ')';
+      }
+    } else if (this.dustSpeed !== 1) {
+      this.dustSpeed = 1;
+    }
+
+    this.drawParticles(t);
+    this.raf = requestAnimationFrame(this.tick);
+  };
+
+  renderVals() {
+    const cart = this.state.cart;
+    const count = cart.reduce((a, c) => a + c.qty, 0);
+    const subtotal = cart.reduce((a, c) => a + c.qty * c.price, 0);
+    return {
+      cartCount: count,
+      cartEmpty: cart.length === 0,
+      cartItems: cart.map((it) => ({
+        ref: it.ref,
+        name: it.name,
+        qty: it.qty,
+        lineTotal: this.fmt(it.price * it.qty),
+        inc: () => this.changeQty(it.ref, 1),
+        dec: () => this.changeQty(it.ref, -1),
+        remove: () => this.removeItem(it.ref),
+      })),
+      cartSubtotal: this.fmt(subtotal),
+      detailOpen: !!this.state.detail,
+      detailRef: this.state.detail || '',
+      detailName: (this.state.detail && this.products[this.state.detail].name) || '',
+      detailDesc: (this.state.detail && this.products[this.state.detail].desc) || '',
+      detailPrice: this.state.detail ? this.fmt(this.products[this.state.detail].price) : '',
+      detailSpecs: (this.state.detail && this.products[this.state.detail].specs) || [],
+      detailAdd: () => { if (this.state.detail) this.addToCart(this.state.detail); },
+      closeDetail: () => this.setState({ detail: null }),
+      viewMS: () => this.setState({ detail: 'AG-1948-MS' }),
+      viewBC: () => this.setState({ detail: 'AG-2100-BC' }),
+      viewOS: () => this.setState({ detail: 'AG-1877-OS' }),
+      viewCL: () => this.setState({ detail: 'AG-1602-CL' }),
+      openCart: () => this.openCart(),
+      closeCart: () => this.closeCart(),
+      checkout: () => this.checkout(),
+      checkoutLabel: this.state.confirmed ? 'Request Received ✓' : 'Proceed to Checkout',
+    };
+  }
+}
+
+</script>
+
+
+
+<script>
+(function () {
+  function initCollectionCarousel() {
+    const section = document.getElementById('s7');
+    const stage = document.getElementById('collectionStage');
+    const track = document.getElementById('collectionTrack');
+    const prev = document.getElementById('collectionPrev');
+    const next = document.getElementById('collectionNext');
+    const current = document.getElementById('collectionCurrent');
+    const progress = document.getElementById('collectionProgress');
+
+    if (!section || !stage || !track || !prev || !next || !current || !progress) {
+      window.setTimeout(initCollectionCarousel, 100);
+      return;
+    }
+
+    if (stage.__collectionReady) return;
+    stage.__collectionReady = true;
+
+    const cards = Array.from(track.querySelectorAll('[data-collection-card]'));
+    if (!cards.length) return;
+
+    let active = 0;
+    let pointerId = null;
+    let startX = 0;
+    let moved = false;
+    let lastWheel = 0;
+
+    function circularOffset(index) {
+      let offset = index - active;
+      const half = cards.length / 2;
+      if (offset > half) offset -= cards.length;
+      if (offset < -half) offset += cards.length;
+      return offset;
+    }
+
+    function updateCarousel() {
+      const width = Math.max(stage.clientWidth, window.innerWidth * 0.8);
+      const mobile = window.innerWidth < 760;
+      const radiusX = mobile ? Math.min(width * 0.43, 285) : Math.min(width * 0.37, 520);
+      const depthStep = mobile ? 115 : 185;
+
+      cards.forEach((card, index) => {
+        const offset = circularOffset(index);
+        const distance = Math.abs(offset);
+        const direction = Math.sign(offset);
+        const x = offset === 0 ? 0 : direction * radiusX * Math.min(1, 0.72 + distance * 0.18);
+        const z = offset === 0 ? 80 : -distance * depthStep;
+        const rotateY = offset === 0 ? 0 : -direction * Math.min(58, 27 + distance * 12);
+        const scale = offset === 0 ? 1 : Math.max(mobile ? 0.62 : 0.58, 0.82 - (distance - 1) * 0.13);
+        const opacity = offset === 0 ? 1 : Math.max(0.24, 0.7 - (distance - 1) * 0.18);
+        const blur = offset === 0 ? 0 : Math.min(2.2, 0.55 + distance * 0.45);
+
+        card.style.transform = `translate(-50%, -50%) translate3d(${x}px, 0, ${z}px) rotateY(${rotateY}deg) scale(${scale})`;
+        card.style.opacity = String(opacity);
+        card.style.filter = `blur(${blur}px) saturate(${offset === 0 ? 1 : 0.78})`;
+        card.style.zIndex = String(100 - distance);
+        card.style.pointerEvents = distance <= 1 ? 'auto' : 'none';
+        card.classList.toggle('is-active', index === active);
+        card.setAttribute('aria-hidden', index === active ? 'false' : 'true');
+      });
+
+      current.textContent = String(active + 1).padStart(2, '0');
+      progress.style.width = `${((active + 1) / cards.length) * 100}%`;
+    }
+
+    function goTo(index) {
+      active = (index + cards.length) % cards.length;
+      updateCarousel();
+    }
+
+    window.collectionCarouselGoTo = goTo;
+    window.collectionCarouselPrev = function () { goTo(active - 1); };
+    window.collectionCarouselNext = function () { goTo(active + 1); };
+
+    prev.type = 'button';
+    next.type = 'button';
+    prev.onclick = function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      goTo(active - 1);
+    };
+    next.onclick = function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      goTo(active + 1);
+    };
+
+    cards.forEach((card, index) => {
+      card.addEventListener('click', function (event) {
+        if (moved || event.target.closest('[data-add], button, a, [onclick]')) return;
+        if (index !== active) goTo(index);
+      });
+    });
+
+    stage.addEventListener('pointerdown', function (event) {
+      if (event.target.closest('[data-add], button, a, [onclick]')) return;
+      pointerId = event.pointerId;
+      startX = event.clientX;
+      moved = false;
+      stage.setPointerCapture(pointerId);
+      stage.classList.add('is-dragging');
+    });
+
+    stage.addEventListener('pointermove', function (event) {
+      if (pointerId !== event.pointerId) return;
+      if (Math.abs(event.clientX - startX) > 6) moved = true;
+    });
+
+    function finishDrag(event) {
+      if (pointerId !== event.pointerId) return;
+      const delta = event.clientX - startX;
+      try { stage.releasePointerCapture(pointerId); } catch (_) {}
+      pointerId = null;
+      stage.classList.remove('is-dragging');
+      if (Math.abs(delta) >= 40) goTo(active + (delta < 0 ? 1 : -1));
+      window.setTimeout(function () { moved = false; }, 0);
+    }
+
+    stage.addEventListener('pointerup', finishDrag);
+    stage.addEventListener('pointercancel', function (event) {
+      if (pointerId === event.pointerId) {
+        pointerId = null;
+        moved = false;
+        stage.classList.remove('is-dragging');
+      }
+    });
+
+    stage.addEventListener('wheel', function (event) {
+      const amount = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      if (Math.abs(amount) < 8) return;
+      const now = performance.now();
+      if (now - lastWheel < 420) return;
+      event.preventDefault();
+      lastWheel = now;
+      goTo(active + (amount > 0 ? 1 : -1));
+    }, { passive: false });
+
+    stage.addEventListener('pointermove', function (event) {
+      if (pointerId !== null) return;
+      const rect = stage.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - 0.5;
+      section.style.setProperty('--collection-glow-x', `${50 + x * 15}%`);
+    });
+
+    stage.addEventListener('pointerleave', function () {
+      section.style.setProperty('--collection-glow-x', '50%');
+    });
+
+    window.addEventListener('resize', updateCarousel, { passive: true });
+    updateCarousel();
+    requestAnimationFrame(updateCarousel);
+    window.setTimeout(updateCarousel, 250);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCollectionCarousel, { once: true });
+  } else {
+    initCollectionCarousel();
+  }
+  window.addEventListener('load', initCollectionCarousel, { once: true });
+})();
+</script>
+
+</body></html>

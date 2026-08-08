@@ -9,6 +9,7 @@ import { Footer, PageTransition } from './components/layout';
 import ChatWidget from './components/ChatWidget';
 
 const LuxuryHome = lazy(() => import('./pages/LuxuryHome'));
+const ArgentumLanding = lazy(() => import('./pages/ArgentumLanding'));
 const ChronosPage = lazy(() => import('./pages/ChronosPage'));
 const HomePage = lazy(() => import('./pages/HomePage'));
 const ShopPage = lazy(() => import('./pages/ShopPage'));
@@ -89,8 +90,9 @@ function Shell() {
       <main id="main-content" className="flex-1">
         <Suspense fallback={<RouteFallback />}>
           <Routes>
-            <Route path="/" element={<PageTransition><LuxuryHome /></PageTransition>} />
+            <Route path="/" element={<PageTransition><ArgentumLanding /></PageTransition>} />
             <Route path="/chronos" element={<PageTransition><ChronosPage /></PageTransition>} />
+            <Route path="/luxury" element={<PageTransition><LuxuryHome /></PageTransition>} />
             <Route path="/legacy" element={<PageTransition><HomePage /></PageTransition>} />
             <Route path="/shop" element={<PageTransition><ShopPage /></PageTransition>} />
             <Route path="/watch/:slug" element={<PageTransition><ProductPage /></PageTransition>} />
