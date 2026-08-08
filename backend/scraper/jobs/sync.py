@@ -62,7 +62,7 @@ def run_source(
     stats.source = adapter.display_name or slug
 
     if adapter.status in ('blocked', 'unsupported', 'manual'):
-        stats.errors.append(f'{adapter.display_name}: {adapter.note}')
+        logger.info('[%s] %s', adapter.display_name, adapter.note)
         adapter.client.close()
         return stats
 

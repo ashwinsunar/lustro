@@ -107,13 +107,17 @@ class TeddyBaldassarreAdapter(SourceAdapter):
 
     @staticmethod
     def _reference_from_tags(tags: list[str], title: str) -> str:
-        # tags like "M0A10870" or "Brand:Baume et Mercier"; also ref in title tail
+        # References look like "M0A10870", "BM7662-59L" or a GTIN
+        # (8061611212893). Marketing tags ("BOUTIQUE", "AFFIRM", "NEW") are
+        # common in the feed and must NOT be captured as references.
         for tag in tags:
             t = clean(tag).replace('ref:', '').replace('reference:', '')
-            if re.fullmatch(r'[A-Za-z0-9]{4,20}', t):
+            if re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9-]{1,19}', t) and re.search(r'\d', t):
                 return t.upper()
         m = re.search(r'([A-Z0-9]{4,20})\s*$', title)
-        return m.group(1).upper() if m else ''
+        if m and re.search(r'\d', m.group(1)):
+            return m.group(1).upper()
+        return ''
 
     @staticmethod
     def _movement_from_text(text: str) -> str:

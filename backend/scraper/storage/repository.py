@@ -15,6 +15,7 @@ Django models are imported lazily so parsers/normalizer stay framework-free.
 from __future__ import annotations
 
 import logging
+import re
 from decimal import Decimal, InvalidOperation
 from typing import Optional
 
@@ -33,6 +34,11 @@ def _decimal(value, places: int = 2) -> Optional[Decimal]:
         return Decimal(str(value)).quantize(Decimal(f'1.{"0" * places}'))
     except (InvalidOperation, ValueError):
         return None
+
+
+def _norm_brand(name: str) -> str:
+    """Brand identity for reconciliation: alphanumerics only, lowercase."""
+    return re.sub(r'[^a-z0-9]', '', (name or '').lower())
 
 
 class Repository:
@@ -71,7 +77,7 @@ class Repository:
         if watch.category:
             category = Category.objects.get_or_create(name=watch.category.strip())[0]
 
-        ref = watch.reference_number.strip().upper()
+        ref = (watch.reference_number or '').strip().upper() or None
         sku = watch.sku.strip()
         source_id = watch.source_product_id.strip()
 
@@ -140,7 +146,7 @@ class Repository:
                 .select_related('brand')
                 .first()
             )
-            if by_ref and by_ref.brand.name.lower() == brand.name.lower():
+            if by_ref and _norm_brand(by_ref.brand.name) == _norm_brand(brand.name):
                 existing = by_ref
         if existing is None and sku:
             by_sku = (
@@ -148,7 +154,7 @@ class Repository:
                 .select_related('brand')
                 .first()
             )
-            if by_sku and by_sku.brand.name.lower() == brand.name.lower():
+            if by_sku and _norm_brand(by_sku.brand.name) == _norm_brand(brand.name):
                 existing = by_sku
 
         if existing is not None:
@@ -176,6 +182,36 @@ class Repository:
             return 'inserted', obj
         except Exception as exc:  # noqa: BLE001 - DB constraint/type issues logged, never crash run
             logger.warning('insert failed %s/%s: %s', watch.source, source_id, exc)
+            # Reference/UNIQUE collision: if the existing row belongs to the
+            # same watch (matching reference + normalized brand), merge into
+            # it instead of erroring out.
+            from django.db import IntegrityError  # noqa: PLC0415
+
+            if isinstance(exc, IntegrityError) and ref:
+                by_ref = (
+                    Watch.objects.filter(reference_number__iexact=ref)
+                    .select_related('brand')
+                    .first()
+                )
+                if by_ref and _norm_brand(by_ref.brand.name) == _norm_brand(brand.name):
+                    for fld, val in data.items():
+                        if fld in ('brand', 'category', 'title', 'price', 'discount_price', 'currency'):
+                            continue
+                        setattr(by_ref, fld, val)
+                    if data['price'] is not None:
+                        by_ref.price = data['price']
+                    by_ref.currency = data['currency'] or by_ref.currency
+                    if watch.source:
+                        known = {s.strip() for s in (by_ref.sources or '').split(',') if s.strip()}
+                        known.add(watch.source)
+                        by_ref.sources = ','.join(sorted(known))
+                        by_ref.source = watch.source
+                    try:
+                        by_ref.save()
+                        return 'updated', by_ref
+                    except Exception:  # noqa: BLE001
+                        logger.warning('recovery merge failed %s/%s', watch.source, source_id)
+                        return 'failed', None
             return 'failed', None
 
     def count_by_source(self) -> dict[str, int]:
