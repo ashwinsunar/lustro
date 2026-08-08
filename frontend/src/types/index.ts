@@ -65,7 +65,9 @@ export interface Watch {
   price: string;
   discount_price: string | null;
   reference_number: string;
+  currency?: string;
   movement: MovementType;
+  movement_type?: string;
   case_size: string;
   case_material: string;
   dial_color: string;
@@ -74,6 +76,10 @@ export interface Watch {
   description: string;
   gender: GenderType;
   warranty_period: string;
+  availability?: string;
+  source?: string;
+  sources?: string;
+  data_quality?: string;
   is_featured: boolean;
   is_trending: boolean;
   is_new_arrival: boolean;
@@ -97,9 +103,15 @@ export interface WatchListItem {
   category: Pick<Category, 'id' | 'name' | 'slug'>;
   price: string;
   discount_price: string | null;
+  currency?: string;
   movement: MovementType;
+  movement_type?: string;
   gender: GenderType;
   in_stock: boolean;
+  availability?: string;
+  source?: string;
+  sources?: string;
+  data_quality?: string;
   is_featured: boolean;
   is_trending: boolean;
   is_new_arrival: boolean;
@@ -224,6 +236,7 @@ export interface WatchFilters {
   categories: string[];
   movements: string[];
   genders: string[];
+  sources: string[];
   minPrice: number;
   maxPrice: number;
   inStockOnly: boolean;
@@ -236,6 +249,12 @@ export interface WatchFilters {
   trending?: boolean;
   featured?: boolean;
   bestSeller?: boolean;
+}
+
+export interface SourceFacet {
+  slug: string;
+  name: string;
+  status: string;
 }
 
 export type SortOption =

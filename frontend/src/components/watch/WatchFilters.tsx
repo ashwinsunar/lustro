@@ -2,20 +2,21 @@ import * as React from 'react';
 import * as Slider from '@radix-ui/react-slider';
 import { ChevronDown, Check } from 'lucide-react';
 import { cn, formatPrice } from '../../lib/utils';
-import type { Brand, Category, WatchFilters as IWatchFilters } from '../../types';
+import type { Brand, Category, SourceFacet, WatchFilters as IWatchFilters } from '../../types';
 
 interface WatchFiltersProps {
   filters: IWatchFilters;
   onChange: (filters: IWatchFilters) => void;
   brands: Brand[];
   categories: Category[];
+  sources?: SourceFacet[];
   className?: string;
 }
 
-export function WatchFilters({ filters, onChange, brands, categories, className }: WatchFiltersProps) {
+export function WatchFilters({ filters, onChange, brands, categories, sources = [], className }: WatchFiltersProps) {
   const [pricePreview, setPricePreview] = React.useState<[number, number] | null>(null);
 
-  const handleCheckboxChange = (group: 'brands' | 'categories' | 'movements' | 'genders', value: string) => {
+  const handleCheckboxChange = (group: 'brands' | 'categories' | 'movements' | 'genders' | 'sources', value: string) => {
     const current = filters[group];
     const updated = current.includes(value)
       ? current.filter(v => v !== value)
@@ -42,6 +43,7 @@ export function WatchFilters({ filters, onChange, brands, categories, className 
       categories: [],
       movements: [],
       genders: [],
+      sources: [],
       minPrice: 0,
       maxPrice: 100000,
       inStockOnly: false,
@@ -53,7 +55,7 @@ export function WatchFilters({ filters, onChange, brands, categories, className 
     });
   };
 
-  const activeCount = filters.brands.length + filters.categories.length + filters.movements.length + filters.genders.length + (filters.inStockOnly ? 1 : 0) + (filters.onSaleOnly ? 1 : 0) + (filters.minPrice > 0 || filters.maxPrice < 100000 ? 1 : 0);
+  const activeCount = filters.brands.length + filters.categories.length + filters.movements.length + filters.genders.length + filters.sources.length + (filters.inStockOnly ? 1 : 0) + (filters.onSaleOnly ? 1 : 0) + (filters.minPrice > 0 || filters.maxPrice < 100000 ? 1 : 0);
 
   return (
     <div className={cn("w-full bg-zinc-950 flex flex-col h-full", className)}>
@@ -123,6 +125,20 @@ export function WatchFilters({ filters, onChange, brands, categories, className 
                 label={cat.name}
                 checked={filters.categories.includes(cat.slug)}
                 onChange={() => handleCheckboxChange('categories', cat.slug)}
+              />
+            ))}
+          </div>
+        </FilterSection>
+
+        {/* Source */}
+        <FilterSection title="Source">
+          <div className="space-y-3">
+            {sources.map((src) => (
+              <CheckboxItem 
+                key={src.slug}
+                label={src.name}
+                checked={filters.sources.includes(src.slug)}
+                onChange={() => handleCheckboxChange('sources', src.slug)}
               />
             ))}
           </div>

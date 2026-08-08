@@ -42,7 +42,8 @@ class WatchListSerializer(serializers.ModelSerializer):
         model = Watch
         fields = [
             'id', 'title', 'slug', 'brand', 'category', 'price', 'discount_price',
-            'movement', 'gender', 'in_stock', 'is_featured', 'is_trending',
+            'currency', 'movement', 'movement_type', 'gender', 'in_stock', 'availability',
+            'source', 'sources', 'data_quality', 'is_featured', 'is_trending',
             'is_new_arrival', 'is_best_seller', 'rating', 'review_count', 'images'
         ]
 

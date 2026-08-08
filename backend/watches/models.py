@@ -227,3 +227,39 @@ class StockNotify(models.Model):
 
     def __str__(self):
         return f"{self.email} · {self.watch.title}"
+
+
+class IngestRun(models.Model):
+    """Audit log of one source ingestion run (Phase 16)."""
+
+    RUN_STATUS = (
+        ('ok', 'OK'),
+        ('partial', 'Partial'),
+        ('failed', 'Failed'),
+    )
+
+    source = models.CharField(max_length=60, db_index=True)
+    status = models.CharField(max_length=10, choices=RUN_STATUS, default='ok')
+    started_at = models.DateTimeField()
+    finished_at = models.DateTimeField(null=True, blank=True)
+    duration_seconds = models.FloatField(default=0.0)
+    requests = models.PositiveIntegerField(default=0)
+    products_found = models.PositiveIntegerField(default=0)
+    products_parsed = models.PositiveIntegerField(default=0)
+    inserted = models.PositiveIntegerField(default=0)
+    updated = models.PositiveIntegerField(default=0)
+    duplicates = models.PositiveIntegerField(default=0)
+    invalid = models.PositiveIntegerField(default=0)
+    failed = models.PositiveIntegerField(default=0)
+    dry_run = models.BooleanField(default=False)
+    errors = models.TextField(blank=True)  # newline-separated
+    note = models.CharField(max_length=300, blank=True)
+
+    class Meta:
+        ordering = ['-started_at']
+        indexes = [
+            models.Index(fields=['source', '-started_at']),
+        ]
+
+    def __str__(self):
+        return f'{self.source} {self.status} {self.started_at:%Y-%m-%d %H:%M}'

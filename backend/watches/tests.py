@@ -97,3 +97,58 @@ class StockNotifyAPITests(APITestCase):
     def test_missing_email_400(self):
         resp = self.client.post(self.url(), {}, format='json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class WatchImportFilterTests(APITestCase):
+    """Phase 11: imported-watch facets (source, availability, movement_type)."""
+
+    def setUp(self):
+        self.brand = Brand.objects.create(name='Omega', slug='omega')
+        self.local = Watch.objects.create(
+            title='Seamaster', slug='omega-seamaster-local', brand=self.brand,
+            price=6400, reference_number=None, movement='automatic',
+            currency='CHF', in_stock=True, availability='',
+            source='', sources='',
+        )
+        self.imported = Watch.objects.create(
+            title='Seamaster Import', slug='omega-seamaster-import', brand=self.brand,
+            price=4100, reference_number=None, movement='quartz',
+            movement_type='quartz', currency='USD', in_stock=True,
+            availability='in_stock', source='teddy_baldassarre',
+            sources='teddy_baldassarre,watchmaxx',
+        )
+
+    def test_source_filter(self):
+        resp = self.client.get(reverse('watch-list'), {'source': 'teddy_baldassarre'})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.data['count'], 1)
+        self.assertEqual(resp.data['results'][0]['slug'], 'omega-seamaster-import')
+
+    def test_sources_multi_filter(self):
+        resp = self.client.get(reverse('watch-list'), {'sources': 'teddy_baldassarre,watchmaxx'})
+        self.assertEqual(resp.data['count'], 1)
+        resp = self.client.get(reverse('watch-list'), {'sources': 'watchmaxx'})
+        self.assertEqual(resp.data['count'], 0)
+
+    def test_availability_filter(self):
+        resp = self.client.get(reverse('watch-list'), {'availabilities': 'in_stock'})
+        self.assertEqual(resp.data['count'], 1)
+
+    def test_movement_type_filter(self):
+        resp = self.client.get(reverse('watch-list'), {'movement_types': 'quartz'})
+        self.assertEqual(resp.data['count'], 1)
+
+    def test_imported_flag(self):
+        resp = self.client.get(reverse('watch-list'), {'imported': 'true'})
+        self.assertEqual(resp.data['count'], 1)
+        resp = self.client.get(reverse('watch-list'), {'imported': 'false'})
+        self.assertEqual(resp.data['count'], 1)
+
+    def test_list_serializer_exposes_source_fields(self):
+        resp = self.client.get(reverse('watch-list'))
+        row = next(r for r in resp.data['results'] if r['slug'] == 'omega-seamaster-import')
+        self.assertEqual(row['currency'], 'USD')
+        self.assertEqual(row['availability'], 'in_stock')
+        self.assertEqual(row['source'], 'teddy_baldassarre')
+        self.assertEqual(row['sources'], 'teddy_baldassarre,watchmaxx')
+        self.assertEqual(row['movement_type'], 'quartz')

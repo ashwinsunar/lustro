@@ -23,7 +23,22 @@ class WatchFilter(django_filters.FilterSet):
     brands = SlugInFilter(field_name='brand__slug', lookup_expr='in')
     categories = SlugInFilter(field_name='category__slug', lookup_expr='in')
     movements = SlugInFilter(field_name='movement', lookup_expr='in')
+    movement_types = SlugInFilter(field_name='movement_type', lookup_expr='in')
     genders = SlugInFilter(field_name='gender', lookup_expr='in')
+    availabilities = SlugInFilter(field_name='availability', lookup_expr='in')
+    source = django_filters.CharFilter(field_name='source', lookup_expr='exact')
+    sources = django_filters.BaseCSVFilter(method='filter_sources')
+
+    def filter_sources(self, queryset, name, value):
+        values = [v.strip() for v in value if v.strip()]
+        if not values:
+            return queryset
+        from django.db.models import Q
+        q = Q()
+        for v in values:
+            q |= Q(source__icontains=v)
+        return queryset.filter(q)
+    imported = django_filters.BooleanFilter(method='filter_imported')
     on_sale = django_filters.BooleanFilter(field_name='discount_price', lookup_expr='isnull', exclude=True)
     featured = django_filters.BooleanFilter(field_name='is_featured')
     trending = django_filters.BooleanFilter(field_name='is_trending')
@@ -33,6 +48,11 @@ class WatchFilter(django_filters.FilterSet):
 
     def filter_exclude(self, queryset, name, value):
         return queryset.exclude(pk=value)
+
+    def filter_imported(self, queryset, name, value):
+        if value:
+            return queryset.exclude(source='')
+        return queryset.filter(source='')
 
     class Meta:
         model = Watch
@@ -66,3 +86,23 @@ class WatchViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action == 'retrieve':
             return WatchDetailSerializer
         return WatchListSerializer
+
+
+class SourceViewSet(viewsets.ViewSet):
+    """Facet metadata for ingestion sources (functional sources only)."""
+
+    def list(self, request):
+        from rest_framework.response import Response  # noqa: PLC0415
+
+        from scraper.sources import all_adapters  # noqa: PLC0415
+
+        rows = [
+            {
+                'slug': cls.slug,
+                'name': cls.display_name or cls.slug.replace('_', ' ').title(),
+                'status': cls.status,
+            }
+            for cls in all_adapters()
+            if cls.status in ('active', 'partial', 'manual')
+        ]
+        return Response(rows)

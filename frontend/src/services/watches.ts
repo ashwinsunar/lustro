@@ -1,5 +1,5 @@
 import api from './api';
-import type { Watch, WatchListItem, PaginatedResponse, WatchFilters } from '../types';
+import type { SourceFacet, Watch, WatchListItem, PaginatedResponse, WatchFilters } from '../types';
 
 export const fetchWatches = async (params?: Partial<WatchFilters>): Promise<PaginatedResponse<WatchListItem>> => {
   const queryParams = new URLSearchParams();
@@ -15,6 +15,7 @@ export const fetchWatches = async (params?: Partial<WatchFilters>): Promise<Pagi
     if (params.categories?.length) queryParams.append('categories', params.categories.join(','));
     if (params.movements?.length) queryParams.append('movements', params.movements.join(','));
     if (params.genders?.length) queryParams.append('genders', params.genders.join(','));
+    if (params.sources?.length) queryParams.append('sources', params.sources.join(','));
     
     if (params.minPrice) queryParams.append('min_price', params.minPrice.toString());
     if (params.maxPrice) queryParams.append('max_price', params.maxPrice.toString());
@@ -62,3 +63,9 @@ function getSortOrdering(sort: string): string {
     default: return '-created_at';
   }
 }
+
+
+export const fetchSources = async (): Promise<SourceFacet[]> => {
+  const { data } = await api.get('/api/v1/sources/');
+  return data;
+};

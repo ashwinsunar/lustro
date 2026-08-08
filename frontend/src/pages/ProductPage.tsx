@@ -212,6 +212,12 @@ export default function ProductPage() {
     ['Warranty', watch.warranty_period],
   ];
 
+  const availabilityLabel =
+    watch.availability === 'pre_order' ? 'Pre-order'
+    : watch.availability === 'out_of_stock' ? 'Out of stock'
+    : watch.availability === 'in_stock' ? 'In stock'
+    : null;
+
   return (
     <div className="pt-32 pb-24 bg-zinc-950 min-h-screen">
       <Container>
@@ -346,6 +352,14 @@ export default function ProductPage() {
               <h1 className="font-display text-4xl md:text-5xl font-medium mb-4">{watch.title}</h1>
               <p className="text-white/50 text-sm font-space tracking-widest uppercase mb-6">
                 {watch.reference_number}
+                {watch.source && (
+                  <span className="ml-3 text-white/30 normal-case tracking-normal">
+                    · via {watch.source.replace(/_/g, ' ')}
+                    {watch.data_quality === 'flagged' && (
+                      <span className="ml-2 text-amber-400/80">· flagged for review</span>
+                    )}
+                  </span>
+                )}
               </p>
 
               <div className="flex items-center gap-3 mb-8">
@@ -368,28 +382,28 @@ export default function ProductPage() {
               <div className="flex items-baseline gap-4 mb-3">
                 {watch.discount_price ? (
                   <>
-                    <span className="text-3xl font-space text-gold">{formatPrice(watch.discount_price)}</span>
-                    <span className="text-lg font-space text-white/40 line-through">{formatPrice(watch.price)}</span>
+                    <span className="text-3xl font-space text-gold">{formatPrice(watch.discount_price, watch.currency)}</span>
+                    <span className="text-lg font-space text-white/40 line-through">{formatPrice(watch.price, watch.currency)}</span>
                   </>
                 ) : (
-                  <span className="text-3xl font-space text-white">{formatPrice(watch.price)}</span>
+                  <span className="text-3xl font-space text-white">{formatPrice(watch.price, watch.currency)}</span>
                 )}
               </div>
 
               <div className="flex items-center gap-2 mb-10 text-sm">
-                {watch.in_stock ? (
+                {!watch.in_stock ? (
+                  <>
+                    <X className="w-4 h-4 text-red-400" strokeWidth={2} />
+                    <span className="text-white/70">{availabilityLabel ?? 'Out of stock'}</span>
+                  </>
+                ) : (
                   <>
                     <Check className="w-4 h-4 text-emerald-400" strokeWidth={2} />
-                    <span className="text-white/70">In stock</span>
+                    <span className="text-white/70">{availabilityLabel ?? 'In stock'}</span>
                     {watch.stock_count > 0 && watch.stock_count <= 5 && (
                       <span className="text-amber-400/90">· Only {watch.stock_count} left</span>
                     )}
                     <span className="text-white/40">· Ships within 24h</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-destructive/90 font-medium">Out of stock</span>
-                    <span className="text-white/40">· Notify me when available</span>
                   </>
                 )}
               </div>

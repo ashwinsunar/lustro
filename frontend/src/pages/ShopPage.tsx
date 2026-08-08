@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Container } from '../components/layout';
 import { WatchGrid, WatchFilters, WatchSortBar } from '../components/watch';
 import { Button } from '../components/ui';
-import { fetchWatches } from '../services/watches';
+import { fetchWatches, fetchSources } from '../services/watches';
 import { fetchBrands } from '../services/brands';
 import { fetchCategories } from '../services/categories';
 import { usePageMeta } from '../hooks/usePageMeta';
@@ -39,6 +39,7 @@ export default function ShopPage() {
     categories: searchParams.get('categories')?.split(',').filter(Boolean) || presetCategories,
     movements: searchParams.get('movements')?.split(',').filter(Boolean) || [],
     genders: searchParams.get('genders')?.split(',').filter(Boolean) || [],
+    sources: searchParams.get('sources')?.split(',').filter(Boolean) || [],
     minPrice: parseIntSafe(searchParams.get('minPrice'), 0),
     maxPrice: parseIntSafe(searchParams.get('maxPrice'), 100000),
     inStockOnly: searchParams.get('inStockOnly') === 'true',
@@ -63,6 +64,7 @@ export default function ShopPage() {
 
   const { data: brands = [] } = useQuery({ queryKey: ['brands'], queryFn: fetchBrands });
   const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories });
+  const { data: sources = [] } = useQuery({ queryKey: ['sources'], queryFn: fetchSources });
 
   const watches = watchesData?.results || [];
   const total = watchesData?.count || watches.length || 0;
@@ -78,6 +80,7 @@ export default function ShopPage() {
     if (newFilters.categories.length) params.set('categories', newFilters.categories.join(','));
     if (newFilters.movements.length) params.set('movements', newFilters.movements.join(','));
     if (newFilters.genders.length) params.set('genders', newFilters.genders.join(','));
+    if (newFilters.sources.length) params.set('sources', newFilters.sources.join(','));
     if (newFilters.minPrice > 0) params.set('minPrice', newFilters.minPrice.toString());
     if (newFilters.maxPrice < 100000) params.set('maxPrice', newFilters.maxPrice.toString());
     if (newFilters.inStockOnly) params.set('inStockOnly', 'true');
@@ -164,6 +167,7 @@ export default function ShopPage() {
                 onChange={onFiltersChange}
                 brands={brands}
                 categories={categories}
+                sources={sources}
               />
             </div>
           </div>
@@ -196,6 +200,7 @@ export default function ShopPage() {
                       onChange={onFiltersChange}
                       brands={brands}
                       categories={categories}
+                      sources={sources}
                     />
                   </div>
                   <div className="p-6 border-t border-white/10 bg-zinc-950">

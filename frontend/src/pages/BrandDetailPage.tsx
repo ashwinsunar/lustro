@@ -23,6 +23,7 @@ export default function BrandDetailPage() {
     categories: [],
     movements: [],
     genders: [],
+    sources: [],
     minPrice: 0,
     maxPrice: 100000,
     inStockOnly: false,

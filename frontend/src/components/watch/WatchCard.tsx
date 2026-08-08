@@ -73,6 +73,8 @@ export function WatchCard({ watch, className }: WatchCardProps) {
           {watch.in_stock && watch.discount_price && <Badge variant="sale">Sale -{discount}%</Badge>}
           {watch.in_stock && watch.is_featured && <Badge variant="featured">Featured</Badge>}
           {watch.in_stock && watch.is_trending && <Badge variant="trending">Trending</Badge>}
+          {watch.availability === 'pre_order' && <Badge variant="new">Pre-Order</Badge>}
+          {watch.availability === 'out_of_stock' && <Badge variant="sold_out">Sold Out</Badge>}
         </div>
 
         {/* Action buttons — always visible on touch, revealed on hover on desktop */}
@@ -125,11 +127,11 @@ export function WatchCard({ watch, className }: WatchCardProps) {
           <div className="flex items-baseline gap-2">
             {watch.discount_price ? (
               <>
-                <span className="text-sm font-space text-white">{formatPrice(watch.discount_price)}</span>
-                <span className="text-xs font-space text-white/40 line-through">{formatPrice(watch.price)}</span>
+                <span className="text-sm font-space text-white">{formatPrice(watch.discount_price, watch.currency)}</span>
+                <span className="text-xs font-space text-white/40 line-through">{formatPrice(watch.price, watch.currency)}</span>
               </>
             ) : (
-              <span className="text-sm font-space text-white">{formatPrice(watch.price)}</span>
+              <span className="text-sm font-space text-white">{formatPrice(watch.price, watch.currency)}</span>
             )}
           </div>
           
@@ -140,6 +142,12 @@ export function WatchCard({ watch, className }: WatchCardProps) {
             </div>
           )}
         </div>
+
+        {watch.source && (
+          <p className="text-[10px] font-space tracking-[0.15em] text-white/35 uppercase">
+            Via {watch.source.replace(/_/g, ' ')}
+          </p>
+        )}
       </div>
     </motion.div>
   );
