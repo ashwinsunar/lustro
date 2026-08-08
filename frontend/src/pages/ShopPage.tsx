@@ -147,7 +147,7 @@ export default function ShopPage() {
         <div className="flex flex-col lg:flex-row gap-10 relative">
 
           {/* Mobile Filter Button (Sticky Bottom) */}
-          <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+          <div className="lg:hidden fixed bottom-6 left-4 z-40">
             <Button
               onClick={() => setIsMobileFiltersOpen(true)}
               className="rounded-full shadow-2xl px-8 flex items-center gap-3"

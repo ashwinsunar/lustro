@@ -454,7 +454,7 @@ export default function ChronosPage() {
         <section id="chronos-overview" className="pointer-events-none flex h-screen w-full flex-col items-start justify-center px-6 md:px-24">
           <div className="max-w-2xl space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 backdrop-blur-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-gold shadow-[0_0_10px_rgba(201,168,76,0.5)]" />
               <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">Series 01 Limited</span>
             </div>
 

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Menu, X, ArrowRight, ArrowUpRight, Star, Shield, Cog,
+  Menu, X, ArrowRight, ArrowUpRight, Shield, Cog,
   Activity, Droplets, BatteryCharging, Gem, Rotate3D, MousePointerClick, Loader2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -47,9 +47,9 @@ const ATELIERS = [
 ];
 
 const VOICES = [
-  { quote: '“It does not ask for attention, but it rewards anyone who looks closely. That is exactly what I wanted from a daily watch.”', name: 'Julien Moreau', role: 'Architect · Paris' },
-  { quote: '“The finishing feels unusually calm. Every surface has purpose, and the movement becomes more interesting the longer you live with it.”', name: 'Elena Rossi', role: 'Curator · Milan' },
-  { quote: '“I expected precision. I did not expect the watch to feel this personal. The proportions, weight and sound are beautifully judged.”', name: 'David Chen', role: 'Founder · Singapore' },
+  { quote: 'Each movement is assembled, adjusted and finished at a single bench. Nothing is split between hands until the watch is whole.', name: 'The single-bench rule', role: 'Assembly · Geneva' },
+  { quote: 'Brushed planes and polished bevels are evaluated under magnification and against controlled light before a case is approved.', name: 'The light test', role: 'Finishing · Geneva' },
+  { quote: 'Every calibre is run across five positions and two temperatures before it is awarded a reference number.', name: 'Regulated, not assembled', role: 'Contrôle · Geneva' },
 ];
 
 export default function LuxuryHome() {
@@ -91,6 +91,18 @@ export default function LuxuryHome() {
 
   const openProduct = (slug: string) => navigate(`/watch/${slug}`);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        setCartOpen(false);
+        setReserveOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const handleReserve = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -118,7 +130,7 @@ export default function LuxuryHome() {
       />
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 w-full z-50 px-6 py-6 flex justify-between items-center mix-blend-difference">
+      <nav aria-label="Primary" className="fixed top-0 left-0 w-full z-50 px-6 py-6 flex justify-between items-center mix-blend-difference">
         <button onClick={() => scrollTo('top')} className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">
             <div className="w-1.5 h-1.5 bg-white rounded-full" />
@@ -144,7 +156,7 @@ export default function LuxuryHome() {
       </nav>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#030304]/95 backdrop-blur-md flex flex-col items-center justify-center gap-6 md:hidden">
+        <div role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-40 bg-[#030304]/95 backdrop-blur-md flex flex-col items-center justify-center gap-6 md:hidden">
           <button onClick={() => scrollTo('collection')} className="text-2xl font-medium tracking-tight text-white">Collection</button>
           <button onClick={() => scrollTo('craft')} className="text-2xl font-medium tracking-tight text-white">Craftsmanship</button>
           <button onClick={() => scrollTo('calibre')} className="text-2xl font-medium tracking-tight text-white">The Watch</button>
@@ -157,8 +169,8 @@ export default function LuxuryHome() {
         <section id="top" className="h-screen w-full flex flex-col justify-center items-start px-6 md:px-24">
           <div className="max-w-2xl space-y-8">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-              <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Manufacture · Since 1948</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-gold/80 shadow-[0_0_10px_rgba(201,168,76,0.5)]" />
+              <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Private Salon · Genève</span>
             </div>
 
             <h1 className="text-7xl md:text-9xl font-medium tracking-tighter leading-[0.9] text-white">
@@ -216,7 +228,7 @@ export default function LuxuryHome() {
         <section id="tech" className="h-screen w-full flex flex-col items-center justify-center text-center px-6">
           <div className="relative z-20 flex flex-col items-center gap-6">
             <div className="inline-flex items-center gap-2 border border-zinc-800 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <div className="w-2 h-2 rounded-full w-1.5 h-1.5 rounded-full bg-gold/80" />
               <span className="text-[10px] font-medium tracking-widest text-zinc-400">CALIBRE AG-72</span>
             </div>
 
@@ -296,7 +308,7 @@ export default function LuxuryHome() {
             <div className="flex items-end justify-between mb-16">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-sm mb-6">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-gold/80" />
                   <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">The Collection</span>
                 </div>
                 <h2 className="font-display text-4xl md:text-6xl font-medium tracking-tight text-white">
@@ -320,6 +332,8 @@ export default function LuxuryHome() {
                       <img
                         src={getImageUrl(w.images[0]?.image)}
                         alt={w.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                       />
                       <span className="absolute top-4 left-4 text-xs text-zinc-500 font-mono">0{i + 1}</span>
@@ -356,7 +370,7 @@ export default function LuxuryHome() {
           </div>
           <div className="flex flex-col justify-center px-6 md:px-24 py-24">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-sm mb-8 w-fit">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full w-1.5 h-1.5 rounded-full bg-gold/80" />
               <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">The Art of Calibre</span>
             </div>
             <h2 className="font-display text-5xl md:text-7xl font-medium tracking-tight leading-[0.95] text-white mb-8">
@@ -380,7 +394,7 @@ export default function LuxuryHome() {
           <div className="max-w-5xl mx-auto">
             <div className="mb-16 text-center">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-sm mb-6">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                <span className="w-1.5 h-1.5 rounded-full bg-gold/80" />
                 <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Calibre A-01 · Assembly Path</span>
               </div>
               <h2 className="font-display text-4xl md:text-6xl font-medium tracking-tight text-white">
@@ -404,21 +418,16 @@ export default function LuxuryHome() {
           <div className="max-w-5xl mx-auto">
             <div className="mb-16 text-center">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-sm mb-6">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Client Stories</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-gold/80" />
+                <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">The Standard</span>
               </div>
               <h2 className="font-display text-4xl md:text-6xl font-medium tracking-tight text-white">
-                Worn by those who value <span className="text-zinc-600 italic">quiet precision.</span>
+                Quiet standards, <span className="text-zinc-600 italic">held daily.</span>
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {VOICES.map((v) => (
                 <article key={v.name} className="glass-panel p-8 rounded-xl flex flex-col justify-between">
-                  <span className="flex gap-1 text-zinc-300 mb-6">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} size={13} fill="currentColor" strokeWidth={0} />
-                    ))}
-                  </span>
                   <blockquote className="text-sm text-zinc-300 leading-relaxed font-light mb-8">{v.quote}</blockquote>
                   <footer>
                     <strong className="block text-sm font-medium text-white mb-1">{v.name}</strong>
@@ -433,7 +442,7 @@ export default function LuxuryHome() {
         {/* ============ CLOSING ============ */}
         <section className="h-screen w-full flex flex-col items-center justify-center text-center px-6 border-t border-white/5">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-sm mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+            <span className="w-1.5 h-1.5 rounded-full bg-gold/80" />
             <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">A private appointment awaits</span>
           </div>
           <h2 className="font-display text-5xl md:text-8xl font-medium tracking-tight leading-[0.95] text-white mb-8">
@@ -527,7 +536,7 @@ export default function LuxuryHome() {
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-sm mb-4">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold/80" />
                     <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Private Appointment</span>
                   </div>
                   <h2 className="text-2xl font-medium tracking-tight text-white">Reserve <span className="text-zinc-600">yours.</span></h2>

@@ -99,7 +99,8 @@ export default function Navbar() {
     if (q) navigate(`/shop?search=${encodeURIComponent(q)}`);
   };
 
-  // Real catalog imagery for the collection mega menu — one request, cached.
+  // Real catalog imagery for the collection mega menu — one request, cached,
+  // fetched only when the menu is opened.
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: fetchCategories,
@@ -112,6 +113,7 @@ export default function Navbar() {
       return data.results || [];
     },
     staleTime: 10 * 60 * 1000,
+    enabled: isCollectionsOpen,
   });
 
   const categoryCover = (slug: string): string | undefined => {
@@ -132,6 +134,10 @@ export default function Navbar() {
     image: categoryCover(cat.slug),
     count: cat.watch_count ?? 0,
   }));
+
+  const isShop = location.pathname === '/shop';
+  const isBrands = location.pathname === '/brands';
+  const isNewArrivals = new URLSearchParams(location.search).get('new_arrival') === 'true';
 
   return (
     <>
@@ -220,17 +226,17 @@ export default function Navbar() {
               </AnimatePresence>
             </div>
 
-            <Link to="/shop" className="text-xs font-space tracking-widest uppercase text-white/80 hover:text-gold transition-colors relative group">
+            <Link to="/shop" className={`text-xs font-space tracking-widest uppercase transition-colors relative group ${isShop ? 'text-gold' : 'text-white/80 hover:text-gold'}`}>
               All Pieces
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full" />
+              <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${isShop ? 'w-full' : 'w-0 group-hover:w-full'}`} />
             </Link>
-            <Link to="/shop?new_arrival=true" className="text-xs font-space tracking-widest uppercase text-white/80 hover:text-gold transition-colors relative group">
+            <Link to="/shop?new_arrival=true" className={`text-xs font-space tracking-widest uppercase transition-colors relative group ${isNewArrivals ? 'text-gold' : 'text-white/80 hover:text-gold'}`}>
               New Arrivals
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full" />
+              <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${isNewArrivals ? 'w-full' : 'w-0 group-hover:w-full'}`} />
             </Link>
-            <Link to="/brands" className="text-xs font-space tracking-widest uppercase text-white/80 hover:text-gold transition-colors relative group">
+            <Link to="/brands" className={`text-xs font-space tracking-widest uppercase transition-colors relative group ${isBrands ? 'text-gold' : 'text-white/80 hover:text-gold'}`}>
               Brands
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full" />
+              <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${isBrands ? 'w-full' : 'w-0 group-hover:w-full'}`} />
             </Link>
           </div>
 

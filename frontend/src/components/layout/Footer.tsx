@@ -23,9 +23,9 @@ const EXPLORE_LINKS = [
 const BRAND_LINKS = ['Rolex', 'Omega', 'TAG Heuer', 'Patek Philippe', 'IWC', 'Breitling'];
 
 const COMPANY_LINKS = [
-  { name: 'About Us', path: '/legacy' },
-  { name: 'The Boutique', path: '/brands' },
-  { name: 'Contact', path: 'mailto:concierge@lustro.ch' },
+  { name: 'Our Story', path: '/' },
+  { name: 'The Collection', path: '/shop' },
+  { name: 'Concierge', path: 'mailto:concierge@lustro.ch' },
 ];
 
 export function Footer() {
@@ -158,10 +158,7 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-6">
             <span className="text-white/40 text-xs font-space tracking-widest">SECURE PAYMENTS</span>
-            <div className="flex gap-2">
-              <div className="w-8 h-5 bg-white/10 rounded flex items-center justify-center text-[8px] text-white/50">COD</div>
-              <div className="w-8 h-5 bg-white/10 rounded flex items-center justify-center text-[8px] text-white/50">CARD</div>
-            </div>
+            <span className="text-white/30 text-xs font-space tracking-widest">VISA · MASTERCARD · AMEX</span>
           </div>
         </div>
       </Container>

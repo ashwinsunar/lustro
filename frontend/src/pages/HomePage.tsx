@@ -71,9 +71,9 @@ export default function HomePage() {
           className="absolute bottom-24 w-full px-6 z-10 hidden md:block"
         >
           <Container className="flex justify-between items-center border-t luxury-border pt-6 text-white/40 text-xs font-space tracking-widest uppercase">
-            <span>500+ Timepieces</span>
-            <span>50+ Luxury Brands</span>
-            <span>Est. 2024</span>
+            <span>54 Curated Timepieces</span>
+            <span>10 Maisons</span>
+            <span>Complimentary Delivery</span>
           </Container>
         </motion.div>
 
@@ -140,13 +140,13 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/10 text-gold">
                 <Sparkles className="w-5 h-5" />
               </div>
-              <p className="text-gold tracking-[0.2em] text-xs font-space uppercase mb-4 font-semibold">Powered by AI</p>
+              <p className="text-gold tracking-[0.2em] text-xs font-space uppercase mb-4 font-semibold">Private Concierge</p>
               <h2 className="font-display text-4xl md:text-5xl font-medium mb-6">Find Your Perfect Timepiece</h2>
               <p className="text-white/60 mb-10 text-balance leading-relaxed">
-                Not sure what you're looking for? Chat with our AI watch expert to get personalized recommendations based on your style, lifestyle, and budget.
+                Not sure where to begin? Ask our concierge for recommendations based on your taste, lifestyle and budget — by brand, style or calibre.
               </p>
               <Button size="lg" className="px-10" onClick={openChat}>
-                Chat With AI Assistant
+                Ask the Concierge
               </Button>
             </motion.div>
           </div>

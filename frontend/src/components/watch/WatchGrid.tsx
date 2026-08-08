@@ -5,6 +5,7 @@ import { cn, getImageUrl, formatPrice } from '../../lib/utils';
 import { WatchCard } from './WatchCard';
 import { WatchCardSkeleton } from './WatchCardSkeleton';
 import { Badge } from '../ui';
+import { Button } from '../ui';
 import type { WatchListItem } from '../../types';
 
 interface WatchGridProps {
@@ -42,8 +43,12 @@ export function WatchGrid({
 
   if (watches.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-white/50 mb-4">No timepieces found.</p>
+      <div className="flex flex-col items-center justify-center py-20 text-center border border-white/5 bg-zinc-900/30">
+        <p className="text-white/50 mb-2">No timepieces match your selection.</p>
+        <p className="text-white/30 text-sm mb-8">Adjust the filters to widen your search.</p>
+        <Link to="/shop">
+          <Button variant="outline">View the full collection</Button>
+        </Link>
       </div>
     );
   }

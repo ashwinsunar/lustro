@@ -50,6 +50,7 @@ export function WatchCard({ watch, className }: WatchCardProps) {
           src={getImageUrl(primaryImage)}
           alt={watch.title}
           loading="lazy"
+          decoding="async"
           className="h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
         />
 

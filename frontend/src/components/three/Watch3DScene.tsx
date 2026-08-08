@@ -318,6 +318,7 @@ export default function Watch3DScene({
     let rafId = 0;
     const animate = () => {
       rafId = requestAnimationFrame(animate);
+      if (document.hidden) return;
       const t = clock.getElapsedTime();
 
       sHand.rotation.z = -t;
