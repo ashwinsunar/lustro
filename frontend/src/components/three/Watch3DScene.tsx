@@ -316,7 +316,9 @@ export default function Watch3DScene({
     // ---------- Render loop ----------
     const clock = new THREE.Clock();
     let rafId = 0;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const animate = () => {
+      if (reduceMotion) return;
       rafId = requestAnimationFrame(animate);
       if (document.hidden) return;
       const t = clock.getElapsedTime();
@@ -330,11 +332,12 @@ export default function Watch3DScene({
         watchGroup.rotation.y += velocity.x;
         watchGroup.rotation.x += velocity.y;
         watchGroup.position.y += Math.sin(t) * 0.001;
+        particles.rotation.y = t * 0.05;
       }
 
-      particles.rotation.y = t * 0.05;
       renderer.render(scene, camera);
     };
+    renderer.render(scene, camera);
     animate();
 
     // ---------- Resize ----------
