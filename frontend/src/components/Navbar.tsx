@@ -243,7 +243,7 @@ export default function Navbar() {
           {/* Logo (Center) */}
           <div className="w-1/3 flex justify-center">
             <Link to="/" className="flex items-center transition-opacity hover:opacity-80" aria-label="Lustro home">
-              <img src="/logo.png" alt="Lustro" className="h-10 md:h-12 w-auto" />
+              <img src="/logo-128.png" alt="Lustro" className="h-10 md:h-12 w-auto" />
             </Link>
           </div>
 
@@ -378,7 +378,7 @@ export default function Navbar() {
             aria-label="Menu"
           >
             <div className="p-6 flex justify-between items-center border-b border-white/10">
-              <img src="/logo.png" alt="Lustro" className="h-9 w-auto" />
+              <img src="/logo-128.png" alt="Lustro" className="h-9 w-auto" />
               <button onClick={() => setIsMobileMenuOpen(false)} className="text-white p-2" aria-label="Close menu">
                 <X className="w-6 h-6" />
               </button>

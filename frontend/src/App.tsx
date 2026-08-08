@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { Suspense, lazy, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { MotionConfig } from 'framer-motion';
 
 import Navbar from './components/Navbar';
 import { Footer, PageTransition } from './components/layout';
@@ -39,16 +40,18 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Shell />
-        <Toaster
-          theme="dark"
-          toastOptions={{
-            className: 'bg-zinc-900 border-white/10 text-white font-space tracking-wide',
-            descriptionClassName: 'text-white/60',
-          }}
-        />
-      </Router>
+      <MotionConfig reducedMotion="user">
+        <Router>
+          <Shell />
+          <Toaster
+            theme="dark"
+            toastOptions={{
+              className: 'bg-zinc-900 border-white/10 text-white font-space tracking-wide',
+              descriptionClassName: 'text-white/60',
+            }}
+          />
+        </Router>
+      </MotionConfig>
     </QueryClientProvider>
   );
 }

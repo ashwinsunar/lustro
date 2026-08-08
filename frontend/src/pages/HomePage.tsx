@@ -94,7 +94,7 @@ export default function HomePage() {
         <div className="flex whitespace-nowrap animate-marquee">
           {[1, 2].map((group) => (
             <div key={group} className="flex items-center gap-12 px-6">
-              {(brands.length ? brands.map((b) => b.name.toUpperCase()) : ['ROLEX', 'OMEGA', 'TAG HEUER', 'PATEK PHILIPPE', 'IWC', 'BREITLING', 'CARTIER', 'AUDEMARS PIGUET']).map((brand, idx) => (
+              {(brands.length ? brands.map((b) => b.name.toUpperCase()) : ['CURATED', 'AUTHENTICATED', 'INDEPENDENT', 'GENÈVE']).map((brand, idx) => (
                 <div key={idx} className="flex items-center gap-12 text-white/60 font-space tracking-widest text-sm uppercase">
                   <span>{brand}</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-gold/50" />

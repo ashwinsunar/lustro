@@ -117,7 +117,7 @@ export default function OrdersPage() {
                         {order.items.map((item) => (
                           <div key={item.id} className="flex gap-4">
                             <div className="w-14 h-18 shrink-0 bg-zinc-900 overflow-hidden">
-                              <img src={getImageUrl(item.image)} alt={item.title} className="w-full h-full object-cover" />
+                              <img src={getImageUrl(item.image)} alt={item.title} onError={(e) => { e.currentTarget.style.display = 'none'; }} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-[10px] font-space tracking-[0.2em] text-gold uppercase">{item.brand_name}</p>

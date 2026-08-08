@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ArrowRight } from 'lucide-react';
 import { Container } from './Container';
 import api from '../../services/api';
+import { fetchBrands } from '../../services/brands';
+import type { Brand } from '../../types';
 
 const SOCIALS = [
   { name: 'Instagram', handle: 'IG', href: 'https://instagram.com' },
@@ -20,8 +23,6 @@ const EXPLORE_LINKS = [
   { name: 'Compare', path: '/compare' },
 ];
 
-const BRAND_LINKS = ['Rolex', 'Omega', 'TAG Heuer', 'Patek Philippe', 'IWC', 'Breitling'];
-
 const COMPANY_LINKS = [
   { name: 'Our Story', path: '/' },
   { name: 'The Collection', path: '/shop' },
@@ -31,6 +32,7 @@ const COMPANY_LINKS = [
 export function Footer() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const { data: brands = [] } = useQuery<Brand[]>({ queryKey: ['brands'], queryFn: fetchBrands });
 
   const subscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,13 +120,13 @@ export function Footer() {
           <div>
             <h4 className="font-space tracking-widest uppercase text-sm mb-6 text-white">Brands</h4>
             <ul className="space-y-4">
-              {BRAND_LINKS.map((brand) => (
-                <li key={brand}>
+              {brands.slice(0, 6).map((brand) => (
+                <li key={brand.id}>
                   <Link
-                    to={`/brands/${brand.toLowerCase().replace(' ', '-')}`}
+                    to={`/brands/${brand.slug}`}
                     className="text-white/60 hover:text-white transition-colors text-sm"
                   >
-                    {brand}
+                    {brand.name}
                   </Link>
                 </li>
               ))}

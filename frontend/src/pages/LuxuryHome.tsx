@@ -25,8 +25,6 @@ const STATIC_PRODUCT: CartItem = {
   slug: 'lustro-moonphase-silver',
 };
 
-const FINISHES = ['Obsidian', 'Silver', 'Gold'];
-
 const COMPOSITION = [
   { label: 'Case', icon: Shield, body: '904L stainless steel, brushed and polished by hand in Geneva.' },
   { label: 'Movement', icon: Cog, body: 'Swiss automatic calibre, assembled and adjusted in-house.' },
@@ -58,7 +56,6 @@ export default function LuxuryHome() {
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [reserveOpen, setReserveOpen] = useState(false);
-  const [finish, setFinish] = useState(FINISHES[0]);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ full_name: '', email: '', date: '', preference: 'Private salon, Geneva', message: '' });
 
@@ -228,7 +225,7 @@ export default function LuxuryHome() {
         <section id="tech" className="h-screen w-full flex flex-col items-center justify-center text-center px-6">
           <div className="relative z-20 flex flex-col items-center gap-6">
             <div className="inline-flex items-center gap-2 border border-zinc-800 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full">
-              <div className="w-2 h-2 rounded-full w-1.5 h-1.5 rounded-full bg-gold/80" />
+              <div className="w-1.5 h-1.5 rounded-full bg-gold/80" />
               <span className="text-[10px] font-medium tracking-widest text-zinc-400">CALIBRE AG-72</span>
             </div>
 
@@ -262,22 +259,8 @@ export default function LuxuryHome() {
 
           <div className="flex flex-col items-center gap-8 relative">
             <div className="text-center">
-              <h2 className="text-4xl font-medium tracking-tight text-white mb-2">The Collection</h2>
-              <p className="text-zinc-500 text-sm">Select your configuration.</p>
-            </div>
-
-            <div className="flex gap-4 p-1 bg-white/5 rounded-lg backdrop-blur-sm">
-              {FINISHES.map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFinish(f)}
-                  className={`px-6 py-2 rounded text-xs font-medium transition-colors ${
-                    finish === f ? 'bg-white text-black shadow-sm' : 'text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
+              <h2 className="text-4xl font-medium tracking-tight text-white mb-2">The First Piece</h2>
+              <p className="text-zinc-500 text-sm">The featured acquisition of the season — ready for delivery.</p>
             </div>
 
             <div className="h-px w-24 bg-zinc-800 my-2" />
@@ -367,11 +350,11 @@ export default function LuxuryHome() {
         {/* ============ CRAFT ============ */}
         <section id="craft" className="min-h-screen grid md:grid-cols-2 border-t border-white/5">
           <div className="relative overflow-hidden bg-black/40">
-            <img src={productImage} alt="Calibre craft" className="w-full h-full object-cover opacity-70" />
+            <img src={productImage} alt="Calibre craft" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-70" />
           </div>
           <div className="flex flex-col justify-center px-6 md:px-24 py-24">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-sm mb-8 w-fit">
-              <span className="w-1.5 h-1.5 rounded-full w-1.5 h-1.5 rounded-full bg-gold/80" />
+              <span className="w-1.5 h-1.5 rounded-full bg-gold/80" />
               <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">The Art of Calibre</span>
             </div>
             <h2 className="font-display text-5xl md:text-7xl font-medium tracking-tight leading-[0.95] text-white mb-8">

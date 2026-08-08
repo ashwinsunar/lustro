@@ -100,7 +100,20 @@ export default function ProductPage() {
           }
         : {}),
     });
-    return () => removeJsonLd('product-jsonld');
+    injectJsonLd('breadcrumb-jsonld', {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_ORIGIN}/` },
+        { '@type': 'ListItem', position: 2, name: 'Collections', item: `${SITE_ORIGIN}/shop` },
+        { '@type': 'ListItem', position: 3, name: watch.brand.name, item: `${SITE_ORIGIN}/brands/${watch.brand.slug}` },
+        { '@type': 'ListItem', position: 4, name: watch.title, item: `${SITE_ORIGIN}/watch/${watch.slug}` },
+      ],
+    });
+    return () => {
+      removeJsonLd('product-jsonld');
+      removeJsonLd('breadcrumb-jsonld');
+    };
   }, [watch]);
 
   // Lightbox keyboard navigation
@@ -472,38 +485,41 @@ export default function ProductPage() {
                 </button>
               </div>
 
-              <button
-                onClick={() => {
-                  const didToggle = toggleCompare({
-                    id: watch.id, title: watch.title, slug: watch.slug, brand: { id: watch.brand.id, name: watch.brand.name, slug: watch.brand.slug },
-                    category: { id: watch.category.id, name: watch.category.name, slug: watch.category.slug },
-                    price: watch.price, discount_price: watch.discount_price, movement: watch.movement, gender: watch.gender,
-                    in_stock: watch.in_stock, is_featured: watch.is_featured, is_trending: watch.is_trending,
-                    is_new_arrival: watch.is_new_arrival, is_best_seller: watch.is_best_seller,
-                    rating: watch.rating, review_count: watch.review_count, images: watch.images || [],
-                  });
-                  if (didToggle === false && !comparing) {
-                    toast.error('Comparison list is full (max 3 pieces).');
-                  }
-                }}
-                className="flex items-center gap-2 text-xs font-space tracking-widest uppercase text-white/50 hover:text-gold transition-colors mb-10"
-              >
-                {comparing ? <><Check className="w-4 h-4" /> Added to compare</> : <>Compare this piece</>}
-              </button>
-              <button
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(window.location.href);
-                    toast.success('Link copied to clipboard.');
-                  } catch {
-                    toast.error('Could not copy the link.');
-                  }
-                }}
-                className="flex items-center gap-2 text-xs font-space tracking-widest uppercase text-white/50 hover:text-gold transition-colors mb-10 ml-6"
-                aria-label="Copy link to this watch"
-              >
-                <Link2 className="w-4 h-4" /> Share
-              </button>
+              <div className="flex items-center gap-8 mb-10">
+                <button
+                  onClick={() => {
+                    const didToggle = toggleCompare({
+                      id: watch.id, title: watch.title, slug: watch.slug, brand: { id: watch.brand.id, name: watch.brand.name, slug: watch.brand.slug },
+                      category: { id: watch.category.id, name: watch.category.name, slug: watch.category.slug },
+                      price: watch.price, discount_price: watch.discount_price, movement: watch.movement, gender: watch.gender,
+                      in_stock: watch.in_stock, is_featured: watch.is_featured, is_trending: watch.is_trending,
+                      is_new_arrival: watch.is_new_arrival, is_best_seller: watch.is_best_seller,
+                      rating: watch.rating, review_count: watch.review_count, images: watch.images || [],
+                    });
+                    if (didToggle === false && !comparing) {
+                      toast.error('Comparison list is full (max 3 pieces).');
+                    }
+                  }}
+                  className="flex items-center gap-2 text-xs font-space tracking-widest uppercase text-white/50 hover:text-gold transition-colors"
+                >
+                  {comparing ? <><Check className="w-4 h-4" /> Added to compare</> : <>Compare this piece</>}
+                </button>
+                <span className="w-px h-4 bg-white/10" />
+                <button
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(window.location.href);
+                      toast.success('Link copied to clipboard.');
+                    } catch {
+                      toast.error('Could not copy the link.');
+                    }
+                  }}
+                  className="flex items-center gap-2 text-xs font-space tracking-widest uppercase text-white/50 hover:text-gold transition-colors"
+                  aria-label="Copy link to this watch"
+                >
+                  <Link2 className="w-4 h-4" /> Share
+                </button>
+              </div>
             </div>
 
             {/* Assurance row */}

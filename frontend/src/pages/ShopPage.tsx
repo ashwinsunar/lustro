@@ -69,7 +69,7 @@ export default function ShopPage() {
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
-  }, []);
+  }, [searchParams]);
 
   const handleFilterChange = useCallback((newFilters: IWatchFilters) => {
     const params = new URLSearchParams();

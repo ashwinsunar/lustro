@@ -31,9 +31,11 @@ interface PageMetaOptions {
   path?: string;
   image?: string;
   type?: 'website' | 'product' | 'article';
+  /** hide the page from search engines (e.g. 404) */
+  noindex?: boolean;
 }
 
-export function usePageMeta({ title, description = SITE_DESCRIPTION, path = '/', image, type = 'website' }: PageMetaOptions) {
+export function usePageMeta({ title, description = SITE_DESCRIPTION, path = '/', image, type = 'website', noindex = false }: PageMetaOptions) {
   useEffect(() => {
     const fullTitle = title === SITE_NAME ? title : `${title} — ${SITE_NAME}`;
     const url = `${window.location.origin}${path}`;
@@ -50,5 +52,10 @@ export function usePageMeta({ title, description = SITE_DESCRIPTION, path = '/',
     setMeta('name', 'twitter:title', fullTitle);
     setMeta('name', 'twitter:description', description);
     setLink('canonical', url);
-  }, [title, description, path, image, type]);
+    if (noindex) setMeta('name', 'robots', 'noindex, nofollow');
+    else {
+      const el = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]');
+      if (el) el.remove();
+    }
+  }, [title, description, path, image, type, noindex]);
 }

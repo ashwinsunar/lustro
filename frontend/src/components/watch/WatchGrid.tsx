@@ -4,8 +4,7 @@ import { Star } from 'lucide-react';
 import { cn, getImageUrl, formatPrice } from '../../lib/utils';
 import { WatchCard } from './WatchCard';
 import { WatchCardSkeleton } from './WatchCardSkeleton';
-import { Badge } from '../ui';
-import { Button } from '../ui';
+import { Badge, Button } from '../ui';
 import type { WatchListItem } from '../../types';
 
 interface WatchGridProps {

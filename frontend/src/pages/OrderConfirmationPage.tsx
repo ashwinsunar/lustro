@@ -110,9 +110,11 @@ export default function OrderConfirmationPage() {
               </div>
               <div className="text-center">
                 <p className="text-sm text-white/60">
-                  {order.status === 'confirmed'
-                    ? 'Our concierge is preparing your timepiece.'
-                    : `Status: ${order.status}`}
+                  {order.status === 'pending'
+                    ? 'Your order has been received and is awaiting confirmation.'
+                    : order.status === 'confirmed'
+                      ? 'Our concierge is preparing your timepiece.'
+                      : `Status: ${order.status}`}
                 </p>
               </div>
             </>
@@ -133,7 +135,7 @@ export default function OrderConfirmationPage() {
                 {order.items.map((item) => (
                   <div key={item.id} className="flex gap-4">
                     <div className="w-16 h-20 shrink-0 bg-zinc-900 overflow-hidden">
-                      <img src={getImageUrl(item.image)} alt={item.title} className="w-full h-full object-cover" />
+                      <img src={getImageUrl(item.image)} alt={item.title} onError={(e) => { e.currentTarget.style.display = 'none'; }} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-space tracking-[0.2em] text-gold uppercase">{item.brand_name}</p>

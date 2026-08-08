@@ -1,8 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Container } from '../components/layout';
 import { Button } from '../components/ui';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 export default function NotFoundPage() {
+  usePageMeta({
+    title: 'Page Not Found',
+    description: 'The page you are looking for cannot be found. Return to the Lustro collection.',
+    path: undefined,
+    noindex: true,
+  });
   return (
     <div className="pt-32 pb-32 bg-zinc-950 min-h-screen flex items-center justify-center">
       <Container className="text-center max-w-lg">

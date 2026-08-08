@@ -315,11 +315,11 @@ export default function ChronosPage() {
       gsap.to(watchGroup.rotation, {
         y: 0.5,
         x: 0.2,
-        scrollTrigger: { trigger: '#overview', start: 'top top', end: 'bottom center', scrub: 2 },
+        scrollTrigger: { trigger: '#chronos-overview', start: 'top top', end: 'bottom center', scrub: 2 },
       });
 
       const tlSpecs = gsap.timeline({
-        scrollTrigger: { trigger: '#specs', start: 'top bottom', end: 'center center', scrub: 1.5 },
+        scrollTrigger: { trigger: '#chronos-specs', start: 'top bottom', end: 'center center', scrub: 1.5 },
       });
       tlSpecs.to(watchGroup.position, { x: -3.5, z: 2 }).to(watchGroup.rotation, { y: 1.2, x: 0.5 }, '<');
 
@@ -328,11 +328,11 @@ export default function ChronosPage() {
         y: 0,
         duration: 1,
         ease: 'power2.out',
-        scrollTrigger: { trigger: '#specs', start: 'top 60%', toggleActions: 'play none none reverse' },
+        scrollTrigger: { trigger: '#chronos-specs', start: 'top 60%', toggleActions: 'play none none reverse' },
       });
 
       const tlTech = gsap.timeline({
-        scrollTrigger: { trigger: '#technology', start: 'top bottom', end: 'center center', scrub: 1 },
+        scrollTrigger: { trigger: '#chronos-technology', start: 'top bottom', end: 'center center', scrub: 1 },
       });
       tlTech
         .to(watchGroup.position, { x: 0, y: 0, z: 5.5 })
@@ -342,12 +342,12 @@ export default function ChronosPage() {
       gsap.to(watchGroup.position, {
         y: 3,
         z: -5,
-        scrollTrigger: { trigger: '#features', start: 'top bottom', end: 'center center', scrub: 1 },
+        scrollTrigger: { trigger: '#chronos-features', start: 'top bottom', end: 'center center', scrub: 1 },
       });
 
       gsap.to(pMat, {
         opacity: 0,
-        scrollTrigger: { trigger: '#features', start: 'top bottom', end: '20% center', scrub: true },
+        scrollTrigger: { trigger: '#chronos-features', start: 'top bottom', end: '20% center', scrub: true },
       });
     }, page);
 
@@ -458,7 +458,7 @@ export default function ChronosPage() {
               <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">Series 01 Limited</span>
             </div>
 
-            <h1 className="text-7xl leading-[0.9] font-medium tracking-tighter text-white md:text-9xl">
+            <h1 className="text-6xl leading-[0.9] font-medium tracking-tighter text-white md:text-7xl lg:text-9xl">
               TIME
               <br />
               <span className="text-zinc-600">REDEFINED.</span>
@@ -519,8 +519,8 @@ export default function ChronosPage() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-5xl font-medium tracking-tighter text-white md:text-8xl">ZERO LATENCY</h2>
-              <h3 className="text-5xl font-medium tracking-tighter text-zinc-800 md:text-8xl">FEEDBACK.</h3>
+              <h2 className="text-4xl font-medium tracking-tighter text-white md:text-6xl lg:text-8xl">ZERO LATENCY</h2>
+              <h3 className="text-4xl font-medium tracking-tighter text-zinc-800 md:text-6xl lg:text-8xl">FEEDBACK.</h3>
             </div>
 
             <p className="mx-auto mt-4 max-w-lg text-lg leading-relaxed tracking-tight text-zinc-500">

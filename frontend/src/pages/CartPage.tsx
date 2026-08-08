@@ -65,6 +65,7 @@ export default function CartPage() {
                     <img
                       src={getImageUrl(item.image)}
                       alt={item.title}
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                       className="w-full h-full object-cover"
                     />
                   </Link>
@@ -181,7 +182,7 @@ export default function CartPage() {
               {savedForLater.map((item) => (
                 <div key={item.id} className="border border-white/5 bg-zinc-900/40 p-4">
                   <Link to={`/watch/${item.slug}`} className="block aspect-[3/4] bg-zinc-900 overflow-hidden mb-4">
-                    <img src={getImageUrl(item.image)} alt={item.title} className="w-full h-full object-cover" />
+                    <img src={getImageUrl(item.image)} alt={item.title} onError={(e) => { e.currentTarget.style.display = 'none'; }} className="w-full h-full object-cover" />
                   </Link>
                   <p className="text-[10px] font-space tracking-[0.2em] text-gold uppercase mb-1">{item.brandName}</p>
                   <Link to={`/watch/${item.slug}`} className="text-sm text-white hover:text-gold transition-colors line-clamp-1">
