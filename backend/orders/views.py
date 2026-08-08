@@ -81,3 +81,19 @@ class CouponValidateView(APIView):
         if coupon.expires_at and coupon.expires_at < timezone.now():
             return Response({'valid': False, 'detail': 'This coupon has expired.'}, status=status.HTTP_404_NOT_FOUND)
         return Response(CouponSerializer(coupon).data)
+
+
+class CancelOrderView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, order_number):
+        order = Order.objects.filter(order_number=order_number, user=request.user).first()
+        if order is None:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if order.status not in ('pending', 'confirmed'):
+            return Response(
+                {'detail': f'An order in "{order.status}" state cannot be cancelled.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        order.cancel()
+        return Response(OrderSerializer(order).data)

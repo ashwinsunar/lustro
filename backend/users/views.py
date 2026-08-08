@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, RegisterSerializer, CustomTokenObtainPairSerializer
+from .serializers import UserSerializer, RegisterSerializer, CustomTokenObtainPairSerializer, NewsletterSubscribeSerializer
 
 User = get_user_model()
 
@@ -44,3 +44,21 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class NewsletterSubscribeView(generics.GenericAPIView):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = NewsletterSubscribeSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        source = request.data.get('source', 'footer')[:50]
+        _, created = serializer.create({'email': email, 'source': source})
+        message = (
+            'Welcome to the Lustro list — expect dispatches worthy of the collection.'
+            if created
+            else 'You are already on the list.'
+        )
+        return Response({'detail': message}, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)

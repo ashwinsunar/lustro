@@ -74,6 +74,20 @@ class Order(models.Model):
     def __str__(self):
         return f"{self.order_number} — {self.user.email}"
 
+    def cancel(self):
+        with transaction.atomic():
+            order = Order.objects.select_for_update().get(pk=self.pk)
+            items = order.items.select_for_update().select_related('watch')
+            for item in items:
+                if item.watch_id:
+                    Watch.objects.filter(pk=item.watch_id).update(
+                        stock_count=F('stock_count') + item.quantity,
+                        in_stock=True,
+                    )
+            order.status = 'cancelled'
+            order.save(update_fields=['status', 'updated_at'])
+        self.refresh_from_db()
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)

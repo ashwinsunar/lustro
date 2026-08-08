@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .models import NewsletterSubscriber
 
 User = get_user_model()
 
@@ -44,3 +45,17 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         data['user'] = UserSerializer(self.user).data
         return data
+
+
+class NewsletterSubscribeSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        return value.lower()
+
+    def create(self, validated_data):
+        subscriber, created = NewsletterSubscriber.objects.get_or_create(
+            email=validated_data['email'],
+            defaults={'source': self.context.get('source', 'footer')},
+        )
+        return subscriber, created

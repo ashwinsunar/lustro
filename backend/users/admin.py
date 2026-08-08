@@ -1,6 +1,22 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+from .models import User, NewsletterSubscriber
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'is_active', 'source', 'created_at')
+    list_filter = ('is_active', 'source')
+    search_fields = ('email',)
+    actions = ('mark_active', 'mark_inactive')
+
+    @admin.action(description='Mark selected as active')
+    def mark_active(self, request, queryset):
+        queryset.update(is_active=True)
+
+    @admin.action(description='Mark selected as inactive')
+    def mark_inactive(self, request, queryset):
+        queryset.update(is_active=False)
+
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):

@@ -89,3 +89,27 @@ class OrderAPITests(APITestCase):
         numbers = [o['order_number'] for o in resp.data]
         self.assertNotIn(other_order.order_number, numbers)
         self.assertEqual(len(numbers), 1)
+    def test_cancel_order_restores_stock(self):
+        resp = self.client.post(reverse('order-list-create'), {
+            'items': [{'watch_id': self.watch.id, 'quantity': 2}],
+            'shipping': self.shipping,
+            'payment_method': 'cod',
+        }, format='json')
+        order_number = resp.data['order_number']
+        self.watch.refresh_from_db()
+        self.assertEqual(self.watch.stock_count, 3)
+
+        cancel = self.client.post(reverse('order-cancel', args=[order_number]))
+        self.assertEqual(cancel.status_code, status.HTTP_200_OK)
+        self.assertEqual(cancel.data['status'], 'cancelled')
+        self.watch.refresh_from_db()
+        self.assertEqual(self.watch.stock_count, 5)
+
+    def test_cannot_cancel_someone_elses_order(self):
+        other = User.objects.create_user(email='other@test.ch', password='secret123')
+        other_order = Order.objects.create(
+            user=other, payment_method='card', full_name='Other', email='other@test.ch',
+            address_line='X', city='Paris',
+        )
+        resp = self.client.post(reverse('order-cancel', args=[other_order.order_number]))
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

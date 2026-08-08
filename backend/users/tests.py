@@ -60,3 +60,33 @@ class AuthAPITests(APITestCase):
     def test_profile_requires_auth(self):
         resp = self.client.get(reverse('user_profile'))
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
+
+class NewsletterAPITests(APITestCase):
+    def test_subscribe_creates_subscriber(self):
+        resp = self.client.post(
+            reverse('newsletter_subscribe'),
+            {'email': 'collector@example.com', 'source': 'footer'},
+            format='json',
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        from .models import NewsletterSubscriber
+        self.assertTrue(NewsletterSubscriber.objects.filter(email='collector@example.com').exists())
+
+    def test_subscribe_idempotent(self):
+        from .models import NewsletterSubscriber
+        NewsletterSubscriber.objects.create(email='dup@example.com')
+        resp = self.client.post(
+            reverse('newsletter_subscribe'),
+            {'email': 'DUP@example.com'},
+            format='json',
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(NewsletterSubscriber.objects.filter(email='dup@example.com').count(), 1)
+
+    def test_subscribe_rejects_invalid_email(self):
+        resp = self.client.post(
+            reverse('newsletter_subscribe'),
+            {'email': 'not-an-email'},
+            format='json',
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
