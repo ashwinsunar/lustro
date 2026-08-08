@@ -81,11 +81,8 @@ class JomashopAdapter(SourceAdapter):
                 raw.source_url = f"{self.base_url}/{re.sub(r'^https?://[^/]+', '', url)}"
                 return raw
 
-        # 2) <title> + meta fallback (price still requires script execution -> reject)
-        title = clean(re.sub(r'<title>([^<]*)</title>', r'\1', html))
-        if title:
-            ref = re.search(r'\b([A-Z0-9]{4,20})\s*$', title)
-            price_probe = re.search(r'\$[\d,]+', html)
-            if not price_probe:
-                return None  # no server-side price => cannot build a valid catalogue row
+        # 2) <title>/meta fallback: real prices are only present after JS
+        #    execution (confirmed on live pages: zero "price" tokens in raw
+        #    HTML). Building a catalogue row from a guessed price is not
+        #    allowed, so a page without usable JSON-LD is rejected here.
         return None

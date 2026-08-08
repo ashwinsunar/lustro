@@ -73,6 +73,9 @@ class WatchMaxxAdapter(SourceAdapter):
         price, currency = parse_price(price_raw)
         if price is None and price_raw:
             price, currency = parse_price(str(price_raw))
+        # JSON-LD often carries the currency code on the offer itself
+        if not currency:
+            currency = clean(str(_ld(offers.get('priceCurrency') or '')))
 
         availability = ''
         avail_ld = _ld(offers.get('availability') or '')

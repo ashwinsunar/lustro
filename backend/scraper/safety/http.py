@@ -95,6 +95,7 @@ class PoliteClient:
         max_retries: int | None = None,
         user_agent: str | None = None,
         stats: RequestStats | None = None,
+        transport=None,
     ) -> None:
         self.timeout = timeout if timeout is not None else CONFIG.timeout_seconds
         self.delay = delay if delay is not None else CONFIG.delay_seconds
@@ -107,6 +108,7 @@ class PoliteClient:
             timeout=self.timeout,
             headers={'User-Agent': self.user_agent, **DEFAULT_HEADERS},
             follow_redirects=True,
+            transport=transport,
         )
 
     # -- internal raw fetch (no robots/backoff) --
