@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { Heart, Eye, Star, GitCompareArrows, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -20,6 +21,7 @@ export function WatchCard({ watch, className }: WatchCardProps) {
   const comparing = isComparing(watch.id);
   const primaryImage = watch.images?.find((img) => img.is_primary)?.image || watch.images?.[0]?.image;
   const discount = getDiscountPercent(watch.price, watch.discount_price);
+  const [imageFailed, setImageFailed] = useState(false);
 
   const handleToggleCompare = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -41,18 +43,25 @@ export function WatchCard({ watch, className }: WatchCardProps) {
         </Link>
         
         {/* Image */}
-        <motion.img
-          variants={{
-            initial: { scale: 1 },
-            hover: { scale: 1.05 },
-          }}
-          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-          src={getImageUrl(primaryImage)}
-          alt={watch.title}
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-        />
+        {!imageFailed ? (
+          <motion.img
+            variants={{
+              initial: { scale: 1 },
+              hover: { scale: 1.05 },
+            }}
+            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            src={getImageUrl(primaryImage)}
+            alt={watch.title}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImageFailed(true)}
+            className="h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+          />
+        ) : (
+          <div className="h-full w-full flex items-center justify-center">
+            <span className="text-xs font-space tracking-[0.3em] text-white/25 uppercase select-none">{watch.brand.name}</span>
+          </div>
+        )}
 
         {/* Overlay (fades out on hover) */}
         <div className="absolute inset-0 bg-black/20 transition-opacity duration-500 group-hover:opacity-0 pointer-events-none" />

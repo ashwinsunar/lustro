@@ -329,13 +329,14 @@ export default function LuxuryHome() {
                     className="glass-panel rounded-xl overflow-hidden text-left group transition-colors hover:bg-white/5"
                   >
                     <div className="aspect-square overflow-hidden bg-black/40 relative">
-                      <img
-                        src={getImageUrl(w.images[0]?.image)}
-                        alt={w.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
-                      />
+                        <img
+                          src={getImageUrl(w.images[0]?.image)}
+                          alt={w.title}
+                          loading="lazy"
+                          decoding="async"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
+                        />
                       <span className="absolute top-4 left-4 text-xs text-zinc-500 font-mono">0{i + 1}</span>
                     </div>
                     <div className="p-6">
@@ -484,7 +485,7 @@ export default function LuxuryHome() {
       {cartOpen && (
         <>
           <div className="fixed inset-0 z-40 bg-black/70" onClick={() => setCartOpen(false)} />
-          <aside className="fixed right-0 top-0 z-50 h-full w-full max-w-md bg-[#0a0a0b] border-l border-white/10 flex flex-col">
+          <aside role="dialog" aria-modal="true" aria-label="Shopping cart" className="fixed right-0 top-0 z-50 h-full w-full max-w-md bg-[#0a0a0b] border-l border-white/10 flex flex-col">
             <header className="flex items-center justify-between px-6 py-5 border-b border-white/5">
               <span className="text-xs font-medium tracking-widest text-zinc-400 uppercase">Shopping cart</span>
               <button onClick={() => setCartOpen(false)} aria-label="Close cart" className="text-zinc-500 hover:text-white transition-colors"><X size={16} /></button>
@@ -500,7 +501,7 @@ export default function LuxuryHome() {
                 <div className="flex-1 overflow-y-auto px-6">
                   {items.map((i) => (
                     <div className="flex gap-4 py-5 border-b border-white/5" key={i.id}>
-                      <img src={getImageUrl(i.image)} alt={i.title} className="w-20 h-20 object-cover rounded-lg bg-black/40" />
+                      <img src={getImageUrl(i.image)} onError={(e) => { e.currentTarget.style.display = 'none'; }} alt={i.title} className="w-20 h-20 object-cover rounded-lg bg-black/40" />
                       <div className="flex-1">
                         <h3 className="text-sm text-white mb-1">{i.title}</h3>
                         <p className="text-xs text-zinc-500 mb-3">{i.brandName} · {formatPrice(i.price)}</p>
@@ -532,7 +533,7 @@ export default function LuxuryHome() {
         <>
           <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" onClick={() => setReserveOpen(false)} />
           <div className="fixed inset-0 z-50 flex items-center justify-center px-6 pointer-events-none">
-            <div className="pointer-events-auto w-full max-w-md glass-panel rounded-xl p-8 bg-[#0a0a0b]">
+            <div className="pointer-events-auto w-full max-w-md glass-panel rounded-xl p-8 bg-[#0a0a0b]" role="dialog" aria-modal="true" aria-label="Reserve a private appointment">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 backdrop-blur-sm mb-4">
