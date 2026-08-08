@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Minus, Plus, Heart, Truck, ShieldCheck, RotateCcw, Star, Check, BadgeCheck, Bell, Loader2 } from 'lucide-react';
+import { Minus, Plus, Heart, Truck, ShieldCheck, RotateCcw, Star, Check, BadgeCheck, Bell, Loader2, Link2, X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 
 import { Container } from '../components/layout';
 import { Button, Badge } from '../components/ui';
@@ -14,13 +14,18 @@ import { useCartStore } from '../store/cartStore';
 import { useWishlistStore } from '../store/wishlistStore';
 import { useCompareStore } from '../store/compareStore';
 import { useAuthStore } from '../store/authStore';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { injectJsonLd, removeJsonLd } from '../lib/seo';
 import { cn, getImageUrl, formatPrice, getDiscountPercent, formatDate } from '../lib/utils';
 import type { Review } from '../types';
+
+const SITE_ORIGIN = 'https://www.lustro.ch';
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewBody, setReviewBody] = useState('');
@@ -51,6 +56,69 @@ export default function ProductPage() {
     enabled: !!slug,
   });
 
+  usePageMeta({
+    title: watch ? watch.title : 'Timepiece',
+    description: watch
+      ? `${watch.title} — ${watch.brand.name}. ${watch.movement.replace('_', ' ')} movement, ${watch.case_size} case, ${watch.water_resistance} water resistance. ${formatPrice(watch.discount_price ?? watch.price)}.`
+      : undefined,
+    path: watch ? `/watch/${watch.slug}` : undefined,
+    type: 'product',
+  });
+
+  // Product structured data (JSON-LD)
+  const images = watch?.images?.length ? watch.images : [];
+
+  useEffect(() => {
+    if (!watch) return;
+    const primaryImage = watch.images?.find((i) => i.is_primary)?.image || watch.images?.[0]?.image;
+    injectJsonLd('product-jsonld', {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: watch.title,
+      sku: watch.reference_number,
+      description: watch.description,
+      brand: { '@type': 'Brand', name: watch.brand.name },
+      category: watch.category?.name,
+      image: primaryImage ? getImageUrl(primaryImage) : undefined,
+      offers: {
+        '@type': 'Offer',
+        url: `${SITE_ORIGIN}/watch/${watch.slug}`,
+        priceCurrency: 'USD',
+        price: watch.discount_price ?? watch.price,
+        availability: watch.in_stock
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+        itemCondition: 'https://schema.org/NewCondition',
+      },
+      ...(parseFloat(watch.rating) > 0
+        ? {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: watch.rating,
+              reviewCount: watch.review_count,
+            },
+          }
+        : {}),
+    });
+    return () => removeJsonLd('product-jsonld');
+  }, [watch]);
+
+  // Lightbox keyboard navigation
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxOpen(false);
+      if (e.key === 'ArrowRight' && images.length > 1) setActiveImage((i) => (i + 1) % images.length);
+      if (e.key === 'ArrowLeft' && images.length > 1) setActiveImage((i) => (i - 1 + images.length) % images.length);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [lightboxOpen, images.length]);
+
   if (isLoading) {
     return (
       <div className="pt-32 pb-32 bg-zinc-950 min-h-screen">
@@ -80,7 +148,6 @@ export default function ProductPage() {
   const discount = getDiscountPercent(watch.price, watch.discount_price);
   const wishlisted = isWishlisted(watch.id);
   const comparing = isComparing(watch.id);
-  const images = watch.images?.length ? watch.images : [];
 
   const handleAddToCart = () => {
     const primaryImage = images.find((img) => img.is_primary)?.image || images[0]?.image || '';
@@ -104,7 +171,7 @@ export default function ProductPage() {
     }
     setSubmittingReview(true);
     try {
-      const created = await createReview(slug as string, {
+      await createReview(slug as string, {
         rating: reviewRating,
         title: reviewTitle.trim() || undefined,
         body: reviewBody.trim(),
@@ -114,7 +181,6 @@ export default function ProductPage() {
       setReviewTitle('');
       setReviewBody('');
       refetchReviews();
-      void created;
     } catch (e: any) {
       const detail = e?.response?.data?.detail;
       toast.error(detail || 'Unable to submit review.');
@@ -154,11 +220,23 @@ export default function ProductPage() {
           <div>
             <div className="aspect-[3/4] bg-zinc-900 border border-white/5 overflow-hidden relative">
               {images.length > 0 ? (
-                <img
-                  src={getImageUrl(images[activeImage]?.image)}
-                  alt={watch.title}
-                  className="w-full h-full object-cover"
-                />
+                <button
+                  onClick={() => images.length > 1 && setLightboxOpen(true)}
+                  disabled={images.length <= 1}
+                  className={cn('w-full h-full block relative', images.length > 1 && 'cursor-zoom-in')}
+                  aria-label="Open image gallery"
+                >
+                  <img
+                    src={getImageUrl(images[activeImage]?.image)}
+                    alt={watch.title}
+                    className="w-full h-full object-cover"
+                  />
+                  {images.length > 1 && (
+                    <span className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/70 backdrop-blur-sm border border-white/10 px-3 py-1.5 text-[10px] font-space tracking-widest uppercase text-white/80">
+                      <ZoomIn className="w-3.5 h-3.5" /> {activeImage + 1} / {images.length}
+                    </span>
+                  )}
+                </button>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-white/30">
                   Image coming soon
@@ -189,6 +267,60 @@ export default function ProductPage() {
             )}
           </div>
 
+          {/* Lightbox */}
+          {lightboxOpen && images.length > 1 && (
+            <div className="fixed inset-0 z-[60] bg-black/95 flex flex-col" role="dialog" aria-modal="true" aria-label={`${watch.title} gallery`}>
+              <div className="flex items-center justify-between px-6 py-4">
+                <span className="text-xs font-space tracking-widest uppercase text-white/50">
+                  {activeImage + 1} / {images.length} · {watch.title}
+                </span>
+                <button
+                  onClick={() => setLightboxOpen(false)}
+                  className="text-white/60 hover:text-white transition-colors p-2"
+                  aria-label="Close gallery"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 relative flex items-center justify-center px-4">
+                <button
+                  onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
+                  className="absolute left-4 md:left-8 z-10 text-white/60 hover:text-white transition-colors p-2"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </button>
+                <img
+                  src={getImageUrl(images[activeImage]?.image)}
+                  alt={watch.title}
+                  className="max-h-full max-w-full object-contain"
+                />
+                <button
+                  onClick={() => setActiveImage((i) => (i + 1) % images.length)}
+                  className="absolute right-4 md:right-8 z-10 text-white/60 hover:text-white transition-colors p-2"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </button>
+              </div>
+              <div className="flex justify-center gap-3 pb-6 pt-4">
+                {images.map((img, i) => (
+                  <button
+                    key={img.id}
+                    onClick={() => setActiveImage(i)}
+                    className={cn(
+                      'w-14 h-14 sm:w-16 sm:h-16 overflow-hidden border transition-colors',
+                      activeImage === i ? 'border-gold' : 'border-white/10 opacity-60 hover:opacity-100'
+                    )}
+                    aria-label={`Image ${i + 1}`}
+                  >
+                    <img src={getImageUrl(img.image)} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Info */}
           <div className="flex flex-col">
             <div className="mb-8">
@@ -198,7 +330,7 @@ export default function ProductPage() {
               >
                 {watch.brand.name} · Est. {watch.brand.founded_year ?? '—'}
               </Link>
-              <h1 className="text-4xl md:text-5xl font-light mb-4">{watch.title}</h1>
+              <h1 className="font-display text-4xl md:text-5xl font-medium mb-4">{watch.title}</h1>
               <p className="text-white/50 text-sm font-space tracking-widest uppercase mb-6">
                 {watch.reference_number}
               </p>
@@ -214,7 +346,9 @@ export default function ProductPage() {
                     <span className="text-white/40 text-sm">{watch.review_count} reviews</span>
                   </>
                 ) : (
-                  <span className="text-white/40 text-sm">New arrival</span>
+                  <span className="text-white/40 text-sm">
+                    {watch.is_new_arrival ? 'New arrival' : 'No reviews yet'}
+                  </span>
                 )}
               </div>
 
@@ -254,7 +388,23 @@ export default function ProductPage() {
                     <span className="text-sm font-medium">Join the waitlist</span>
                   </div>
                   <p className="text-xs text-white/50 mb-4">This timepiece is currently sold out. Leave your email and we'll let you know the moment it's back.</p>
-                  <div className="flex gap-2">
+                  <form
+                    className="flex gap-2"
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (!notifyEmail) return;
+                      setSubmittingNotify(true);
+                      try {
+                        await api.post(`/api/v1/watches/${watch.slug}/notify/`, { email: notifyEmail });
+                        toast.success('You are on the waitlist — we will notify you when it is back in stock.');
+                        setNotifyEmail('');
+                      } catch {
+                        toast.error('Could not join the waitlist. Please try again.');
+                      } finally {
+                        setSubmittingNotify(false);
+                      }
+                    }}
+                  >
                     <input
                       type="email"
                       required
@@ -264,25 +414,13 @@ export default function ProductPage() {
                       className="flex-1 bg-white/5 border border-white/10 rounded px-4 py-3 text-sm text-white placeholder-white/40 focus:outline-none focus:border-gold/60 transition-colors"
                     />
                     <Button
+                      type="submit"
                       size="lg"
                       disabled={submittingNotify}
-                      onClick={async () => {
-                        if (!notifyEmail) return;
-                        setSubmittingNotify(true);
-                        try {
-                          await api.post(`/api/v1/watches/${watch.slug}/notify/`, { email: notifyEmail });
-                          toast.success('You are on the waitlist — we will notify you when it is back in stock.');
-                          setNotifyEmail('');
-                        } catch {
-                          toast.error('Could not join the waitlist. Please try again.');
-                        } finally {
-                          setSubmittingNotify(false);
-                        }
-                      }}
                     >
                       {submittingNotify ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Notify me'}
                     </Button>
-                  </div>
+                  </form>
                 </div>
               )}
 
@@ -335,17 +473,36 @@ export default function ProductPage() {
               </div>
 
               <button
-                onClick={() => toggleCompare({
-                  id: watch.id, title: watch.title, slug: watch.slug, brand: { id: watch.brand.id, name: watch.brand.name, slug: watch.brand.slug },
-                  category: { id: watch.category.id, name: watch.category.name, slug: watch.category.slug },
-                  price: watch.price, discount_price: watch.discount_price, movement: watch.movement, gender: watch.gender,
-                  in_stock: watch.in_stock, is_featured: watch.is_featured, is_trending: watch.is_trending,
-                  is_new_arrival: watch.is_new_arrival, is_best_seller: watch.is_best_seller,
-                  rating: watch.rating, review_count: watch.review_count, images: watch.images || [],
-                })}
+                onClick={() => {
+                  const didToggle = toggleCompare({
+                    id: watch.id, title: watch.title, slug: watch.slug, brand: { id: watch.brand.id, name: watch.brand.name, slug: watch.brand.slug },
+                    category: { id: watch.category.id, name: watch.category.name, slug: watch.category.slug },
+                    price: watch.price, discount_price: watch.discount_price, movement: watch.movement, gender: watch.gender,
+                    in_stock: watch.in_stock, is_featured: watch.is_featured, is_trending: watch.is_trending,
+                    is_new_arrival: watch.is_new_arrival, is_best_seller: watch.is_best_seller,
+                    rating: watch.rating, review_count: watch.review_count, images: watch.images || [],
+                  });
+                  if (didToggle === false && !comparing) {
+                    toast.error('Comparison list is full (max 3 pieces).');
+                  }
+                }}
                 className="flex items-center gap-2 text-xs font-space tracking-widest uppercase text-white/50 hover:text-gold transition-colors mb-10"
               >
                 {comparing ? <><Check className="w-4 h-4" /> Added to compare</> : <>Compare this piece</>}
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    toast.success('Link copied to clipboard.');
+                  } catch {
+                    toast.error('Could not copy the link.');
+                  }
+                }}
+                className="flex items-center gap-2 text-xs font-space tracking-widest uppercase text-white/50 hover:text-gold transition-colors mb-10 ml-6"
+                aria-label="Copy link to this watch"
+              >
+                <Link2 className="w-4 h-4" /> Share
               </button>
             </div>
 
@@ -353,8 +510,8 @@ export default function ProductPage() {
             <div className="grid grid-cols-3 gap-4 border-y border-white/10 py-6 mb-10">
               {[
                 { icon: Truck, label: 'Complimentary shipping' },
-                { icon: ShieldCheck, label: '5-year warranty' },
-                { icon: RotateCcw, label: '30-day returns' },
+                { icon: ShieldCheck, label: `${watch.warranty_period.replace(' Years', '-year').replace(' Year', '-year')} warranty` },
+                { icon: RotateCcw, label: '14-day returns' },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex flex-col items-center text-center gap-2">
                   <Icon className="w-5 h-5 text-gold" strokeWidth={1.5} />
@@ -382,7 +539,7 @@ export default function ProductPage() {
         <div className="mt-24">
           <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-3xl font-light mb-2">Collector Reviews</h2>
+              <h2 className="font-display text-3xl font-medium mb-2">Collector Reviews</h2>
               <div className="flex items-center gap-3">
                 {parseFloat(watch.rating) > 0 ? (
                   <>
@@ -490,7 +647,7 @@ export default function ProductPage() {
         {/* Related */}
         <div className="mt-24">
           <div className="flex items-end justify-between mb-10">
-            <h2 className="text-3xl font-light">From the Same Maison</h2>
+            <h2 className="font-display text-3xl font-medium">From the Same Maison</h2>
             <Link to={`/brands/${watch.brand.slug}`} className="text-xs font-space tracking-widest uppercase text-gold hover:text-white transition-colors">
               View all {watch.brand.name} →
             </Link>

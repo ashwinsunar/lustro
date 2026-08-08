@@ -6,6 +6,7 @@ import { Button } from '../components/ui';
 import { useAuthStore } from '../store/authStore';
 import { useUiStore } from '../store/uiStore';
 import { fetchOrder } from '../services/orders';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { getImageUrl, formatPrice, formatDate } from '../lib/utils';
 import type { Order } from '../types';
 
@@ -17,20 +18,27 @@ export default function OrderConfirmationPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const authenticated = isAuthenticated();
+
+  usePageMeta({
+    title: order ? `Order ${order.order_number}` : 'Order',
+    description: order ? `Order ${order.order_number} — status: ${order.status}.` : undefined,
+    path: order ? `/order/${order.order_number}` : undefined,
+  });
+
   useEffect(() => {
-    document.title = order ? `Order ${order.order_number} — Lustro` : 'Order — Lustro';
     window.scrollTo({ top: 0 });
   }, [order]);
 
   useEffect(() => {
-    if (!orderNumber) return;
+    if (!orderNumber || !authenticated) return;
     fetchOrder(orderNumber)
       .then(setOrder)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  }, [orderNumber]);
+  }, [orderNumber, authenticated]);
 
-  if (!isAuthenticated()) {
+  if (!authenticated) {
     return <Navigate to="/login" replace state={{ from: `/order/${orderNumber}` }} />;
   }
 
@@ -58,13 +66,15 @@ export default function OrderConfirmationPage() {
   }
 
   const statusSteps = ['confirmed', 'processing', 'shipped', 'delivered'];
+  const statusIdx = statusSteps.indexOf(order.status as Order['status']);
+  const isCancelled = order.status === 'cancelled' || order.status === 'refunded';
 
   return (
     <div className="pt-32 pb-32 min-h-screen bg-zinc-950">
       <Container>
         <div className="mb-12 text-center">
           <CheckCircle2 className="w-14 h-14 text-gold mx-auto mb-6" strokeWidth={1.25} />
-          <h1 className="text-4xl font-light mb-2">Thank you for your order</h1>
+          <h1 className="font-display text-4xl font-medium mb-2">Thank you for your order</h1>
           <p className="text-white/50">
             Order <span className="text-gold font-space">{order.order_number}</span> has been received.
             <br />
@@ -74,30 +84,42 @@ export default function OrderConfirmationPage() {
 
         {/* Status tracker */}
         <div className="max-w-2xl mx-auto mb-12">
-          <div className="flex justify-between mb-6">
-            {statusSteps.map((step, i) => {
-              const idx = statusSteps.indexOf(order.status as any);
-              const reached = idx >= i;
-              return (
-                <div key={step} className="flex flex-col items-center gap-2 flex-1 relative">
-                  <div className={`h-2 w-2 rounded-full ${reached ? 'bg-gold' : 'bg-white/15'}`} />
-                  <span className={`text-[10px] font-space tracking-widest uppercase ${reached ? 'text-gold' : 'text-white/40'}`}>
-                    {step}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-white/60">
-              {order.status === 'confirmed'
-                ? 'Our concierge is preparing your timepiece.'
-                : `Status: ${order.status}`}
-            </p>
-            <p className="text-xs text-white/30 mt-1">
-              Placed on {formatDate(order.created_at)} · {order.status}
-            </p>
-          </div>
+          {isCancelled ? (
+            <div className="text-center border border-destructive/30 bg-destructive/5 px-8 py-6">
+              <p className="text-sm text-destructive font-medium uppercase tracking-widest font-space">
+                Order {order.status}
+              </p>
+              <p className="text-xs text-white/40 mt-2">
+                If you have any questions, our concierge can assist.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="flex justify-between mb-6">
+                {statusSteps.map((step, i) => {
+                  const reached = statusIdx >= i;
+                  return (
+                    <div key={step} className="flex flex-col items-center gap-2 flex-1 relative">
+                      <div className={`h-2 w-2 rounded-full ${reached ? 'bg-gold' : 'bg-white/15'}`} />
+                      <span className={`text-[10px] font-space tracking-widest uppercase ${reached ? 'text-gold' : 'text-white/40'}`}>
+                        {step}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-white/60">
+                  {order.status === 'confirmed'
+                    ? 'Our concierge is preparing your timepiece.'
+                    : `Status: ${order.status}`}
+                </p>
+              </div>
+            </>
+          )}
+          <p className="text-xs text-white/30 mt-1 text-center">
+            Placed on {formatDate(order.created_at)} · {order.status}
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-12">
@@ -197,7 +219,7 @@ export default function OrderConfirmationPage() {
               <div className="border-t border-white/10 pt-5 space-y-2 text-xs text-white/40">
                 <p className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-gold" /> Fully insured, tracked delivery</p>
                 <p className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-gold" /> 14-day easy returns</p>
-                <p className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-gold" /> 2-year international warranty</p>
+                <p className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-gold" /> 5-year international warranty</p>
               </div>
             </div>
           </div>

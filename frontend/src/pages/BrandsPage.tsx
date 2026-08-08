@@ -1,12 +1,24 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight } from 'lucide-react';
+import { useEffect } from 'react';
 import { Container } from '../components/layout';
 import { WatchCardSkeleton } from '../components/watch';
 import { fetchBrands } from '../services/brands';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 export default function BrandsPage() {
   const { data: brands = [], isLoading } = useQuery({ queryKey: ['brands'], queryFn: fetchBrands });
+
+  usePageMeta({
+    title: 'Our Maisons',
+    description: 'Ten of horology\u2019s most storied names — Rolex, Omega, Patek Philippe and more — curated for Lustro.',
+    path: '/brands',
+  });
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   return (
     <div className="pt-32 pb-32 bg-zinc-950 min-h-screen">
@@ -15,7 +27,7 @@ export default function BrandsPage() {
           <div className="text-white/40 text-xs font-space tracking-widest uppercase mb-4">
             Home / Brands
           </div>
-          <h1 className="text-4xl md:text-5xl font-light">Our Maisons</h1>
+          <h1 className="font-display text-4xl md:text-5xl font-medium">Our Maisons</h1>
           <p className="text-white/50 mt-4 max-w-xl font-light">
             Ten of horology's most storied names, curated for Lustro.
           </p>

@@ -13,13 +13,14 @@ interface WatchFiltersProps {
 }
 
 export function WatchFilters({ filters, onChange, brands, categories, className }: WatchFiltersProps) {
-  
+  const [pricePreview, setPricePreview] = React.useState<[number, number] | null>(null);
+
   const handleCheckboxChange = (group: 'brands' | 'categories' | 'movements' | 'genders', value: string) => {
     const current = filters[group];
     const updated = current.includes(value)
       ? current.filter(v => v !== value)
       : [...current, value];
-    
+
     onChange({ ...filters, [group]: updated, page: 1 });
   };
 
@@ -28,8 +29,12 @@ export function WatchFilters({ filters, onChange, brands, categories, className 
   };
 
   const handlePriceChange = (value: number[]) => {
+    setPricePreview(null);
     onChange({ ...filters, minPrice: value[0], maxPrice: value[1], page: 1 });
   };
+
+  const shownMin = pricePreview?.[0] ?? filters.minPrice;
+  const shownMax = pricePreview?.[1] ?? filters.maxPrice;
 
   const clearAll = () => {
     onChange({
@@ -78,7 +83,9 @@ export function WatchFilters({ filters, onChange, brands, categories, className 
               defaultValue={[filters.minPrice, filters.maxPrice]}
               max={100000}
               step={100}
+              onValueChange={(value) => setPricePreview([value[0], value[1]])}
               onValueCommit={handlePriceChange}
+              aria-label="Price range"
             >
               <Slider.Track className="bg-white/10 relative grow rounded-full h-[2px]">
                 <Slider.Range className="absolute bg-gold rounded-full h-full" />
@@ -87,8 +94,8 @@ export function WatchFilters({ filters, onChange, brands, categories, className 
               <Slider.Thumb className="block w-4 h-4 bg-gold rounded-full shadow-[0_2px_10px] shadow-blackA4 focus:outline-none focus:ring-2 focus:ring-gold/50 cursor-grab active:cursor-grabbing" />
             </Slider.Root>
             <div className="flex items-center justify-between text-xs font-space tracking-wider text-white/60">
-              <span>{formatPrice(filters.minPrice)}</span>
-              <span>{formatPrice(filters.maxPrice)}+</span>
+              <span>{formatPrice(shownMin)}</span>
+              <span>{formatPrice(shownMax)}+</span>
             </div>
           </div>
         </FilterSection>
@@ -181,41 +188,53 @@ function FilterSection({ title, children, defaultOpen = false }: { title: string
 
 function CheckboxItem({ label, checked, onChange }: { label: string, checked: boolean, onChange: () => void }) {
   return (
-    <label className="flex items-center gap-3 cursor-pointer group" onClick={onChange}>
-      <div className={cn(
-        "w-4 h-4 flex items-center justify-center transition-colors border",
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      onClick={onChange}
+      className="flex items-center gap-3 cursor-pointer group w-full text-left"
+    >
+      <span className={cn(
+        "w-4 h-4 flex items-center justify-center shrink-0 transition-colors border",
         checked ? "bg-gold border-gold" : "bg-transparent border-white/20 group-hover:border-white/50"
       )}>
         {checked && <Check className="w-3 h-3 text-black" strokeWidth={3} />}
-      </div>
+      </span>
       <span className={cn(
         "text-sm transition-colors",
         checked ? "text-white font-medium" : "text-white/60 group-hover:text-white"
       )}>
         {label}
       </span>
-    </label>
+    </button>
   );
 }
 
 function ToggleItem({ label, checked, onChange }: { label: string, checked: boolean, onChange: () => void }) {
   return (
-    <label className="flex items-center justify-between cursor-pointer group" onClick={onChange}>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      className="flex items-center justify-between cursor-pointer group w-full text-left"
+    >
       <span className={cn(
         "text-sm uppercase tracking-widest font-space transition-colors",
         checked ? "text-gold" : "text-white/60 group-hover:text-white"
       )}>
         {label}
       </span>
-      <div className={cn(
-        "w-8 h-4 rounded-full relative transition-colors",
+      <span className={cn(
+        "w-8 h-4 rounded-full relative transition-colors shrink-0",
         checked ? "bg-gold" : "bg-zinc-800"
       )}>
-        <div className={cn(
+        <span className={cn(
           "absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all shadow-sm",
           checked ? "left-[18px] bg-black" : "left-0.5"
         )} />
-      </div>
-    </label>
+      </span>
+    </button>
   );
 }

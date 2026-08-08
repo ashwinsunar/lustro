@@ -8,6 +8,13 @@ interface Message {
   content: string;
 }
 
+const SUGGESTIONS = [
+  'Recommend a GMT under 15,000 CHF',
+  'Show me Omega',
+  'A dress watch for a wedding',
+  'Do you have diver watches?',
+];
+
 export default function ChatWidget() {
   const { chatOpen, openChat, closeChat } = useUiStore();
   const [messages, setMessages] = useState<Message[]>([
@@ -26,15 +33,15 @@ export default function ChatWidget() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, chatOpen]);
 
-  const sendMessage = async () => {
-    const text = input.trim();
-    if (!text || loading) return;
+  const sendMessage = async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || loading) return;
     setInput('');
-    setMessages((prev) => [...prev, { role: 'user', content: text }]);
+    setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
     setLoading(true);
     try {
       const { data } = await api.post<{ reply: string; conversation_id: number }>('/api/v1/chat/', {
-        message: text,
+        message: trimmed,
         conversation_id: conversationId.current,
       });
       conversationId.current = data.conversation_id;
@@ -86,7 +93,7 @@ export default function ChatWidget() {
             className="p-4 border-t border-white/5 flex gap-3"
             onSubmit={(e) => {
               e.preventDefault();
-              sendMessage();
+              sendMessage(input);
             }}
           >
             <input
@@ -105,6 +112,19 @@ export default function ChatWidget() {
               <Send className="w-4 h-4" />
             </button>
           </form>
+          {messages.length <= 1 && (
+            <div className="px-4 pb-4 flex flex-wrap gap-2">
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => sendMessage(s)}
+                  className="text-[11px] border border-white/10 rounded-full px-3 py-1.5 text-white/60 hover:border-gold/60 hover:text-gold transition-colors"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         <button

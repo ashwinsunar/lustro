@@ -8,6 +8,7 @@ import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
 import { getImageUrl, formatPrice, cn } from '../lib/utils';
 import { createOrder, validateCoupon } from '../services/orders';
+import { usePageMeta } from '../hooks/usePageMeta';
 import type { Coupon } from '../types';
 
 interface ShippingForm {
@@ -52,8 +53,13 @@ export default function CheckoutPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  usePageMeta({
+    title: 'Checkout',
+    description: 'Complete your purchase — complimentary insured shipping and 14-day returns on every Lustro timepiece.',
+    path: '/checkout',
+  });
+
   useEffect(() => {
-    document.title = 'Checkout — Lustro';
     window.scrollTo({ top: 0 });
   }, []);
 
@@ -174,7 +180,7 @@ export default function CheckoutPage() {
         <Link to="/cart" className="inline-flex items-center gap-2 text-xs font-space tracking-widest uppercase text-white/40 hover:text-gold transition-colors mb-8">
           <ArrowLeft className="w-3.5 h-3.5" /> Back to cart
         </Link>
-        <h1 className="text-4xl font-light mb-12">Checkout</h1>
+        <h1 className="font-display text-4xl font-medium mb-12">Checkout</h1>
 
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Form */}

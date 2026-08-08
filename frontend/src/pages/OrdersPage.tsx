@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { Package, ChevronDown, ChevronUp, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { Container } from '../components/layout';
 import { Button } from '../components/ui';
 import { useAuthStore } from '../store/authStore';
-import { fetchOrders } from '../services/orders';
+import { fetchOrders, cancelOrder } from '../services/orders';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { getImageUrl, formatPrice, formatDate, cn } from '../lib/utils';
 import type { Order } from '../types';
 
@@ -24,16 +26,39 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState<string | null>(null);
 
-  useEffect(() => {
-    document.title = 'My Orders — Lustro';
-    window.scrollTo({ top: 0 });
-    if (!isAuthenticated()) return;
+  const loadOrders = () =>
     fetchOrders()
       .then(setOrders)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
+
+  usePageMeta({
+    title: 'My Orders',
+    description: 'Track and review every timepiece you have acquired through Lustro.',
+    path: '/profile/orders',
+  });
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+    if (!isAuthenticated()) return;
+    loadOrders();
   }, [isAuthenticated]);
+
+  const handleCancel = async (orderNumber: string) => {
+    if (!window.confirm('Cancel this order? Stock will be released and the order marked as cancelled.')) return;
+    setCancelling(orderNumber);
+    try {
+      const updated = await cancelOrder(orderNumber);
+      setOrders((prev) => prev.map((o) => (o.order_number === orderNumber ? updated : o)));
+      toast.success(`Order ${orderNumber} cancelled.`);
+    } catch (e: any) {
+      toast.error(e?.response?.data?.detail || 'Unable to cancel this order.');
+    } finally {
+      setCancelling(null);
+    }
+  };
 
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace state={{ from: '/profile/orders' }} />;
@@ -44,7 +69,7 @@ export default function OrdersPage() {
       <Container>
         <div className="mb-12">
           <div className="text-white/40 text-xs font-space tracking-widest uppercase mb-4">Account</div>
-          <h1 className="text-4xl font-light mb-2">My Orders</h1>
+          <h1 className="font-display text-4xl font-medium mb-2">My Orders</h1>
           <p className="text-white/50 text-sm">Track and review every timepiece you've acquired.</p>
         </div>
 
@@ -123,6 +148,18 @@ export default function OrdersPage() {
                         <Link to={`/order/${order.order_number}`}>
                           <Button variant="outline" size="sm">View details</Button>
                         </Link>
+                        {(order.status === 'pending' || order.status === 'confirmed') && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={cancelling === order.order_number}
+                            onClick={() => handleCancel(order.order_number)}
+                            className="text-destructive border-destructive/40 hover:bg-destructive/10"
+                          >
+                            <XCircle className="w-3.5 h-3.5 mr-1.5" />
+                            {cancelling === order.order_number ? 'Cancelling…' : 'Cancel order'}
+                          </Button>
+                        )}
                       </div>
                     </div>
                   )}

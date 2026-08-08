@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion';
-import { Heart, Eye, Star } from 'lucide-react';
+import { Heart, Eye, Star, GitCompareArrows, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { cn, getImageUrl, formatPrice, getDiscountPercent } from '../../lib/utils';
 import { Badge } from '../ui';
 import { useWishlistStore } from '../../store/wishlistStore';
+import { useCompareStore } from '../../store/compareStore';
 import type { WatchListItem } from '../../types';
 
 interface WatchCardProps {
@@ -13,9 +15,19 @@ interface WatchCardProps {
 
 export function WatchCard({ watch, className }: WatchCardProps) {
   const { isWishlisted, toggleItem } = useWishlistStore();
+  const { isComparing, toggleItem: toggleCompare } = useCompareStore();
   const wishlisted = isWishlisted(watch.id);
+  const comparing = isComparing(watch.id);
   const primaryImage = watch.images?.find((img) => img.is_primary)?.image || watch.images?.[0]?.image;
   const discount = getDiscountPercent(watch.price, watch.discount_price);
+
+  const handleToggleCompare = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!comparing && !toggleCompare(watch)) {
+      toast.error('Comparison list is full (max 3 pieces).');
+    }
+  };
 
   return (
     <motion.div
@@ -37,6 +49,7 @@ export function WatchCard({ watch, className }: WatchCardProps) {
           transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
           src={getImageUrl(primaryImage)}
           alt={watch.title}
+          loading="lazy"
           className="h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
         />
 
@@ -52,18 +65,28 @@ export function WatchCard({ watch, className }: WatchCardProps) {
           {watch.in_stock && watch.is_trending && <Badge variant="trending">Trending</Badge>}
         </div>
 
-        {/* Wishlist Button */}
-        <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Action buttons — always visible on touch, revealed on hover on desktop */}
+        <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
           <button
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               toggleItem(watch);
             }}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-gold hover:text-black transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm text-white opacity-90 hover:bg-gold hover:text-black transition-colors sm:opacity-0 sm:group-hover:opacity-100"
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
-            <Heart className={cn('h-4 w-4', wishlisted && 'fill-current text-gold group-hover:text-black')} />
+            <Heart className={cn('h-4 w-4', wishlisted && 'fill-current text-gold')} />
+          </button>
+          <button
+            onClick={handleToggleCompare}
+            className={cn(
+              'flex h-8 w-8 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-colors opacity-90 sm:opacity-0 sm:group-hover:opacity-100',
+              comparing ? 'text-gold hover:bg-gold hover:text-black' : 'text-white hover:bg-gold hover:text-black'
+            )}
+            aria-label={comparing ? "Remove from comparison" : "Add to comparison"}
+          >
+            {comparing ? <Check className="h-4 w-4" /> : <GitCompareArrows className="h-4 w-4" />}
           </button>
         </div>
 

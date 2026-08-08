@@ -37,3 +37,8 @@ export const validateCoupon = async (code: string): Promise<Coupon> => {
   const { data } = await api.get<Coupon>(`/api/v1/orders/coupon/${code}/`);
   return data;
 };
+
+export const cancelOrder = async (orderNumber: string): Promise<Order> => {
+  const { data } = await api.post<Order>(`/api/v1/orders/${orderNumber}/cancel/`);
+  return data;
+};

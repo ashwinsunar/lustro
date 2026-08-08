@@ -4,6 +4,7 @@ import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { Container } from '../components/layout';
 import { Button, Input } from '../components/ui';
+import { usePageMeta } from '../hooks/usePageMeta';
 import type { User, AuthTokens } from '../types';
 
 interface LoginResponse {
@@ -12,6 +13,12 @@ interface LoginResponse {
 }
 
 export default function LoginPage() {
+  usePageMeta({
+    title: 'Sign In',
+    description: 'Sign in to your Lustro account to track orders, save timepieces and check out faster.',
+    path: '/login',
+  });
+
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: string } | null)?.from;
@@ -47,7 +54,7 @@ export default function LoginPage() {
   return (
     <div className="pt-32 pb-32 min-h-screen flex items-center justify-center bg-zinc-950">
       <Container className="max-w-md w-full">
-        <h1 className="text-4xl font-light mb-2 text-center">Welcome Back</h1>
+        <h1 className="font-display text-4xl font-medium mb-2 text-center">Welcome back</h1>
         <p className="text-white/50 text-sm text-center mb-10">Sign in to your Lustro account.</p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -79,7 +86,11 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-white/50 mt-8">
           New to Lustro?{' '}
-          <Link to="/register" className="text-gold hover:text-white transition-colors">
+          <Link
+            to="/register"
+            state={from ? { from } : undefined}
+            className="text-gold hover:text-white transition-colors"
+          >
             Create an account
           </Link>
         </p>

@@ -113,6 +113,7 @@ export default function LuxuryHome() {
         id="canvas-container"
         wordmark="L U S T R O"
         targets={{ overview: 'top', specs: 'calibre', technology: 'tech', features: 'features' }}
+        draggable
         className="fixed top-0 left-0 w-full h-screen z-0 outline-none"
       />
 
@@ -220,8 +221,8 @@ export default function LuxuryHome() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-5xl md:text-8xl font-medium tracking-tighter text-white">QUIET</h2>
-              <h3 className="text-5xl md:text-8xl font-medium tracking-tighter text-zinc-800">OBSESSION.</h3>
+              <h2 className="font-display text-5xl md:text-8xl font-medium tracking-tighter text-white">Quiet</h2>
+              <h3 className="font-display text-5xl md:text-8xl font-medium tracking-tighter text-zinc-600 italic">obsession.</h3>
             </div>
 
             <p className="mt-4 text-lg text-zinc-500 max-w-lg mx-auto leading-relaxed tracking-tight">
@@ -298,8 +299,8 @@ export default function LuxuryHome() {
                   <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                   <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">The Collection</span>
                 </div>
-                <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-white">
-                  Objects of <span className="text-zinc-700">devotion.</span>
+                <h2 className="font-display text-4xl md:text-6xl font-medium tracking-tight text-white">
+                  Objects of <span className="text-zinc-600 italic">devotion.</span>
                 </h2>
               </div>
               <button onClick={() => navigate('/shop')} className="hidden md:flex items-center gap-2 text-xs font-medium text-zinc-400 hover:text-white transition-colors">
@@ -358,8 +359,8 @@ export default function LuxuryHome() {
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">The Art of Calibre</span>
             </div>
-            <h2 className="text-5xl md:text-7xl font-medium tracking-tighter leading-[0.95] text-white mb-8">
-              Precision<br /><span className="text-zinc-700">without hurry.</span>
+            <h2 className="font-display text-5xl md:text-7xl font-medium tracking-tight leading-[0.95] text-white mb-8">
+              Precision<br /><span className="text-zinc-600 italic">without hurry.</span>
             </h2>
             <p className="text-zinc-500 text-base font-light leading-relaxed max-w-md mb-10">
               More than 230 individual components, patiently calibrated into a single, enduring movement.
@@ -382,8 +383,8 @@ export default function LuxuryHome() {
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                 <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Calibre A-01 · Assembly Path</span>
               </div>
-              <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-white">
-                The making of <span className="text-zinc-700">a Lustro.</span>
+              <h2 className="font-display text-4xl md:text-6xl font-medium tracking-tight text-white">
+                The making of <span className="text-zinc-600 italic">a Lustro.</span>
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -406,8 +407,8 @@ export default function LuxuryHome() {
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                 <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">Client Stories</span>
               </div>
-              <h2 className="text-4xl md:text-6xl font-medium tracking-tighter text-white">
-                Worn by those who value <span className="text-zinc-700">quiet precision.</span>
+              <h2 className="font-display text-4xl md:text-6xl font-medium tracking-tight text-white">
+                Worn by those who value <span className="text-zinc-600 italic">quiet precision.</span>
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -435,8 +436,8 @@ export default function LuxuryHome() {
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
             <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-widest">A private appointment awaits</span>
           </div>
-          <h2 className="text-5xl md:text-8xl font-medium tracking-tighter leading-[0.95] text-white mb-8">
-            Own the moment<br /><span className="text-zinc-700">before it passes.</span>
+          <h2 className="font-display text-5xl md:text-8xl font-medium tracking-tight leading-[0.95] text-white mb-8">
+            Own the moment<br /><span className="text-zinc-600 italic">before it passes.</span>
           </h2>
           <p className="text-zinc-500 max-w-md mx-auto leading-relaxed tracking-tight mb-12">
             A mechanical watch built for precision, presence, and quiet luxury.

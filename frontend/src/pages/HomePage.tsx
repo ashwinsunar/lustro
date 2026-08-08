@@ -43,7 +43,7 @@ export default function HomePage() {
           </motion.div>
           
           <motion.div initial="hidden" animate="visible" variants={heroItemVariants} transition={{ delay: 0.4, duration: 0.8, ease: 'easeOut' }}>
-            <h1 className="text-5xl md:text-7xl lg:text-[7rem] font-light tracking-tight mb-8 leading-[1.1] text-balance">
+            <h1 className="font-display text-5xl md:text-7xl lg:text-[7rem] font-medium tracking-tight mb-8 leading-[1.1] text-balance">
               Elegance in <br className="hidden md:block" /> Every Second
             </h1>
           </motion.div>
@@ -111,7 +111,7 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-16 gap-6">
             <div>
               <p className="text-gold tracking-[0.2em] text-xs font-space uppercase mb-4">Curated Selections</p>
-              <h2 className="text-4xl md:text-5xl font-light">Featured Timepieces</h2>
+              <h2 className="font-display text-4xl md:text-5xl font-medium">Featured Timepieces</h2>
             </div>
             <Link to="/shop?featured=true" className="group flex items-center gap-2 text-xs font-space tracking-widest uppercase text-white/60 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1">
               View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -141,7 +141,7 @@ export default function HomePage() {
                 <Sparkles className="w-5 h-5" />
               </div>
               <p className="text-gold tracking-[0.2em] text-xs font-space uppercase mb-4 font-semibold">Powered by AI</p>
-              <h2 className="text-4xl md:text-5xl font-light mb-6">Find Your Perfect Timepiece</h2>
+              <h2 className="font-display text-4xl md:text-5xl font-medium mb-6">Find Your Perfect Timepiece</h2>
               <p className="text-white/60 mb-10 text-balance leading-relaxed">
                 Not sure what you're looking for? Chat with our AI watch expert to get personalized recommendations based on your style, lifestyle, and budget.
               </p>
@@ -157,7 +157,7 @@ export default function HomePage() {
       <Section className="bg-zinc-950">
         <Container>
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-light mb-4">Trending Now</h2>
+            <h2 className="font-display text-4xl md:text-5xl font-medium mb-4">Trending Now</h2>
             <p className="text-white/50 font-space tracking-widest text-xs uppercase">Most desired pieces this week</p>
           </div>
 
@@ -194,7 +194,7 @@ export default function HomePage() {
       {/* 6. Newsletter */}
       <Section className="border-t border-white/5 bg-[#0c0c0e]">
         <Container className="max-w-4xl text-center">
-          <h2 className="text-3xl md:text-4xl font-light mb-4">Join the Collection</h2>
+          <h2 className="font-display text-3xl md:text-4xl font-medium mb-4">Join the Collection</h2>
           <p className="text-white/50 mb-10 text-sm">Be the first to know about new arrivals, exclusive offers, and watchmaking editorials.</p>
           
           <form className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto" onSubmit={(e) => e.preventDefault()}>

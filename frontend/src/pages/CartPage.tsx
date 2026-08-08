@@ -1,10 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Minus, Plus, Trash2, ArrowRight, Bookmark, ShoppingBag } from 'lucide-react';
 import { toast } from 'sonner';
+import { useEffect } from 'react';
 import { Container } from '../components/layout';
 import { Button } from '../components/ui';
 import { useCartStore } from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { getImageUrl, formatPrice } from '../lib/utils';
 
 export default function CartPage() {
@@ -25,6 +27,16 @@ export default function CartPage() {
 
   const isEmpty = items.length === 0;
 
+  usePageMeta({
+    title: 'Shopping Cart',
+    description: 'Review the timepieces in your cart and proceed to secure checkout.',
+    path: '/cart',
+  });
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
+
   return (
     <div className="pt-32 pb-32 min-h-screen bg-zinc-950">
       <Container>
@@ -32,7 +44,7 @@ export default function CartPage() {
           <div className="text-white/40 text-xs font-space tracking-widest uppercase mb-4">
             Home / Cart
           </div>
-          <h1 className="text-4xl font-light">Shopping Cart</h1>
+          <h1 className="font-display text-4xl font-medium">Shopping Cart</h1>
         </div>
 
         {isEmpty ? (

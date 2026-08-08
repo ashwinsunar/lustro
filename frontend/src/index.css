@@ -8,7 +8,8 @@
   --color-zinc-950: #09090b;
   --font-inter: 'Inter', sans-serif;
   --font-space: 'Space Grotesk', sans-serif;
-  
+  --font-display: 'Fraunces', Georgia, serif;
+
   /* Custom easings */
   --ease-luxury: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -40,8 +41,6 @@
 }
 
 @layer base {
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
@@ -97,6 +96,12 @@
     font-family: var(--font-inter);
   }
 
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
   ::selection {
     background: rgba(201, 168, 76, 0.3);
     color: white;
@@ -123,6 +128,12 @@
 @layer utilities {
   .font-space {
     font-family: var(--font-space);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+    font-variation-settings: 'SOFT' 0, 'WONK' 0;
+    letter-spacing: -0.01em;
   }
   .text-gold {
     color: var(--color-gold);
@@ -272,4 +283,13 @@
   0% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

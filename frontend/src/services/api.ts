@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 export const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
@@ -14,6 +15,12 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+function clearSession() {
+  useAuthStore.getState().logout();
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -23,7 +30,7 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refresh_token');
         if (refreshToken) {
-          const res = await axios.post(`${apiUrl}/api/v1/auth/token/refresh/`, {
+          const res = await axios.post(`${apiUrl}/api/v1/auth/login/refresh/`, {
             refresh: refreshToken,
           });
           if (res.status === 200) {
@@ -32,11 +39,11 @@ api.interceptors.response.use(
             return api(originalRequest);
           }
         }
-      } catch (refreshError) {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
+      } catch {
+        // refresh failed — token is dead; leave state consistent
       }
+      clearSession();
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

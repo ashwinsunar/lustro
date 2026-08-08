@@ -7,7 +7,7 @@ export default function NotFoundPage() {
     <div className="pt-32 pb-32 bg-zinc-950 min-h-screen flex items-center justify-center">
       <Container className="text-center max-w-lg">
         <p className="text-gold font-space tracking-[0.3em] text-xl mb-6">404</p>
-        <h1 className="text-5xl font-light mb-6">Time Lost</h1>
+        <h1 className="font-display text-5xl font-medium mb-6">Time Lost</h1>
         <p className="text-white/50 mb-10 font-light">
           The page you're looking for has slipped through our fingers. Let's get you back to the collection.
         </p>

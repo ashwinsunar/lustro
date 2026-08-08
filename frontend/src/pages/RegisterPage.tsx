@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { Container } from '../components/layout';
 import { Button, Input } from '../components/ui';
+import { usePageMeta } from '../hooks/usePageMeta';
 import type { User, AuthTokens } from '../types';
 
 interface RegisterResponse {
@@ -12,7 +13,15 @@ interface RegisterResponse {
 }
 
 export default function RegisterPage() {
+  usePageMeta({
+    title: 'Create Account',
+    description: 'Create a Lustro account for private access to the collection, wishlists and order tracking.',
+    path: '/register',
+  });
+
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from;
   const setTokens = useAuthStore((s) => s.setTokens);
   const setUser = useAuthStore((s) => s.setUser);
 
@@ -36,7 +45,7 @@ export default function RegisterPage() {
       });
       setTokens(data.tokens.access, data.tokens.refresh);
       setUser(data.user);
-      navigate('/');
+      navigate(from || '/');
     } catch (err: unknown) {
       const errorData = (err as { response?: { data?: { email?: string[]; password?: string[] } } }).response?.data;
       const detail =
@@ -50,7 +59,7 @@ export default function RegisterPage() {
   return (
     <div className="pt-32 pb-32 min-h-screen flex items-center justify-center bg-zinc-950">
       <Container className="max-w-md w-full">
-        <h1 className="text-4xl font-light mb-2 text-center">Create Account</h1>
+        <h1 className="font-display text-4xl font-medium mb-2 text-center">Create Account</h1>
         <p className="text-white/50 text-sm text-center mb-10">Join Lustro for exclusive access.</p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -101,7 +110,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-white/50 mt-8">
           Already have an account?{' '}
-          <Link to="/login" className="text-gold hover:text-white transition-colors">
+          <Link to="/login" state={from ? { from } : undefined} className="text-gold hover:text-white transition-colors">
             Sign in
           </Link>
         </p>

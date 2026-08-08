@@ -1,13 +1,25 @@
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
+import { useEffect } from 'react';
 import { Container } from '../components/layout';
 import { WatchCard } from '../components/watch';
 import { Button } from '../components/ui';
 import { useWishlistStore } from '../store/wishlistStore';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 export default function WishlistPage() {
   const { items, clearWishlist, count } = useWishlistStore();
   const itemsCount = count();
+
+  usePageMeta({
+    title: 'Wishlist',
+    description: 'The timepieces you have saved for later, across the Lustro collection.',
+    path: '/wishlist',
+  });
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   return (
     <div className="pt-32 pb-32 bg-zinc-950 min-h-screen">
@@ -17,7 +29,7 @@ export default function WishlistPage() {
             <div className="text-white/40 text-xs font-space tracking-widest uppercase mb-4">
               Home / Wishlist
             </div>
-            <h1 className="text-4xl md:text-5xl font-light">Your Wishlist</h1>
+            <h1 className="font-display text-4xl md:text-5xl font-medium">Your Wishlist</h1>
             <p className="text-white/50 mt-3">
               {itemsCount > 0 ? `${itemsCount} timepiece${itemsCount > 1 ? 's' : ''} saved` : 'Nothing saved yet'}
             </p>

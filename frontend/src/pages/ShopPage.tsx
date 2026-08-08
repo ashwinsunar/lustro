@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { Container } from '../components/layout';
@@ -10,12 +10,20 @@ import { Button } from '../components/ui';
 import { fetchWatches } from '../services/watches';
 import { fetchBrands } from '../services/brands';
 import { fetchCategories } from '../services/categories';
+import { usePageMeta } from '../hooks/usePageMeta';
 import type { WatchFilters as IWatchFilters, SortOption } from '../types';
 
 export default function ShopPage() {
+  usePageMeta({
+    title: 'The Collections',
+    description: 'Browse the Lustro collection — dress, sport, dive, pilot, chronograph and GMT timepieces from Rolex, Omega, Patek Philippe and more.',
+    path: '/shop',
+  });
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [debouncedPrice, setDebouncedPrice] = useState<{min: number, max: number} | null>(null);
+  const filtersRef = useRef<IWatchFilters | null>(null);
 
   const parseIntSafe = (value: string | null, fallback: number): number => {
     const n = parseInt(value || '', 10);
@@ -45,8 +53,10 @@ export default function ShopPage() {
     bestSeller: searchParams.get('best_seller') === 'true',
   };
 
+  filtersRef.current = filters;
+
   // Queries
-  const { data: watchesData, isLoading: loadingWatches } = useQuery({
+  const { data: watchesData, isLoading: loadingWatches, isError, refetch } = useQuery({
     queryKey: ['watches', filters],
     queryFn: () => fetchWatches(filters),
   });
@@ -57,19 +67,13 @@ export default function ShopPage() {
   const watches = watchesData?.results || [];
   const total = watchesData?.count || watches.length || 0;
 
-  // Debounce price changes before updating URL
   useEffect(() => {
-    if (debouncedPrice) {
-      const timer = setTimeout(() => {
-        handleFilterChange({ ...filters, minPrice: debouncedPrice.min, maxPrice: debouncedPrice.max });
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [debouncedPrice]);
+    window.scrollTo({ top: 0 });
+  }, []);
 
-  const handleFilterChange = (newFilters: IWatchFilters) => {
+  const handleFilterChange = useCallback((newFilters: IWatchFilters) => {
     const params = new URLSearchParams();
-    
+
     if (newFilters.brands.length) params.set('brands', newFilters.brands.join(','));
     if (newFilters.categories.length) params.set('categories', newFilters.categories.join(','));
     if (newFilters.movements.length) params.set('movements', newFilters.movements.join(','));
@@ -88,7 +92,27 @@ export default function ShopPage() {
     if (newFilters.bestSeller) params.set('best_seller', 'true');
 
     setSearchParams(params);
-  };
+  }, [setSearchParams]);
+
+  // Debounce price changes before updating URL — always merge into the latest
+  // filter state so other pending edits are never lost.
+  useEffect(() => {
+    if (debouncedPrice) {
+      const timer = setTimeout(() => {
+        const current = filtersRef.current;
+        if (current) {
+          handleFilterChange({
+            ...current,
+            minPrice: debouncedPrice.min,
+            maxPrice: debouncedPrice.max,
+            page: 1,
+          });
+        }
+        setDebouncedPrice(null);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [debouncedPrice, handleFilterChange]);
 
   // Pre-process filters for WatchFilters component (handle local price debounce)
   const displayFilters = {
@@ -98,12 +122,16 @@ export default function ShopPage() {
   };
 
   const onFiltersChange = (newF: IWatchFilters) => {
-    if (newF.minPrice !== displayFilters.minPrice || newF.maxPrice !== displayFilters.maxPrice) {
+    if (newF.minPrice !== filters.minPrice || newF.maxPrice !== filters.maxPrice) {
       setDebouncedPrice({ min: newF.minPrice, max: newF.maxPrice });
     } else {
       handleFilterChange(newF);
     }
   };
+
+  const hasNext = !!watchesData?.next;
+  const hasPrev = !!watchesData?.previous;
+  const totalPages = Math.max(1, Math.ceil(total / 12));
 
   return (
     <div className="pt-32 pb-32 bg-zinc-950 min-h-screen">
@@ -113,14 +141,14 @@ export default function ShopPage() {
           <div className="text-white/40 text-xs font-space tracking-widest uppercase mb-4">
             Home / Collections
           </div>
-          <h1 className="text-4xl md:text-5xl font-light">The Collections</h1>
+          <h1 className="font-display text-4xl md:text-5xl font-medium">The Collections</h1>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-10 relative">
-          
+
           {/* Mobile Filter Button (Sticky Bottom) */}
           <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
-            <Button 
+            <Button
               onClick={() => setIsMobileFiltersOpen(true)}
               className="rounded-full shadow-2xl px-8 flex items-center gap-3"
             >
@@ -131,8 +159,8 @@ export default function ShopPage() {
           {/* Sidebar (Desktop) */}
           <div className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-32">
-              <WatchFilters 
-                filters={displayFilters} 
+              <WatchFilters
+                filters={displayFilters}
                 onChange={onFiltersChange}
                 brands={brands}
                 categories={categories}
@@ -163,8 +191,8 @@ export default function ShopPage() {
                     </button>
                   </div>
                   <div className="flex-1 overflow-hidden p-6">
-                    <WatchFilters 
-                      filters={displayFilters} 
+                    <WatchFilters
+                      filters={displayFilters}
                       onChange={onFiltersChange}
                       brands={brands}
                       categories={categories}
@@ -182,36 +210,45 @@ export default function ShopPage() {
 
           {/* Main Content */}
           <div className="flex-1 min-w-0">
-            <WatchSortBar 
+            <WatchSortBar
               total={total}
               sort={filters.sort}
               view={filters.view}
-              onSortChange={(sort) => handleFilterChange({ ...filters, sort })}
+              onSortChange={(sort) => handleFilterChange({ ...filters, sort, page: 1 })}
               onViewChange={(view) => handleFilterChange({ ...filters, view })}
             />
 
-            <WatchGrid 
-              watches={watches}
-              isLoading={loadingWatches}
-              columns={filters.view === 'list' ? 2 : 3} // We don't have list view implemented in grid yet, but we pass columns
-            />
+            {isError ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center border border-white/5 bg-zinc-900/30">
+                <p className="text-white/60 mb-8">We couldn't load the collection right now.</p>
+                <Button variant="outline" onClick={() => refetch()}>
+                  <RefreshCw className="w-4 h-4 mr-2" /> Try again
+                </Button>
+              </div>
+            ) : (
+              <WatchGrid
+                watches={watches}
+                isLoading={loadingWatches}
+                variant={filters.view}
+              />
+            )}
 
             {/* Pagination Controls */}
-            {total > 0 && Math.ceil(total / 12) > 1 && (
+            {!isError && total > 0 && totalPages > 1 && (
               <div className="mt-16 flex justify-center gap-2">
-                <Button 
-                  variant="outline" 
-                  disabled={filters.page === 1}
+                <Button
+                  variant="outline"
+                  disabled={!hasPrev}
                   onClick={() => handleFilterChange({ ...filters, page: filters.page - 1 })}
                 >
                   Previous
                 </Button>
                 <span className="flex items-center px-4 font-space text-sm">
-                  Page {filters.page} of {Math.ceil(total / 12)}
+                  Page {filters.page} of {totalPages}
                 </span>
-                <Button 
+                <Button
                   variant="outline"
-                  disabled={filters.page >= Math.ceil(total / 12)}
+                  disabled={!hasNext}
                   onClick={() => handleFilterChange({ ...filters, page: filters.page + 1 })}
                 >
                   Next

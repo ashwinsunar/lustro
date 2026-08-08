@@ -1,10 +1,12 @@
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { RefreshCw } from 'lucide-react';
 import { Container } from '../components/layout';
 import { WatchGrid, WatchCardSkeleton } from '../components/watch';
 import { Button } from '../components/ui';
 import { fetchBrand } from '../services/brands';
 import { fetchWatches } from '../services/watches';
+import { usePageMeta } from '../hooks/usePageMeta';
 import type { WatchFilters } from '../types';
 
 export default function BrandDetailPage() {
@@ -31,13 +33,19 @@ export default function BrandDetailPage() {
     view: 'grid',
   };
 
-  const { data: watchesData, isLoading: loadingWatches } = useQuery({
+  const { data: watchesData, isLoading: loadingWatches, isError: watchesError, refetch } = useQuery({
     queryKey: ['watches', 'brand', slug],
     queryFn: () => fetchWatches(filters),
     enabled: !!slug,
   });
 
   const watches = watchesData?.results || [];
+
+  usePageMeta({
+    title: brand ? brand.name : 'Maison',
+    description: brand?.description ? brand.description.slice(0, 160) : undefined,
+    path: brand ? `/brands/${brand.slug}` : undefined,
+  });
 
   if (loadingBrand) {
     return (
@@ -74,7 +82,7 @@ export default function BrandDetailPage() {
         </div>
 
         <div className="border border-white/5 bg-zinc-900/40 p-10 md:p-14 mb-14">
-          <h1 className="text-4xl md:text-6xl font-light mb-4">{brand.name}</h1>
+          <h1 className="font-display text-4xl md:text-6xl font-medium mb-4">{brand.name}</h1>
           <p className="text-white/40 text-xs font-space tracking-widest uppercase mb-8">
             {brand.country || 'Switzerland'} · Est. {brand.founded_year ?? '—'} · {brand.watch_count ?? 0} timepieces
           </p>
@@ -90,7 +98,21 @@ export default function BrandDetailPage() {
           </span>
         </div>
 
-        <WatchGrid watches={watches} isLoading={loadingWatches} columns={3} skeletonCount={6} />
+        <WatchGrid
+          watches={watchesError ? [] : watches}
+          isLoading={loadingWatches}
+          columns={3}
+          skeletonCount={6}
+        />
+
+        {watchesError && (
+          <div className="mt-8 flex flex-col items-center justify-center py-8 text-center border border-white/5 bg-zinc-900/30">
+            <p className="text-white/60 mb-6">We couldn't load the pieces in this collection.</p>
+            <Button variant="outline" onClick={() => refetch()}>
+              <RefreshCw className="w-4 h-4 mr-2" /> Try again
+            </Button>
+          </div>
+        )}
       </Container>
     </div>
   );

@@ -1,12 +1,54 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User as UserIcon, LogOut, Package } from 'lucide-react';
+import { User as UserIcon, LogOut, Package, Save } from 'lucide-react';
+import { toast } from 'sonner';
 import { Container } from '../components/layout';
-import { Button } from '../components/ui';
+import { Button, Input } from '../components/ui';
 import { useAuthStore } from '../store/authStore';
+import { usePageMeta } from '../hooks/usePageMeta';
+import api from '../services/api';
+import type { User } from '../types';
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, setUser } = useAuthStore();
   const navigate = useNavigate();
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  usePageMeta({
+    title: 'My Account',
+    description: 'Manage your personal details and review your acquisitions at Lustro.',
+    path: '/profile',
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.first_name || '');
+      setLastName(user.last_name || '');
+      setPhone(user.phone || '');
+    }
+  }, [user]);
+
+  const saveProfile = async () => {
+    if (!user) return;
+    setSaving(true);
+    try {
+      const { data } = await api.patch<User>('/api/v1/auth/profile/', {
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        phone: phone.trim(),
+      });
+      setUser(data);
+      toast.success('Profile updated.');
+    } catch {
+      toast.error('Unable to save your profile. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (!isAuthenticated()) {
     return (
@@ -30,11 +72,11 @@ export default function ProfilePage() {
           <div className="text-white/40 text-xs font-space tracking-widest uppercase mb-4">
             Home / Account
           </div>
-          <h1 className="text-4xl font-light">My Account</h1>
+          <h1 className="font-display text-4xl font-medium">My Account</h1>
         </div>
 
         <div className="border border-white/10 bg-zinc-900/40 p-8 mb-8">
-          <div className="flex items-center gap-6 mb-6">
+          <div className="flex items-center gap-6 mb-8">
             <div className="w-16 h-16 bg-gold/10 border border-gold/30 rounded-full flex items-center justify-center">
               <UserIcon className="w-7 h-7 text-gold" strokeWidth={1.5} />
             </div>
@@ -45,17 +87,44 @@ export default function ProfilePage() {
               <p className="text-white/50 text-sm">{user?.email}</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-6 text-sm">
+
+          <div className="grid sm:grid-cols-2 gap-5 mb-6">
+            <Input
+              label="First name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              autoComplete="given-name"
+            />
+            <Input
+              label="Last name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              autoComplete="family-name"
+            />
+            <Input
+              label="Phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+41 79 123 45 67"
+              autoComplete="tel"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-6 text-sm mb-8">
             <div className="flex justify-between border-b border-white/5 py-3">
               <span className="text-white/40">Role</span>
               <span className="capitalize text-white/80">{user?.role}</span>
             </div>
             <div className="flex justify-between border-b border-white/5 py-3">
-              <span className="text-white/40">Phone</span>
-              <span className="text-white/80">{user?.phone || '—'}</span>
+              <span className="text-white/40">Email</span>
+              <span className="text-white/80">{user?.email}</span>
             </div>
           </div>
-          <div className="flex gap-4 mt-8">
+
+          <div className="flex gap-4">
+            <Button onClick={saveProfile} isLoading={saving}>
+              <Save className="w-4 h-4 mr-2" /> Save Changes
+            </Button>
             <Button variant="outline" onClick={() => { logout(); navigate('/'); }}>
               <LogOut className="w-4 h-4 mr-2" /> Sign Out
             </Button>

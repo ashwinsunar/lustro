@@ -35,9 +35,8 @@ function createWatchFaceTexture(wordmark: string, accent: string) {
   ctx.fillStyle = '#000000';
   ctx.fillRect(0, 0, 1024, 1024);
 
+  // Tick Marks
   ctx.translate(512, 512);
-
-  // Minute ticks
   ctx.strokeStyle = '#333';
   ctx.lineWidth = 4;
   for (let i = 0; i < 60; i++) {
@@ -48,7 +47,7 @@ function createWatchFaceTexture(wordmark: string, accent: string) {
     ctx.stroke();
   }
 
-  // Hour indices
+  // Hour Marks
   ctx.strokeStyle = '#fff';
   ctx.lineWidth = 8;
   for (let i = 0; i < 12; i++) {
@@ -59,11 +58,15 @@ function createWatchFaceTexture(wordmark: string, accent: string) {
     ctx.stroke();
   }
 
+  // Reset Rotation for Text
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  const drawSpaced = (text: string, y: number, font: string, style: string, spacing: number) => {
-    ctx.font = font;
-    ctx.fillStyle = style;
+  // Wordmark
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '500 30px Inter, sans-serif';
+  ctx.textAlign = 'center';
+
+  const drawSpaced = (text: string, y: number, spacing: number) => {
     const letters = Array.from(text);
     const widths = letters.map((c) => ctx.measureText(c).width);
     const total = widths.reduce((a, b) => a + b, 0) + spacing * (letters.length - 1);
@@ -74,15 +77,13 @@ function createWatchFaceTexture(wordmark: string, accent: string) {
       x += widths[i] + spacing;
     });
   };
+  drawSpaced(wordmark, 300, 10);
 
-  drawSpaced(wordmark, 300, '500 30px Inter, sans-serif', '#ffffff', 6);
-
-  ctx.font = '400 20px Inter, sans-serif';
   ctx.fillStyle = '#666';
-  ctx.textAlign = 'center';
+  ctx.font = '400 20px Inter, sans-serif';
   ctx.fillText('AUTOMATIC', 512, 750);
 
-  // Sub-dials
+  // Sub-dials (Abstract)
   ctx.strokeStyle = '#222';
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -92,15 +93,13 @@ function createWatchFaceTexture(wordmark: string, accent: string) {
   ctx.arc(674, 512, 80, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Accent dot
+  // Accent
   ctx.fillStyle = accent;
   ctx.beginPath();
   ctx.arc(674, 512, 5, 0, Math.PI * 2);
   ctx.fill();
 
   const texture = new THREE.CanvasTexture(canvas);
-  texture.anisotropy = 16;
-  texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
 }
 
@@ -133,20 +132,25 @@ export default function Watch3DScene({
     container.appendChild(renderer.domElement);
 
     // ---------- Lights ----------
-    scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
 
     const keyLight = new THREE.SpotLight(0xffffff, 1.5);
     keyLight.position.set(5, 5, 10);
     keyLight.angle = 0.5;
     keyLight.penumbra = 1;
+    keyLight.decay = 0;
     scene.add(keyLight);
 
-    const accentLight = new THREE.SpotLight(accent, 2.5);
+    const accentLight = new THREE.SpotLight(accent, 3);
     accentLight.position.set(-5, 0, -5);
     accentLight.lookAt(0, 0, 0);
+    accentLight.decay = 0;
     scene.add(accentLight);
 
-    scene.add(new THREE.PointLight(0xffffff, 0.5).translateY(-5).translateZ(5));
+    const fillLight = new THREE.PointLight(0xffffff, 1.8);
+    fillLight.position.set(5, -5, 5);
+    fillLight.decay = 0;
+    scene.add(fillLight);
 
     // ---------- Watch ----------
     const watchGroup = new THREE.Group();

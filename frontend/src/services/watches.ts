@@ -6,6 +6,7 @@ export const fetchWatches = async (params?: Partial<WatchFilters>): Promise<Pagi
   
   if (params) {
     if (params.page) queryParams.append('page', params.page.toString());
+    queryParams.append('page_size', '12');
     if (params.search) queryParams.append('search', params.search);
     if (params.sort) queryParams.append('ordering', getSortOrdering(params.sort));
     
@@ -40,29 +41,13 @@ export const fetchFeaturedWatches = async (): Promise<WatchListItem[]> => {
   return data.results || data; // handle both paginated and non-paginated backend responses
 };
 
-export const fetchNewArrivals = async (): Promise<WatchListItem[]> => {
-  const { data } = await api.get<PaginatedResponse<WatchListItem>>('/api/v1/watches/?is_new_arrival=true&page_size=8');
-  return data.results || data;
-};
-
 export const fetchTrending = async (): Promise<WatchListItem[]> => {
   const { data } = await api.get<PaginatedResponse<WatchListItem>>('/api/v1/watches/?is_trending=true&page_size=6');
   return data.results || data;
 };
 
-export const fetchBestSellers = async (): Promise<WatchListItem[]> => {
-  const { data } = await api.get<PaginatedResponse<WatchListItem>>('/api/v1/watches/?is_best_seller=true&page_size=5');
-  return data.results || data;
-};
-
 export const fetchRelated = async (watchId: number, brandSlug: string): Promise<WatchListItem[]> => {
   const { data } = await api.get<PaginatedResponse<WatchListItem>>(`/api/v1/watches/?brand=${brandSlug}&exclude=${watchId}&page_size=4`);
-  return data.results || data;
-};
-
-export const searchWatches = async (q: string): Promise<WatchListItem[]> => {
-  if (!q) return [];
-  const { data } = await api.get<PaginatedResponse<WatchListItem>>(`/api/v1/watches/?search=${q}`);
   return data.results || data;
 };
 

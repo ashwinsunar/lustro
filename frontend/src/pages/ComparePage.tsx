@@ -1,13 +1,25 @@
 import { Link } from 'react-router-dom';
 import { X, Scale } from 'lucide-react';
+import { useEffect } from 'react';
 import { Container } from '../components/layout';
 import { Button } from '../components/ui';
 import { useCompareStore } from '../store/compareStore';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { getImageUrl, formatPrice } from '../lib/utils';
 
 export default function ComparePage() {
   const { items, removeItem, clearCompare, count } = useCompareStore();
   const itemsCount = count();
+
+  usePageMeta({
+    title: 'Compare Timepieces',
+    description: 'Compare up to three luxury timepieces side by side — movement, case, price and more.',
+    path: '/compare',
+  });
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, []);
 
   const rows: Array<[string, (item: (typeof items)[number]) => string]> = [
     ['Price', (w) => formatPrice(w.discount_price ?? w.price)],
@@ -25,7 +37,7 @@ export default function ComparePage() {
             <div className="text-white/40 text-xs font-space tracking-widest uppercase mb-4">
               Home / Compare
             </div>
-            <h1 className="text-4xl md:text-5xl font-light">Compare Timepieces</h1>
+            <h1 className="font-display text-4xl md:text-5xl font-medium">Compare Timepieces</h1>
             <p className="text-white/50 mt-3">
               {itemsCount > 0
                 ? `Comparing ${itemsCount} of 3 pieces`
