@@ -483,7 +483,7 @@ export default function ProductPage() {
                 <button
                   onClick={() => toggleItem({
                     id: watch.id, title: watch.title, slug: watch.slug, brand: { id: watch.brand.id, name: watch.brand.name, slug: watch.brand.slug },
-                    category: { id: watch.category.id, name: watch.category.name, slug: watch.category.slug },
+                    category: watch.category ? { id: watch.category.id, name: watch.category.name, slug: watch.category.slug } : null,
                     price: watch.price, discount_price: watch.discount_price, movement: watch.movement, gender: watch.gender,
                     in_stock: watch.in_stock, is_featured: watch.is_featured, is_trending: watch.is_trending,
                     is_new_arrival: watch.is_new_arrival, is_best_seller: watch.is_best_seller,
@@ -504,7 +504,7 @@ export default function ProductPage() {
                   onClick={() => {
                     const didToggle = toggleCompare({
                       id: watch.id, title: watch.title, slug: watch.slug, brand: { id: watch.brand.id, name: watch.brand.name, slug: watch.brand.slug },
-                      category: { id: watch.category.id, name: watch.category.name, slug: watch.category.slug },
+                      category: watch.category ? { id: watch.category.id, name: watch.category.name, slug: watch.category.slug } : null,
                       price: watch.price, discount_price: watch.discount_price, movement: watch.movement, gender: watch.gender,
                       in_stock: watch.in_stock, is_featured: watch.is_featured, is_trending: watch.is_trending,
                       is_new_arrival: watch.is_new_arrival, is_best_seller: watch.is_best_seller,

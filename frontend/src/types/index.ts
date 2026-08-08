@@ -60,7 +60,7 @@ export interface Watch {
   title: string;
   slug: string;
   brand: Brand;
-  category: Category;
+  category: Category | null;
   collection?: Collection | null;
   price: string;
   discount_price: string | null;
@@ -100,7 +100,7 @@ export interface WatchListItem {
   title: string;
   slug: string;
   brand: Pick<Brand, 'id' | 'name' | 'slug'>;
-  category: Pick<Category, 'id' | 'name' | 'slug'>;
+  category: Pick<Category, 'id' | 'name' | 'slug'> | null;
   price: string;
   discount_price: string | null;
   currency?: string;

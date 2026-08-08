@@ -88,7 +88,7 @@ export function WatchGrid({
                     {watch.title}
                   </Link>
                   <p className="text-xs text-white/40 mt-1 capitalize">
-                    {watch.category.name} · {watch.movement.replace('_', ' ')} · {watch.gender}
+                    {watch.category ? `${watch.category.name} · ` : ''}{watch.movement.replace('_', ' ')} · {watch.gender}
                   </p>
                   <div className="flex items-baseline gap-2 mt-3">
                     {watch.discount_price ? (
