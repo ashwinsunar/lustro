@@ -75,6 +75,16 @@ class OrderAPITests(APITestCase):
         resp = self.client.get(reverse('coupon-validate', args=['WELCOME10']))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+    def test_advertised_promo_auto_created_on_validation(self):
+        # The checkout copy says "try LUSTRO10" — the promo must validate even
+        # before the seed command has run against a fresh database.
+        self.assertFalse(Coupon.objects.filter(code='LUSTRO10').exists())
+        resp = self.client.get(reverse('coupon-validate', args=['LUSTRO10']))
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data['code'], 'LUSTRO10')
+        self.assertEqual(int(resp.data['discount_percent']), 10)
+        self.assertTrue(Coupon.objects.filter(code='LUSTRO10', active=True).exists())
+
     def test_orders_list_scoped_to_user(self):
         other = User.objects.create_user(email='other@test.ch', password='secret123')
         self.client.post(reverse('order-list-create'), {

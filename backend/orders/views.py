@@ -74,8 +74,21 @@ class OrderDetailView(APIView):
 class CouponValidateView(APIView):
     permission_classes = (permissions.AllowAny,)
 
+    # Marketing promos advertised in the storefront (checkout helper text, etc.).
+    # Guaranteed to validate even before the seed command has run, so the
+    # storefront hint "try LUSTRO10" always works for shoppers.
+    PROMO_DEFAULTS: dict[str, dict] = {
+        'LUSTRO10': {'discount_percent': 10, 'active': True, 'expires_at': None},
+    }
+
     def get(self, request, code):
+        code = (code or '').strip()
         coupon = Coupon.objects.filter(code__iexact=code, active=True).first()
+        if coupon is None:
+            defaults = self.PROMO_DEFAULTS.get(code.upper())
+            if defaults:
+                coupon, _ = Coupon.objects.get_or_create(code=code.upper(), defaults=defaults)
+                coupon.refresh_from_db()
         if coupon is None:
             return Response({'valid': False, 'detail': 'Invalid coupon code.'}, status=status.HTTP_404_NOT_FOUND)
         if coupon.expires_at and coupon.expires_at < timezone.now():
