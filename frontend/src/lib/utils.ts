@@ -26,7 +26,7 @@ export function formatDate(dateString: string): string {
 export function getImageUrl(path: string | null | undefined): string {
   if (!path) return '/images/watch-detail.avif';
   if (path.startsWith('http')) return path;
-  if (path.startsWith('/media')) return `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}${path}`;
+  if (path.startsWith('/media')) return `${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://127.0.0.1:8000')}${path}`;
   return path;
 }
 

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom';
 import { Suspense, lazy, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
@@ -85,7 +85,17 @@ function Shell() {
         Skip to content
       </a>
       <ScrollToTop />
-      {!isImmersive && <Navbar />}
+      {isImmersive ? (
+        <Link
+          to="/"
+          className="fixed top-5 left-6 z-50 transition-opacity hover:opacity-80"
+          aria-label="Lustro home"
+        >
+          <img src="/logo-128.png" alt="Lustro" className="h-10 w-auto" />
+        </Link>
+      ) : (
+        <Navbar />
+      )}
 
       <main id="main-content" className="flex-1">
         <Suspense fallback={<RouteFallback />}>

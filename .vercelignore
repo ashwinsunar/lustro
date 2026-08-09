@@ -4,7 +4,6 @@ backend/node_modules
 backend/venv
 backend/.venv
 backend/db.sqlite3
-backend/media
 frontend/dist
 *.pyc
 __pycache__

@@ -164,7 +164,14 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Desktop Links (Left) */}
+          {/* Logo (Left) */}
+          <div className="flex items-center justify-start w-1/3">
+            <Link to="/" className="flex items-center transition-opacity hover:opacity-80" aria-label="Lustro home">
+              <img src="/logo-128.png" alt="Lustro" className="h-10 md:h-12 w-auto" />
+            </Link>
+          </div>
+
+          {/* Desktop Links (Center) */}
           <div className="hidden lg:flex items-center gap-8 w-1/3">
             <div
               className="relative"
@@ -237,13 +244,6 @@ export default function Navbar() {
             <Link to="/brands" className={`text-xs font-space tracking-widest uppercase transition-colors relative group ${isBrands ? 'text-gold' : 'text-white/80 hover:text-gold'}`}>
               Brands
               <span className={`absolute -bottom-1 left-0 h-px bg-gold transition-all duration-300 ${isBrands ? 'w-full' : 'w-0 group-hover:w-full'}`} />
-            </Link>
-          </div>
-
-          {/* Logo (Center) */}
-          <div className="w-1/3 flex justify-center">
-            <Link to="/" className="flex items-center transition-opacity hover:opacity-80" aria-label="Lustro home">
-              <img src="/logo-128.png" alt="Lustro" className="h-10 md:h-12 w-auto" />
             </Link>
           </div>
 

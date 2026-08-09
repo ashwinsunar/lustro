@@ -17,6 +17,17 @@ from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Minimal .env loader (no external dependency)
+_ENV_FILE = BASE_DIR / '.env'
+if _ENV_FILE.exists():
+    for _line in _ENV_FILE.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith('#') and '=' in _line:
+            _key, _, _val = _line.partition('=')
+            _key = _key.strip()
+            _val = _val.strip().strip('"').strip("'")
+            os.environ.setdefault(_key, _val)
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
@@ -94,11 +105,39 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-# Uses Postgres when DB_HOST is set (docker-compose); otherwise SQLite for dev.
+# Uses Postgres when DB_HOST is set (docker-compose/Vercel); otherwise SQLite for dev.
 
 DB_HOST = os.environ.get('DB_HOST', '')
 
-if DB_HOST:
+if os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL'):
+    # Vercel/Neon — parse connection string or fall back to individual vars
+    def _parse_db_url(url: str) -> dict:
+        import urllib.parse
+        parsed = urllib.parse.urlparse(url)
+        return {
+            'NAME': parsed.path.lstrip('/'),
+            'USER': urllib.parse.unquote(parsed.username or ''),
+            'PASSWORD': urllib.parse.unquote(parsed.password or ''),
+            'HOST': parsed.hostname or '',
+            'PORT': parsed.port or '5432',
+        }
+
+    if os.environ.get('DATABASE_URL'):
+        _db = _parse_db_url(os.environ['DATABASE_URL'])
+    else:
+        _db = _parse_db_url(os.environ['POSTGRES_URL'])
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _db['NAME'] or os.environ.get('POSTGRES_DATABASE', 'lustro_db'),
+            'USER': _db['USER'] or os.environ.get('POSTGRES_USER', 'lustro_user'),
+            'PASSWORD': _db['PASSWORD'] or os.environ.get('POSTGRES_PASSWORD', 'lustro_password'),
+            'HOST': _db['HOST'] or DB_HOST,
+            'PORT': _db['PORT'] or os.environ.get('DB_PORT', '5432'),
+            'OPTIONS': {'sslmode': os.environ.get('POSTGRES_SSLMODE', 'require')},
+        }
+    }
+elif DB_HOST:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',

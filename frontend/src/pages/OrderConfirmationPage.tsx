@@ -208,7 +208,7 @@ export default function OrderConfirmationPage() {
                   variant="outline"
                   className="w-full"
                   onClick={() => {
-                    window.location.href = 'mailto:concierge@lustro.ch?subject=' + encodeURIComponent(`Order ${order.order_number}`);
+                    window.location.href = 'mailto:ashwinsunar18@gmail.com?subject=' + encodeURIComponent(`Order ${order.order_number}`);
                   }}
                 >
                   <Mail className="w-4 h-4" /> Contact concierge

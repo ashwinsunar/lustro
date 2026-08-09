@@ -26,7 +26,7 @@ const EXPLORE_LINKS = [
 const COMPANY_LINKS = [
   { name: 'Our Story', path: '/' },
   { name: 'The Collection', path: '/shop' },
-  { name: 'Concierge', path: 'mailto:concierge@lustro.ch' },
+  { name: 'Concierge', path: 'mailto:ashwinsunar18@gmail.com' },
 ];
 
 export function Footer() {
