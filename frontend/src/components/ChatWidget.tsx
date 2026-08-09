@@ -1,11 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { MessageCircle, Send, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { useUiStore } from '../store/uiStore';
+import { getImageUrl } from '../lib/utils';
+
+interface ChatPick {
+  title: string;
+  slug: string;
+  price: string;
+  image: string;
+}
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  picks?: ChatPick[];
 }
 
 const SUGGESTIONS = [
@@ -40,12 +50,12 @@ export default function ChatWidget() {
     setMessages((prev) => [...prev, { role: 'user', content: trimmed }]);
     setLoading(true);
     try {
-      const { data } = await api.post<{ reply: string; conversation_id: number }>('/api/v1/chat/', {
+      const { data } = await api.post<{ reply: string; picks?: ChatPick[]; conversation_id: number }>('/api/v1/chat/', {
         message: trimmed,
         conversation_id: conversationId.current,
       });
       conversationId.current = data.conversation_id;
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply, picks: data.picks }]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -72,14 +82,40 @@ export default function ChatWidget() {
           <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto space-y-4">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-[80%] px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${
-                    m.role === 'user'
-                      ? 'bg-gold text-black'
-                      : 'bg-zinc-800 text-white/90 border border-white/5'
-                  }`}
-                >
-                  {m.content}
+                <div className={`max-w-[85%] ${m.role === 'user' ? '' : ''}`}>
+                  <div
+                    className={`px-4 py-3 text-sm leading-relaxed whitespace-pre-line ${
+                      m.role === 'user'
+                        ? 'bg-gold text-black'
+                        : 'bg-zinc-800 text-white/90 border border-white/5'
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                  {m.role === 'assistant' && m.picks && m.picks.length > 0 && (
+                    <div className="mt-2 space-y-2">
+                      {m.picks.map((p) => (
+                        <Link
+                          key={p.slug}
+                          to={`/watch/${p.slug}`}
+                          className="flex items-center gap-3 bg-zinc-800/80 border border-white/10 hover:border-gold/60 p-2 pr-3 transition-colors"
+                        >
+                          {p.image && (
+                            <img
+                              src={getImageUrl(p.image)}
+                              alt={p.title}
+                              className="w-14 h-14 object-cover flex-shrink-0"
+                              loading="lazy"
+                            />
+                          )}
+                          <div className="min-w-0">
+                            <p className="text-sm text-white/90 truncate">{p.title}</p>
+                            <p className="text-xs text-gold font-space tracking-widest">{p.price}</p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

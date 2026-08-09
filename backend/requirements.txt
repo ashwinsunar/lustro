@@ -8,6 +8,8 @@ django-cors-headers==4.9.0
 django-filter==26.1
 djangorestframework==3.17.2
 djangorestframework_simplejwt==5.5.1
+cloudinary==1.45.0
+django-cloudinary-storage==0.3.0
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1

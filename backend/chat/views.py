@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from .models import Conversation, ChatMessage, Appointment
 from .serializers import AppointmentSerializer
 from watches.models import Watch, Brand
+from watches.serializers import _media_url
 
 def _find_brand(text):
     low = text.lower()
@@ -51,6 +52,15 @@ def _format(w):
     return (f"{w.brand.name} {w.title} · {w.case_size} · {w.movement.title()} · "
             f"{price:,} CHF · {w.water_resistance} · /watch/{w.slug}")
 
+def _pick(w):
+    img = w.images.filter(is_primary=True).first() or w.images.first()
+    return {
+        'title': f"{w.brand.name} {w.title}",
+        'slug': w.slug,
+        'price': f"{int(w.price):,} CHF",
+        'image': _media_url(img.image) if img else '',
+    }
+
 def _reply(message):
     low = message.lower()
     words = len(message.split())
@@ -82,37 +92,37 @@ def _reply(message):
         picks = list(qs[:3])
         if picks:
             lead = f"For you, I would suggest" if wants_rec else f"Here's what matches"
-            return f"{lead}: " + ' | '.join(_format(w) for w in picks)
+            return f"{lead}: " + ' | '.join(_format(w) for w in picks), [_pick(w) for w in picks]
         if brand:
             return (f"We do carry {brand}, but nothing in the current stock matches your "
-                    f"other criteria. Try fewer filters, or browse /shop?brands={brand.lower().replace(' ', '-')}")
+                    f"other criteria. Try fewer filters, or browse /shop?brands={brand.lower().replace(' ', '-')}"), []
         return (f"Nothing in stock matches those exact criteria. "
-                f"Try widening the budget or browsing /shop.")
+                f"Try widening the budget or browsing /shop."), []
 
     if 'stock' in low or 'available' in low or 'availability' in low:
         count = Watch.objects.filter(in_stock=True).count()
         top = Watch.objects.filter(in_stock=True)[:3]
         names = ', '.join(w.title for w in top)
-        return f"We currently have {count} timepieces in stock, including {names}."
+        return f"We currently have {count} timepieces in stock, including {names}.", []
 
     if 'water' in low or 'depth' in low:
         deep = Watch.objects.filter(water_resistance__gte='100')
         names = ', '.join(w.title for w in deep[:3])
-        return f"Many of our divers go deep — e.g. {names}. Ask for a “diver” for a full list."
+        return f"Many of our divers go deep — e.g. {names}. Ask for a “diver” for a full list.", []
 
     if any(k in low for k in ['price', 'cost', 'how much', 'expensive']):
         cheapest = Watch.objects.order_by('price').first()
         priciest = Watch.objects.order_by('-price').first()
         return (f"Prices range from {int(cheapest.price):,} CHF for the {cheapest.title} "
-                f"up to {int(priciest.price):,} CHF for the {priciest.title}.")
+                f"up to {int(priciest.price):,} CHF for the {priciest.title}."), []
 
     if any(k in low for k in ['contact', 'visit', 'boutique', 'store', 'location', 'appointment']):
         return ("Our boutique is open by appointment. Email concierge@lustro.ch or call "
-                "+41 22 000 00 00 and we'll arrange a private viewing.")
+                "+41 22 000 00 00 and we'll arrange a private viewing."), []
 
     return ("I can help you navigate our 54-piece collection. Try asking for a recommendation "
             "(“a GMT under 15,000 CHF”), by brand (“Show me Cartier”), or by style (“a dress "
-            "watch for my wedding”).")
+            "watch for my wedding”)."), []
 
 class ChatbotView(APIView):
     permission_classes = (AllowAny,)
@@ -131,10 +141,10 @@ class ChatbotView(APIView):
             conversation = Conversation.objects.create(user=user)
 
         ChatMessage.objects.create(conversation=conversation, role='user', content=user_message)
-        reply = _reply(user_message)
+        reply, picks = _reply(user_message)
         ChatMessage.objects.create(conversation=conversation, role='assistant', content=reply)
 
-        return Response({"reply": reply, "conversation_id": conversation.id})
+        return Response({"reply": reply, "picks": picks, "conversation_id": conversation.id})
 
 
 class AppointmentView(APIView):

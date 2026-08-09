@@ -186,7 +186,7 @@
   #s6 .craft-node {
     position: relative;
     width: clamp(360px, 36vw, 590px);
-    height: clamp(390px, 54vh, 610px);
+    min-height: clamp(390px, 54vh, 610px);
     flex: 0 0 auto;
     border: 1px solid rgba(208,222,241,.14);
     border-radius: 34px;
@@ -244,7 +244,7 @@
 
   #s6 .craft-visual {
     position: relative;
-    height: 49%;
+    height: clamp(150px, 24vh, 300px);
     margin: 22px 28px 0;
     border-radius: 22px;
     overflow: hidden;
@@ -463,13 +463,13 @@
     #s6 .craft-node {
       width: 82vw;
       min-width: 300px;
-      height: 56vh;
       min-height: 440px;
       border-radius: 25px;
     }
     #s6 .craft-node:nth-of-type(even),
     #s6 .craft-node:nth-of-type(odd) { transform: none; }
     #s6 .craft-copy { grid-template-columns: 1fr; }
+    #s6 .craft-visual { height: clamp(130px, 21vh, 230px); }
     #s6 .craft-status { display: none; }
     #s6 .craft-rail { padding-inline: 20px; }
   }

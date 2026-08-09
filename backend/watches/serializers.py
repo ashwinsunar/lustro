@@ -23,10 +23,20 @@ class CollectionSerializer(serializers.ModelSerializer):
         model = Collection
         fields = '__all__'
 
+def _media_url(image_field):
+    """Return a working URL for a media ImageField (Cloudinary or local)."""
+    url = image_field.url if image_field else ''
+    return url.replace('/image/upload/v1/', '/image/upload/')
+
 class WatchImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = WatchImage
         fields = ['id', 'image', 'is_primary', 'order']
+
+    def get_image(self, obj):
+        return _media_url(obj.image)
 
 class WatchVideoSerializer(serializers.ModelSerializer):
     class Meta:
