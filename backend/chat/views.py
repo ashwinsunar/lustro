@@ -117,8 +117,8 @@ def _reply(message):
                 f"up to {int(priciest.price):,} CHF for the {priciest.title}."), []
 
     if any(k in low for k in ['contact', 'visit', 'boutique', 'store', 'location', 'appointment']):
-        return ("Our boutique is open by appointment. Email concierge@lustro.ch or call "
-                "+41 22 000 00 00 and we'll arrange a private viewing."), []
+        return ("Our boutique is open by appointment. Email ashwinsunar18@gmail.com or "
+                "message us on Instagram (@10m_ashwin2) and we'll arrange a private viewing."), []
 
     return ("I can help you navigate our 54-piece collection. Try asking for a recommendation "
             "(“a GMT under 15,000 CHF”), by brand (“Show me Cartier”), or by style (“a dress "

@@ -19,7 +19,7 @@ import { injectJsonLd, removeJsonLd } from '../lib/seo';
 import { cn, getImageUrl, formatPrice, getDiscountPercent, formatDate } from '../lib/utils';
 import type { Review } from '../types';
 
-const SITE_ORIGIN = 'https://www.lustro.ch';
+const SITE_ORIGIN = 'https://lustro.vercel.app';
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -83,7 +83,7 @@ export default function ProductPage() {
       offers: {
         '@type': 'Offer',
         url: `${SITE_ORIGIN}/watch/${watch.slug}`,
-        priceCurrency: 'USD',
+        priceCurrency: watch.currency || 'CHF',
         price: watch.discount_price ?? watch.price,
         availability: watch.in_stock
           ? 'https://schema.org/InStock'

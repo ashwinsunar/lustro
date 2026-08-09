@@ -8,4 +8,4 @@ Disallow: /order/
 Disallow: /login
 Disallow: /register
 
-Sitemap: https://www.lustro.ch/sitemap.xml
+Sitemap: https://lustro.vercel.app/sitemap.xml
