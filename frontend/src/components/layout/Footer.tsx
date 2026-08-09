@@ -9,7 +9,7 @@ import { fetchBrands } from '../../services/brands';
 import type { Brand } from '../../types';
 
 const SOCIALS = [
-  { name: 'Instagram', handle: 'IG', href: 'https://instagram.com' },
+  { name: 'Instagram', handle: 'IG', href: 'https://www.instagram.com/10m_ashwin2' },
   { name: 'Twitter / X', handle: 'TW', href: 'https://x.com' },
   { name: 'Facebook', handle: 'FB', href: 'https://facebook.com' },
   { name: 'YouTube', handle: 'YT', href: 'https://youtube.com' },
