@@ -9,5 +9,7 @@ frontend/node_modules/
 .env*
 !.env.example
 .skill
+.skills
 .opencode/goal
+.opencode/goals
 .agents/skills/
