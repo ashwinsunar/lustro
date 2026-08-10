@@ -50,14 +50,14 @@ def _style_tags(text):
 def _format(w):
     price = int(w.price)
     return (f"{w.brand.name} {w.title} · {w.case_size} · {w.movement.title()} · "
-            f"{price:,} CHF · {w.water_resistance} · /watch/{w.slug}")
+            f"Rs {price:,} · {w.water_resistance}m")
 
 def _pick(w):
     img = w.images.filter(is_primary=True).first() or w.images.first()
     return {
         'title': f"{w.brand.name} {w.title}",
         'slug': w.slug,
-        'price': f"{int(w.price):,} CHF",
+        'price': f"{int(w.price):,} Rs",
         'image': _media_url(img.image) if img else '',
     }
 
@@ -68,7 +68,7 @@ def _reply(message):
     if any(k in low for k in ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening']) and words <= 4:
         return ("Hello! Welcome to Lustro, your private boutique concierge. Ask me for a "
                 "recommendation by brand, budget, or style — for example: "
-                "“Recommend an automatic diver under 8,000 CHF” or “Tell me about JLC watches.”")
+                "“Recommend an automatic diver under 8,000 Rs” or “Tell me about JLC watches.”")
 
     brand = _find_brand(message)
     budget = _parse_budget(message)
@@ -113,15 +113,15 @@ def _reply(message):
     if any(k in low for k in ['price', 'cost', 'how much', 'expensive']):
         cheapest = Watch.objects.order_by('price').first()
         priciest = Watch.objects.order_by('-price').first()
-        return (f"Prices range from {int(cheapest.price):,} CHF for the {cheapest.title} "
-                f"up to {int(priciest.price):,} CHF for the {priciest.title}."), []
+        return (f"Prices range from {int(cheapest.price):,} Rs for the {cheapest.title} "
+                f"up to {int(priciest.price):,} Rs for the {priciest.title}."), []
 
     if any(k in low for k in ['contact', 'visit', 'boutique', 'store', 'location', 'appointment']):
         return ("Our boutique is open by appointment. Email concierge@lustro.ch or call "
                 "+41 22 000 00 00 and we'll arrange a private viewing."), []
 
     return ("I can help you navigate our 54-piece collection. Try asking for a recommendation "
-            "(“a GMT under 15,000 CHF”), by brand (“Show me Cartier”), or by style (“a dress "
+            "(“a GMT under 15,000 Rs”), by brand (“Show me Cartier”), or by style (“a dress "
             "watch for my wedding”)."), []
 
 class ChatbotView(APIView):

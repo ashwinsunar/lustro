@@ -1046,7 +1046,7 @@
         </div>
         <div style="height: 1px; background: rgba(210,222,244,0.12); margin: 30px 0;"></div>
         <div data-spec="6" style="will-change: transform, opacity;">
-          <div id="s5price" style="font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 500; color: #ffffff; will-change: opacity;">CHF 24,500</div>
+          <div id="s5price" style="font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 500; color: #ffffff; will-change: opacity;">Rs 24,500</div>
           <div style="display: flex; gap: 14px; margin-top: 22px; flex-wrap: wrap;">
             <div data-add="AG-1948-MS" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 17px 36px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">Add to Cart</div>
             <div style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #dfe5ee; border: 1px solid rgba(210,222,244,0.22); padding: 16px 36px; border-radius: 9999px; cursor: pointer; transition: border-color 300ms ease, color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.5); color: #ffffff;">Reserve Appointment</div>
@@ -1254,7 +1254,7 @@
         <div class="collection3d-copy">
           <h3 class="collection3d-name">Lustro Moonphase Silver</h3>
           <p class="collection3d-desc">Moonphase · open heart · brushed 904L</p>
-          <p class="collection3d-price">CHF 24,500</p>
+          <p class="collection3d-price">Rs 24,500</p>
           <div class="collection3d-actions">
             <div class="collection3d-action primary" data-add="AG-1948-MS">Add to Cart</div>
             <div class="collection3d-action secondary" onclick="{{ viewMS }}">View Details</div>
@@ -1265,7 +1265,7 @@
         <div class="collection3d-copy">
           <h3 class="collection3d-name">Lustro Black Ceramic</h3>
           <p class="collection3d-desc">Matte ceramic case · rubber-lined strap</p>
-          <p class="collection3d-price">CHF 21,900</p>
+          <p class="collection3d-price">Rs 21,900</p>
           <div class="collection3d-actions">
             <div class="collection3d-action primary" data-add="AG-2100-BC">Add to Cart</div>
             <div class="collection3d-action secondary" onclick="{{ viewBC }}">View Details</div>
@@ -1276,7 +1276,7 @@
         <div class="collection3d-copy">
           <h3 class="collection3d-name">Lustro Open-Heart Steel</h3>
           <p class="collection3d-desc">Skeletonised balance · steel bracelet</p>
-          <p class="collection3d-price">CHF 18,400</p>
+          <p class="collection3d-price">Rs 18,400</p>
           <div class="collection3d-actions">
             <div class="collection3d-action primary" data-add="AG-1877-OS">Add to Cart</div>
             <div class="collection3d-action secondary" onclick="{{ viewOS }}">View Details</div>
@@ -1287,7 +1287,7 @@
         <div class="collection3d-copy">
           <h3 class="collection3d-name">Lustro Classic Leather</h3>
           <p class="collection3d-desc">Time-only · 38 mm · calf leather</p>
-          <p class="collection3d-price">CHF 12,900</p>
+          <p class="collection3d-price">Rs 12,900</p>
           <div class="collection3d-actions">
             <div class="collection3d-action primary" data-add="AG-1602-CL">Add to Cart</div>
             <div class="collection3d-action secondary" onclick="{{ viewCL }}">View Details</div>
@@ -1691,7 +1691,7 @@ class Component extends DCLogic {
   }
 
   // ---------- cart ----------
-  fmt(n) { return 'CHF ' + n.toLocaleString('en-US'); }
+  fmt(n) { return 'Rs ' + n.toLocaleString('en-US'); }
 
   setupCartButtons() {
     document.querySelectorAll('[data-add]').forEach((el) => {

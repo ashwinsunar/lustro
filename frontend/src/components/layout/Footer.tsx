@@ -2,17 +2,15 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Instagram, Mail } from 'lucide-react';
 import { Container } from './Container';
 import api from '../../services/api';
 import { fetchBrands } from '../../services/brands';
 import type { Brand } from '../../types';
 
 const SOCIALS = [
-  { name: 'Instagram', handle: 'IG', href: 'https://www.instagram.com/10m_ashwin2' },
-  { name: 'Twitter / X', handle: 'TW', href: 'https://x.com' },
-  { name: 'Facebook', handle: 'FB', href: 'https://facebook.com' },
-  { name: 'YouTube', handle: 'YT', href: 'https://youtube.com' },
+  { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/10m_ashwin2' },
+  { name: 'Email', icon: Mail, href: 'mailto:ashwinsunar18@gmail.com' },
 ];
 
 const EXPLORE_LINKS = [
@@ -94,9 +92,9 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.name}
-                  className="text-white/40 hover:text-gold transition-colors text-sm tracking-widest uppercase font-space"
+                  className="text-white/40 hover:text-gold transition-colors"
                 >
-                  {social.handle}
+                  <social.icon className="w-5 h-5" />
                 </a>
               ))}
             </div>
