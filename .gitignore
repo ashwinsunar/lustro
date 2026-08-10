@@ -8,3 +8,6 @@ frontend/node_modules/
 .vercel
 .env*
 !.env.example
+.skill
+.opencode/goal
+.agents/skills/
