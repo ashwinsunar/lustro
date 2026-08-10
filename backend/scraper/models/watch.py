@@ -77,7 +77,7 @@ class NormalizedWatch(RawProduct):
     water_resistance_m: Optional[int] = None
     price: Optional[Union[float, str]] = None
     original_price: Optional[Union[float, str]] = None
-    currency: str = 'CHF'
+    currency: str = 'NPR'
 
     # normalized enums
     movement: str = 'automatic'  # automatic | manual | quartz | spring_drive

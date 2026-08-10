@@ -19,7 +19,7 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  'Recommend a GMT under 15,000 CHF',
+  'Recommend a GMT under 15,000',
   'Show me Omega',
   'A dress watch for a wedding',
   'Do you have diver watches?',
@@ -31,7 +31,7 @@ export default function ChatWidget() {
     {
       role: 'assistant',
       content:
-        'Welcome to Lustro. Ask me for a recommendation by brand, budget, or style — e.g. “a GMT under 15,000 CHF”.',
+        'Welcome to Lustro. Ask me for a recommendation by brand, budget, or style — e.g. “a GMT under 15,000”.',
     },
   ]);
   const [input, setInput] = useState('');

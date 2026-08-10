@@ -83,7 +83,7 @@ export default function ProductPage() {
       offers: {
         '@type': 'Offer',
         url: `${SITE_ORIGIN}/watch/${watch.slug}`,
-        priceCurrency: watch.currency || 'CHF',
+        priceCurrency: 'NPR',
         price: watch.discount_price ?? watch.price,
         availability: watch.in_stock
           ? 'https://schema.org/InStock'

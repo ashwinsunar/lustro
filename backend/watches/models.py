@@ -84,7 +84,7 @@ class Watch(models.Model):
 
     price = models.DecimalField(max_digits=12, decimal_places=2)
     discount_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    currency = models.CharField(max_length=3, default='CHF')
+    currency = models.CharField(max_length=3, default='NPR')
 
     reference_number = models.CharField(max_length=100, unique=True, null=True, blank=True)
     sku = models.CharField(max_length=120, blank=True)

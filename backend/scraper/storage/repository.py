@@ -87,7 +87,7 @@ class Repository:
             'category': category,
             'price': _decimal(watch.price),
             'discount_price': _decimal(watch.original_price),
-            'currency': (watch.currency or 'CHF')[:3],
+            'currency': (watch.currency or 'NPR')[:3],
             'reference_number': ref,
             'sku': sku[:120],
         }

@@ -576,7 +576,7 @@ export default function ChronosPage() {
 
             <div className="space-y-6 text-center">
               <div className="flex items-baseline justify-center gap-1">
-                <span className="text-lg text-zinc-500">CHF</span>
+                <span className="text-lg text-zinc-500">Rs</span>
                 <span className="text-5xl font-semibold tracking-tighter text-white tabular-nums">
                   {VARIANTS[variant].price}
                 </span>

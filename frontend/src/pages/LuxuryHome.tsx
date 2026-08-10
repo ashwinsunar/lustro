@@ -42,6 +42,7 @@ const ATELIERS = [
   { num: '02', title: 'Case room', body: 'The case is cut in controlled passes, then refined by hand until every transition feels continuous from lug to crown.' },
   { num: '03', title: 'Finishing room', body: 'Brushed planes and polished edges are finished independently so every surface responds to light with intention.' },
   { num: '04', title: 'Assembly bench', body: 'Hundreds of components are assembled under magnification, adjusted by feel, then regulated across multiple positions.' },
+  { num: '05', title: 'Quality control', body: 'Each watch undergoes a final 48-hour test — accuracy, power reserve and water resistance — before earning its reference number.' },
 ];
 
 const VOICES = [
@@ -267,7 +268,7 @@ export default function LuxuryHome() {
 
             <div className="text-center space-y-6">
               <div className="flex items-baseline justify-center gap-1">
-                <span className="text-lg text-zinc-500">CHF</span>
+                <span className="text-lg text-zinc-500">Rs</span>
                 <span className="text-5xl font-semibold tracking-tighter text-white">{Number(productPrice).toLocaleString('en-US')}</span>
               </div>
 
@@ -385,7 +386,7 @@ export default function LuxuryHome() {
                 The making of <span className="text-zinc-600 italic">a Lustro.</span>
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
               {ATELIERS.map((a) => (
                 <article key={a.num} className="glass-panel p-6 rounded-lg">
                   <span className="text-xs text-zinc-500 font-mono">{a.num}</span>

@@ -9,7 +9,8 @@ import { fetchBrands } from '../../services/brands';
 import type { Brand } from '../../types';
 
 const SOCIALS = [
-  { name: 'Instagram', handle: 'IG', href: 'https://www.instagram.com/10m_ashwin2' },
+  { name: 'Instagram', handle: 'Instagram', href: 'https://www.instagram.com/10m_ashwin2' },
+  { name: 'Email', handle: 'Email', href: 'mailto:ashwinsunar18@gmail.com' },
 ];
 
 const EXPLORE_LINKS = [

@@ -107,7 +107,7 @@ class WatchImportFilterTests(APITestCase):
         self.local = Watch.objects.create(
             title='Seamaster', slug='omega-seamaster-local', brand=self.brand,
             price=6400, reference_number=None, movement='automatic',
-            currency='CHF', in_stock=True, availability='',
+            currency='NPR', in_stock=True, availability='',
             source='', sources='',
         )
         self.imported = Watch.objects.create(

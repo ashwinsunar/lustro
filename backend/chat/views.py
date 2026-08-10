@@ -50,14 +50,14 @@ def _style_tags(text):
 def _format(w):
     price = int(w.price)
     return (f"{w.brand.name} {w.title} · {w.case_size} · {w.movement.title()} · "
-            f"{price:,} CHF · {w.water_resistance} · /watch/{w.slug}")
+            f"Rs {price:,} · {w.water_resistance}m")
 
 def _pick(w):
     img = w.images.filter(is_primary=True).first() or w.images.first()
     return {
         'title': f"{w.brand.name} {w.title}",
         'slug': w.slug,
-        'price': f"{int(w.price):,} CHF",
+        'price': f"Rs {int(w.price):,}",
         'image': _media_url(img.image) if img else '',
     }
 
@@ -68,7 +68,7 @@ def _reply(message):
     if any(k in low for k in ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening']) and words <= 4:
         return ("Hello! Welcome to Lustro, your private boutique concierge. Ask me for a "
                 "recommendation by brand, budget, or style — for example: "
-                "“Recommend an automatic diver under 8,000 CHF” or “Tell me about JLC watches.”")
+                "“Recommend an automatic diver under 8,000” or “Tell me about JLC watches.”"), []
 
     brand = _find_brand(message)
     budget = _parse_budget(message)
@@ -95,9 +95,9 @@ def _reply(message):
             return f"{lead}: " + ' | '.join(_format(w) for w in picks), [_pick(w) for w in picks]
         if brand:
             return (f"We do carry {brand}, but nothing in the current stock matches your "
-                    f"other criteria. Try fewer filters, or browse /shop?brands={brand.lower().replace(' ', '-')}"), []
+                    f"other criteria. Try fewer filters or ask for a different budget."), []
         return (f"Nothing in stock matches those exact criteria. "
-                f"Try widening the budget or browsing /shop."), []
+                f"Try widening the budget or asking for a different style."), []
 
     if 'stock' in low or 'available' in low or 'availability' in low:
         count = Watch.objects.filter(in_stock=True).count()
@@ -113,15 +113,15 @@ def _reply(message):
     if any(k in low for k in ['price', 'cost', 'how much', 'expensive']):
         cheapest = Watch.objects.order_by('price').first()
         priciest = Watch.objects.order_by('-price').first()
-        return (f"Prices range from {int(cheapest.price):,} CHF for the {cheapest.title} "
-                f"up to {int(priciest.price):,} CHF for the {priciest.title}."), []
+        return (f"Prices range from Rs {int(cheapest.price):,} for the {cheapest.title} "
+                f"up to Rs {int(priciest.price):,} for the {priciest.title}."), []
 
     if any(k in low for k in ['contact', 'visit', 'boutique', 'store', 'location', 'appointment']):
         return ("Our boutique is open by appointment. Email ashwinsunar18@gmail.com or "
                 "message us on Instagram (@10m_ashwin2) and we'll arrange a private viewing."), []
 
-    return ("I can help you navigate our 54-piece collection. Try asking for a recommendation "
-            "(“a GMT under 15,000 CHF”), by brand (“Show me Cartier”), or by style (“a dress "
+    return ("I can help you navigate our collection. Try asking for a recommendation "
+            "(“a GMT under 15,000”), by brand (“Show me Cartier”), or by style (“a dress "
             "watch for my wedding”)."), []
 
 class ChatbotView(APIView):
