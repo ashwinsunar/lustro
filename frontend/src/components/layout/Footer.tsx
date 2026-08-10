@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ArrowRight, Instagram, Mail } from 'lucide-react';
+import { ArrowRight, AtSign, Mail } from 'lucide-react';
 import { Container } from './Container';
 import api from '../../services/api';
 import { fetchBrands } from '../../services/brands';
 import type { Brand } from '../../types';
 
 const SOCIALS = [
-  { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/10m_ashwin2' },
+  { name: 'Instagram', icon: AtSign, href: 'https://www.instagram.com/10m_ashwin2' },
   { name: 'Email', icon: Mail, href: 'mailto:ashwinsunar18@gmail.com' },
 ];
 
