@@ -47,12 +47,10 @@ def _style_tags(text):
         tags.append('quartz')
     return tags
 
-FRONTEND_URL = 'https://lustro.vercel.app'
-
 def _format(w):
     price = int(w.price)
     return (f"{w.brand.name} {w.title} · {w.case_size} · {w.movement.title()} · "
-            f"{price:,} Rs · {w.water_resistance} · {FRONTEND_URL}/watch/{w.slug}")
+            f"Rs {price:,} · {w.water_resistance}m")
 
 def _pick(w):
     img = w.images.filter(is_primary=True).first() or w.images.first()
