@@ -1,14 +1,14 @@
 from django.db import migrations
 
 
-def update_currency_to_npr(apps, schema_editor):
+def update_currency_to_rs(apps, schema_editor):
     Watch = apps.get_model('watches', 'Watch')
-    Watch.objects.filter(currency='CHF').update(currency='NPR')
+    Watch.objects.filter(currency='CHF').update(currency='Rs')
 
 
 def reverse_currency(apps, schema_editor):
     Watch = apps.get_model('watches', 'Watch')
-    Watch.objects.filter(currency='NPR').update(currency='CHF')
+    Watch.objects.filter(currency='Rs').update(currency='CHF')
 
 
 class Migration(migrations.Migration):
@@ -18,5 +18,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_currency_to_npr, reverse_currency),
+        migrations.RunPython(update_currency_to_rs, reverse_currency),
     ]
