@@ -778,7 +778,7 @@
       <a href="#collection" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #9aa3b2;">Collection</a>
       <a href="#craft" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #9aa3b2;">Craftsmanship</a>
       <a href="#showcase" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #9aa3b2;">The Watch</a>
-      <div data-act="openCart" style="display: flex; align-items: center; gap: 9px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #dfe5ee; border: 1px solid rgba(210,222,244,0.2); padding: 10px 20px; border-radius: 9999px; cursor: pointer; transition: border-color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.5);">Cart<span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #04060b; background: #dfe5ee; border-radius: 9999px; min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px;">{{ cartCount }}</span></div>
+      <div onclick="{{ openCart }}" style="display: flex; align-items: center; gap: 9px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #dfe5ee; border: 1px solid rgba(210,222,244,0.2); padding: 10px 20px; border-radius: 9999px; cursor: pointer; transition: border-color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.5);">Cart<span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #04060b; background: #dfe5ee; border-radius: 9999px; min-width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px;">{{ cartCount }}</span></div>
       <div style="font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 12px 26px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">Reserve</div>
     </div>
   </nav>
@@ -1257,7 +1257,7 @@
           <p class="collection3d-price">Rs 24,500</p>
           <div class="collection3d-actions">
             <div class="collection3d-action primary" data-add="AG-1948-MS">Add to Cart</div>
-            <div class="collection3d-action secondary" data-act="viewMS">View Details</div>
+            <div class="collection3d-action secondary" onclick="{{ viewMS }}">View Details</div>
           </div>
         </div>
       </article><article class="collection3d-card" data-collection-card="1" aria-label="Lustro Black Ceramic">
@@ -1268,7 +1268,7 @@
           <p class="collection3d-price">Rs 21,900</p>
           <div class="collection3d-actions">
             <div class="collection3d-action primary" data-add="AG-2100-BC">Add to Cart</div>
-            <div class="collection3d-action secondary" data-act="viewBC">View Details</div>
+            <div class="collection3d-action secondary" onclick="{{ viewBC }}">View Details</div>
           </div>
         </div>
       </article><article class="collection3d-card" data-collection-card="2" aria-label="Lustro Open-Heart Steel">
@@ -1279,7 +1279,7 @@
           <p class="collection3d-price">Rs 18,400</p>
           <div class="collection3d-actions">
             <div class="collection3d-action primary" data-add="AG-1877-OS">Add to Cart</div>
-            <div class="collection3d-action secondary" data-act="viewOS">View Details</div>
+            <div class="collection3d-action secondary" onclick="{{ viewOS }}">View Details</div>
           </div>
         </div>
       </article><article class="collection3d-card" data-collection-card="3" aria-label="Lustro Classic Leather">
@@ -1290,7 +1290,7 @@
           <p class="collection3d-price">Rs 12,900</p>
           <div class="collection3d-actions">
             <div class="collection3d-action primary" data-add="AG-1602-CL">Add to Cart</div>
-            <div class="collection3d-action secondary" data-act="viewCL">View Details</div>
+            <div class="collection3d-action secondary" onclick="{{ viewCL }}">View Details</div>
           </div>
         </div>
       </article></div>
@@ -1327,63 +1327,66 @@
   </section>
 
   <!-- footer -->
-  <footer style="position: relative; z-index: 3; border-top: 1px solid rgba(255,255,255,0.05); background: #09090b; padding: 80px 6vw 40px 6vw;">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 48px; padding-bottom: 64px;">
+  <footer style="position: relative; z-index: 3; border-top: 1px solid rgba(210,222,244,0.1); background: #04060b; padding: 80px 6vw 0 6vw;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 48px; padding-bottom: 64px;">
       <div style="display: flex; flex-direction: column; gap: 18px;">
-        <a href="/" target="_top" style="font-family: 'Cormorant Garamond', serif; font-size: 28px; letter-spacing: 0.2em; color: #c5a55a; text-decoration: none;">LUSTRO</a>
-        <p style="font-size: 12px; font-weight: 300; line-height: 1.9; color: rgba(255,255,255,0.6); max-width: 34ch;">Curating the world's most exceptional timepieces for those who appreciate the extraordinary.</p>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 22px; letter-spacing: 0.28em; color: #eef1f6;">LUSTRO GENÈVE</div>
+        <div style="font-size: 12px; font-weight: 300; line-height: 1.9; color: #7d8595; max-width: 34ch;">Manufacture d'horlogerie. Mechanical watches designed, assembled and regulated in Geneva since 1948.</div>
         <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
-          <label style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: rgba(255,255,255,0.5);">PRIVATE DISPATCHES</label>
-          <div style="display: flex; gap: 0; border: 1px solid rgba(255,255,255,0.15); padding: 4px 4px 4px 16px; align-items: center; max-width: 320px;">
-            <input placeholder="you@example.com" style="flex: 1; background: transparent; border: none; outline: none; color: #fff; font-family: 'Inter', sans-serif; font-size: 12px; min-width: 0;">
-            <div style="color: #c5a55a; font-size: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;">→</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #8b94a6;">PRIVATE RELEASES</div>
+          <div style="display: flex; gap: 8px; border: 1px solid rgba(210,222,244,0.16); border-radius: 9999px; padding: 4px 4px 4px 18px; align-items: center; max-width: 320px;">
+            <input placeholder="Email address" style="flex: 1; background: transparent; border: none; outline: none; color: #eef1f6; font-family: 'Inter', sans-serif; font-size: 12px; min-width: 0;">
+            <div style="font-size: 13px; color: #04060b; background: #dfe5ee; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 300ms ease;" style-hover="background: #ffffff;">→</div>
           </div>
         </div>
-        <div style="display: flex; gap: 16px; margin-top: 8px;">
-          <a href="https://www.instagram.com/10m_ashwin2" target="_blank" rel="noopener noreferrer" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: rgba(255,255,255,0.4); text-decoration: none; text-transform: uppercase;">Instagram</a>
-          <a href="mailto:ashwinsunar18@gmail.com" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: rgba(255,255,255,0.4); text-decoration: none; text-transform: uppercase;">Email</a>
-        </div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 14px;">
-        <h4 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #fff; margin-bottom: 4px; text-transform: uppercase;">Explore</h4>
-        <a href="/shop" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">All Collections</a>
-        <a href="/shop?new_arrival=true" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">New Arrivals</a>
-        <a href="/shop?trending=true" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Trending Now</a>
-        <a href="/wishlist" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Wishlist</a>
-        <a href="/compare" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Compare</a>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #8b94a6; margin-bottom: 4px;">COLLECTION</div>
+        <a href="#collection" style="font-size: 12px; color: #9aa3b2;">Moonphase Silver</a>
+        <a href="#collection" style="font-size: 12px; color: #9aa3b2;">Black Ceramic</a>
+        <a href="#collection" style="font-size: 12px; color: #9aa3b2;">Open-Heart Steel</a>
+        <a href="#collection" style="font-size: 12px; color: #9aa3b2;">Classic Leather</a>
+        <a href="#craft" style="font-size: 12px; color: #9aa3b2;">The Manufacture</a>
       </div>
       <div style="display: flex; flex-direction: column; gap: 14px;">
-        <h4 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #fff; margin-bottom: 4px; text-transform: uppercase;">Brands</h4>
-        <a href="/brands/rolex" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Rolex</a>
-        <a href="/brands/omega" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Omega</a>
-        <a href="/brands/patek-philippe" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Patek Philippe</a>
-        <a href="/brands/audemars-piguet" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Audemars Piguet</a>
-        <a href="/brands/cartier" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Cartier</a>
-        <a href="/brands/tag-heuer" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">TAG Heuer</a>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #8b94a6; margin-bottom: 4px;">CLIENT SERVICES</div>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Book a Private Viewing</a>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Servicing &amp; Repairs</a>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Warranty Registration</a>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Care Guide</a>
+        <a href="#showcase" style="font-size: 12px; color: #9aa3b2;">Certificate of Authenticity</a>
       </div>
       <div style="display: flex; flex-direction: column; gap: 14px;">
-        <h4 style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: #fff; margin-bottom: 4px; text-transform: uppercase;">Company</h4>
-        <a href="/" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Our Story</a>
-        <a href="/shop" target="_top" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">The Collection</a>
-        <a href="mailto:ashwinsunar18@gmail.com" style="font-size: 12px; color: rgba(255,255,255,0.6); text-decoration: none;">Concierge</a>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: #8b94a6; margin-bottom: 4px;">BOUTIQUES</div>
+        <div style="font-size: 12px; color: #9aa3b2; line-height: 1.7;">Geneva — Rue du Rhône 17</div>
+        <div style="font-size: 12px; color: #9aa3b2; line-height: 1.7;">Zurich — Bahnhofstrasse 4</div>
+        <div style="font-size: 12px; color: #9aa3b2; line-height: 1.7;">London — Old Bond Street 9</div>
+        <div style="height: 1px; background: rgba(210,222,244,0.1); max-width: 180px; margin: 6px 0;"></div>
+        <a href="mailto:ashwinsunar18@gmail.com" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9aa3b2; letter-spacing: 0.08em;">ashwinsunar18@gmail.com</a>
+        <a href="https://www.instagram.com/10m_ashwin2" target="_blank" rel="noopener" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9aa3b2; letter-spacing: 0.08em;">instagram.com/10m_ashwin2</a>
       </div>
     </div>
-    <div style="border-top: 1px solid rgba(255,255,255,0.05); padding: 24px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-      <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.26em; color: rgba(255,255,255,0.4);">© 2025 LUSTRO. CRAFTED FOR THE EXTRAORDINARY.</div>
-      <div style="display: flex; align-items: center; gap: 24px;">
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.26em; color: rgba(255,255,255,0.4);">SECURE PAYMENTS</span>
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.26em; color: rgba(255,255,255,0.3);">VISA · MASTERCARD · AMEX</span>
+    <div style="border-top: 1px solid rgba(210,222,244,0.08); padding: 26px 0 34px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.26em; color: #4d5462;">© MMXXVI LUSTRO GENÈVE SA · ALL RIGHTS RESERVED</div>
+      <div style="display: flex; gap: 26px;">
+        <a href="#collection" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.26em; color: #4d5462;">PRIVACY</a>
+        <a href="#collection" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.26em; color: #4d5462;">TERMS</a>
+        <a href="#collection" style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.26em; color: #4d5462;">COOKIES</a>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 7px; height: 7px; background: #dfe5ee;"></div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.3em; color: #7d8595;">SWISS MADE</div>
       </div>
     </div>
   </footer>
 
   <!-- cart drawer -->
   <div style="position: fixed; inset: 0; z-index: 90; pointer-events: none;">
-    <div id="cartoverlay" data-act="closeCart" style="position: absolute; inset: 0; background: rgba(2,4,8,0.55); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity 500ms ease;"></div>
+    <div id="cartoverlay" onclick="{{ closeCart }}" style="position: absolute; inset: 0; background: rgba(2,4,8,0.55); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity 500ms ease;"></div>
     <div id="cartdrawer" style="position: absolute; top: 0; right: 0; bottom: 0; width: min(440px, 94vw); background: rgba(6,9,16,0.94); backdrop-filter: blur(30px) saturate(140%); border-left: 1px solid rgba(210,222,244,0.14); box-shadow: -30px 0 80px rgba(0,0,0,0.6); display: flex; flex-direction: column; pointer-events: auto; transform: translateX(112%); transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1);">
       <div style="display: flex; align-items: center; justify-content: space-between; padding: 26px 30px; border-bottom: 1px solid rgba(210,222,244,0.1);">
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.4em; color: #dfe5ee;">CART · {{ cartCount }}</div>
-        <div data-act="closeCart" style="font-size: 15px; color: #9aa3b2; cursor: pointer; padding: 4px 10px; transition: color 300ms ease;" style-hover="color: #ffffff;">✕</div>
+        <div onclick="{{ closeCart }}" style="font-size: 15px; color: #9aa3b2; cursor: pointer; padding: 4px 10px; transition: color 300ms ease;" style-hover="color: #ffffff;">✕</div>
       </div>
       <div style="flex: 1; overflow-y: auto; padding: 8px 30px;">
         <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
@@ -1401,14 +1404,14 @@
               <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em; color: #6d7686;">REF. {{ ci.ref }}</div>
               <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
                 <div style="display: flex; align-items: center; border: 1px solid rgba(210,222,244,0.16); border-radius: 9999px;">
-                  <div data-act="ci.dec" data-ref="{{ ci.ref }}" style="padding: 4px 12px; cursor: pointer; color: #9aa3b2; font-size: 13px; transition: color 300ms ease;" style-hover="color: #ffffff;">−</div>
+                  <div onclick="{{ ci.dec }}" style="padding: 4px 12px; cursor: pointer; color: #9aa3b2; font-size: 13px; transition: color 300ms ease;" style-hover="color: #ffffff;">−</div>
                   <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #dfe5ee; min-width: 18px; text-align: center;">{{ ci.qty }}</div>
-                  <div data-act="ci.inc" data-ref="{{ ci.ref }}" style="padding: 4px 12px; cursor: pointer; color: #9aa3b2; font-size: 13px; transition: color 300ms ease;" style-hover="color: #ffffff;">+</div>
+                  <div onclick="{{ ci.inc }}" style="padding: 4px 12px; cursor: pointer; color: #9aa3b2; font-size: 13px; transition: color 300ms ease;" style-hover="color: #ffffff;">+</div>
                 </div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #dfe5ee;">{{ ci.lineTotal }}</div>
               </div>
             </div>
-            <div data-act="ci.remove" data-ref="{{ ci.ref }}" style="align-self: flex-start; font-size: 12px; color: #4d5462; cursor: pointer; transition: color 300ms ease;" style-hover="color: #eef1f6;">✕</div>
+            <div onclick="{{ ci.remove }}" style="align-self: flex-start; font-size: 12px; color: #4d5462; cursor: pointer; transition: color 300ms ease;" style-hover="color: #eef1f6;">✕</div>
           </div>
         </sc-for>
       </div>
@@ -1418,7 +1421,7 @@
           <div style="font-family: 'Cormorant Garamond', serif; font-size: 27px; color: #ffffff;">{{ cartSubtotal }}</div>
         </div>
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: #6d7686; line-height: 1.8;">COMPLIMENTARY INSURED DELIVERY · TAXES INCLUDED · 5-YEAR WARRANTY</div>
-        <div data-act="checkout" style="text-align: center; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 17px 20px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">{{ checkoutLabel }}</div>
+        <div onclick="{{ checkout }}" style="text-align: center; font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 17px 20px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">{{ checkoutLabel }}</div>
       </div>
     </div>
   </div>
@@ -1426,14 +1429,14 @@
   <!-- product detail modal -->
   <sc-if value="{{ detailOpen }}" hint-placeholder-val="{{ false }}">
     <div style="position: fixed; inset: 0; z-index: 92;">
-      <div data-act="closeDetail" style="position: absolute; inset: 0; background: rgba(2,4,8,0.62); backdrop-filter: blur(10px);"></div>
+      <div onclick="{{ closeDetail }}" style="position: absolute; inset: 0; background: rgba(2,4,8,0.62); backdrop-filter: blur(10px);"></div>
       <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(600px, 92vw); max-height: 86vh; overflow-y: auto; background: rgba(7,10,18,0.92); backdrop-filter: blur(30px) saturate(140%); border: 1px solid rgba(210,222,244,0.16); border-radius: 24px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 40px 90px rgba(0,0,0,0.7); padding: 38px 42px; box-sizing: border-box;">
         <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;">
           <div style="display: flex; flex-direction: column; gap: 8px;">
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.4em; color: #8b94a6;">REF. {{ detailRef }}</div>
             <div style="font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 500; color: #f2f4f8; line-height: 1.15;">{{ detailName }}</div>
           </div>
-          <div data-act="closeDetail" style="font-size: 15px; color: #9aa3b2; cursor: pointer; padding: 4px 10px; transition: color 300ms ease;" style-hover="color: #ffffff;">✕</div>
+          <div onclick="{{ closeDetail }}" style="font-size: 15px; color: #9aa3b2; cursor: pointer; padding: 4px 10px; transition: color 300ms ease;" style-hover="color: #ffffff;">✕</div>
         </div>
         <p style="font-size: 13px; font-weight: 300; line-height: 1.9; color: #9aa3b2; margin: 18px 0 0 0;">{{ detailDesc }}</p>
         <div style="height: 1px; background: rgba(210,222,244,0.12); margin: 26px 0;"></div>
@@ -1449,8 +1452,8 @@
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;">
           <div style="font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 500; color: #ffffff;">{{ detailPrice }}</div>
           <div style="display: flex; gap: 12px;">
-            <div data-act="detailAdd" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 15px 30px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">Add to Cart</div>
-            <div data-act="closeDetail" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #dfe5ee; border: 1px solid rgba(210,222,244,0.22); padding: 14px 26px; border-radius: 9999px; cursor: pointer; transition: border-color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.5);">Close</div>
+            <div onclick="{{ detailAdd }}" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #04060b; background: #dfe5ee; padding: 15px 30px; border-radius: 9999px; cursor: pointer; transition: background 300ms ease;" style-hover="background: #ffffff;">Add to Cart</div>
+            <div onclick="{{ closeDetail }}" style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: #dfe5ee; border: 1px solid rgba(210,222,244,0.22); padding: 14px 26px; border-radius: 9999px; cursor: pointer; transition: border-color 300ms ease;" style-hover="border-color: rgba(230,238,250,0.5);">Close</div>
           </div>
         </div>
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em; color: #6d7686; margin-top: 18px;">COMPLIMENTARY INSURED DELIVERY · 5-YEAR INTERNATIONAL WARRANTY</div>
@@ -1547,7 +1550,6 @@ class Component extends DCLogic {
     this.setupCards();
     this.setupVariants();
     this.setupCartButtons();
-    this.delegateClicks();
     this.cacheDom();
     this.measure();
     // re-measure after late layout shifts (fonts, images)
@@ -1690,33 +1692,6 @@ class Component extends DCLogic {
 
   // ---------- cart ----------
   fmt(n) { return 'Rs ' + n.toLocaleString('en-US'); }
-
-  // Delegated click handling for [data-act] controls. The compiled
-  // `onclick="{{ method }}"` bindings in this template are generated as
-  // no-op stubs by the export pipeline, so we route every control through
-  // a single document-level listener against the live component instance.
-  delegateClicks() {
-    document.addEventListener('click', (e) => {
-      const t = e.target && e.target.closest ? e.target.closest('[data-act]') : null;
-      if (!t) return;
-      const act = t.getAttribute('data-act');
-      const ref = t.getAttribute('data-ref');
-      switch (act) {
-        case 'openCart': this.openCart(); break;
-        case 'closeCart': this.closeCart(); break;
-        case 'viewMS': this.setState({ detail: 'AG-1948-MS' }); break;
-        case 'viewBC': this.setState({ detail: 'AG-2100-BC' }); break;
-        case 'viewOS': this.setState({ detail: 'AG-1877-OS' }); break;
-        case 'viewCL': this.setState({ detail: 'AG-1602-CL' }); break;
-        case 'detailAdd': if (this.state.detail) this.addToCart(this.state.detail); break;
-        case 'closeDetail': this.setState({ detail: null }); break;
-        case 'checkout': this.checkout(); break;
-        case 'ci.inc': if (ref) this.changeQty(ref, 1); break;
-        case 'ci.dec': if (ref) this.changeQty(ref, -1); break;
-        case 'ci.remove': if (ref) this.removeItem(ref); break;
-      }
-    });
-  }
 
   setupCartButtons() {
     document.querySelectorAll('[data-add]').forEach((el) => {
@@ -2266,13 +2241,13 @@ class Component extends DCLogic {
 
     cards.forEach((card, index) => {
       card.addEventListener('click', function (event) {
-        if (moved || event.target.closest('[data-add], button, a, [onclick], [data-act]')) return;
+        if (moved || event.target.closest('[data-add], button, a, [onclick]')) return;
         if (index !== active) goTo(index);
       });
     });
 
     stage.addEventListener('pointerdown', function (event) {
-      if (event.target.closest('[data-add], button, a, [onclick], [data-act]')) return;
+      if (event.target.closest('[data-add], button, a, [onclick]')) return;
       pointerId = event.pointerId;
       startX = event.clientX;
       moved = false;
