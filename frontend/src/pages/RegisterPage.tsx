@@ -7,6 +7,11 @@ import { Button, Input } from '../components/ui';
 import { usePageMeta } from '../hooks/usePageMeta';
 import type { User, AuthTokens } from '../types';
 
+interface LoginResponse {
+  user: User;
+  tokens: AuthTokens;
+}
+
 interface RegisterResponse {
   user: User;
   tokens: AuthTokens;
@@ -56,14 +61,32 @@ export default function RegisterPage() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { data } = await api.post<LoginResponse>('/api/v1/auth/login/', {
+        email: 'demo@lustro.com',
+        password: 'Demo1234!',
+      });
+      setTokens(data.tokens.access, data.tokens.refresh);
+      setUser(data.user);
+      navigate(from || '/');
+    } catch {
+      setError('Demo account unavailable. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="pt-32 pb-32 min-h-screen flex items-center justify-center bg-zinc-950">
-      <Container className="max-w-md w-full">
-        <h1 className="font-display text-4xl font-medium mb-2 text-center">Create Account</h1>
-        <p className="text-white/50 text-sm text-center mb-10">Join Lustro for exclusive access.</p>
+      <Container className="max-w-sm w-full">
+        <h1 className="font-display text-3xl font-medium mb-2 text-center">Create Account</h1>
+        <p className="text-white/50 text-sm text-center mb-8">Join Lustro for exclusive access.</p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
             <Input
               label="First Name"
               value={firstName}
@@ -103,12 +126,31 @@ export default function RegisterPage() {
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          <Button type="submit" className="w-full" isLoading={loading}>
+          <Button type="submit" className="w-full h-10" isLoading={loading}>
             Create Account
           </Button>
         </form>
 
-        <p className="text-center text-sm text-white/50 mt-8">
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10"></div>
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-zinc-950 px-3 text-white/40">or</span>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full h-10"
+          onClick={handleDemoLogin}
+          isLoading={loading}
+        >
+          Try Demo Account
+        </Button>
+
+        <p className="text-center text-sm text-white/50 mt-6">
           Already have an account?{' '}
           <Link to="/login" state={from ? { from } : undefined} className="text-gold hover:text-white transition-colors">
             Sign in

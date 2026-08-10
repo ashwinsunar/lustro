@@ -30,6 +30,24 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const handleDemoLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { data } = await api.post<LoginResponse>('/api/v1/auth/login/', {
+        email: 'demo@lustro.com',
+        password: 'Demo1234!',
+      });
+      setTokens(data.tokens.access, data.tokens.refresh);
+      setUser(data.user);
+      navigate(from || '/');
+    } catch {
+      setError('Demo account unavailable. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -53,11 +71,11 @@ export default function LoginPage() {
 
   return (
     <div className="pt-32 pb-32 min-h-screen flex items-center justify-center bg-zinc-950">
-      <Container className="max-w-md w-full">
-        <h1 className="font-display text-4xl font-medium mb-2 text-center">Welcome back</h1>
-        <p className="text-white/50 text-sm text-center mb-10">Sign in to your Lustro account.</p>
+      <Container className="max-w-sm w-full">
+        <h1 className="font-display text-3xl font-medium mb-2 text-center">Welcome back</h1>
+        <p className="text-white/50 text-sm text-center mb-8">Sign in to your Lustro account.</p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             type="email"
             label="Email"
@@ -79,12 +97,31 @@ export default function LoginPage() {
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          <Button type="submit" className="w-full" isLoading={loading}>
+          <Button type="submit" className="w-full h-10" isLoading={loading}>
             Sign In
           </Button>
         </form>
 
-        <p className="text-center text-sm text-white/50 mt-8">
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10"></div>
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-zinc-950 px-3 text-white/40">or</span>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full h-10"
+          onClick={handleDemoLogin}
+          isLoading={loading}
+        >
+          Try Demo Account
+        </Button>
+
+        <p className="text-center text-sm text-white/50 mt-6">
           New to Lustro?{' '}
           <Link
             to="/register"
