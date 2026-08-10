@@ -5,10 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatPrice(price: string | number): string {
+export function formatPrice(price: string | number, currency?: string): string {
   const num = typeof price === 'string' ? parseFloat(price) : price;
   if (Number.isNaN(num)) return String(price);
-  return `Rs ${new Intl.NumberFormat('en-US', {
+  const curr = currency || 'Rs';
+  return `${curr} ${new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(num)}`;
