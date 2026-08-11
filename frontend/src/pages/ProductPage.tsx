@@ -194,8 +194,8 @@ export default function ProductPage() {
       setReviewTitle('');
       setReviewBody('');
       refetchReviews();
-    } catch (e: any) {
-      const detail = e?.response?.data?.detail;
+    } catch (e: unknown) {
+      const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       toast.error(detail || 'Unable to submit review.');
     } finally {
       setSubmittingReview(false);

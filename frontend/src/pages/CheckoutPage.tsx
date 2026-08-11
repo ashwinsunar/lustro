@@ -82,9 +82,9 @@ export default function CheckoutPage() {
       const c = await validateCoupon(code);
       setCoupon(c);
       toast.success(`Coupon ${c.code} applied — ${c.discount_percent}% off`);
-    } catch (e: any) {
+    } catch (e: unknown) {
       setCoupon(null);
-      toast.error(e?.response?.data?.detail || 'Invalid coupon code');
+      toast.error((e as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Invalid coupon code');
     } finally {
       setCouponLoading(false);
     }
@@ -143,12 +143,13 @@ export default function CheckoutPage() {
       clearCart();
       toast.success('Order placed successfully');
       navigate(`/order/${order.order_number}`);
-    } catch (e: any) {
-      const detail = e?.response?.data?.detail;
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { detail?: string; items?: unknown } } };
+      const detail = err?.response?.data?.detail;
       if (typeof detail === 'string') {
         setError(detail);
         toast.error(detail);
-      } else if (e?.response?.data?.items) {
+      } else if (err?.response?.data?.items) {
         setError('One of the items is no longer available in the requested quantity.');
         toast.error('Insufficient stock');
       } else {

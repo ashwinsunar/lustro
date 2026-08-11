@@ -53,8 +53,8 @@ export default function OrdersPage() {
       const updated = await cancelOrder(orderNumber);
       setOrders((prev) => prev.map((o) => (o.order_number === orderNumber ? updated : o)));
       toast.success(`Order ${orderNumber} cancelled.`);
-    } catch (e: any) {
-      toast.error(e?.response?.data?.detail || 'Unable to cancel this order.');
+    } catch (e: unknown) {
+      toast.error((e as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Unable to cancel this order.');
     } finally {
       setCancelling(null);
     }
